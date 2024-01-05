@@ -78,6 +78,13 @@ android {
         pickFirst 'lib/x86_64/libcrypto.so'
         pickFirst 'lib/armeabi-v7a/libcrypto.so'
         pickFirst 'lib/arm64-v8a/libcrypto.so'
+        // win编译通过需要增加以下
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/liblog.so'
+        pickFirst 'lib/armeabi-v7a/liblog.so'
     }
     ndkVersion rootProject.ext.ndkVersion
 
@@ -165,7 +172,8 @@ project.ext.vectoricons = [
         "MaterialIcons.ttf",
         "Octicons.ttf",
         "SimpleLineIcons.ttf",
-        "Zocial.ttf"
+         "Zocial.ttf",
+        "remixicon.ttf",
     ]
 ]
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
