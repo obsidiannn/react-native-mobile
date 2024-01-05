@@ -163,10 +163,7 @@ export interface GroupCategoryListItem {
     name: string;
 }
 const categoryList = (params: GroupCategoryListParams): Promise<{
-    items: {
-        id: string;
-        name: string;
-    }[]
+    items: GroupCategoryListItem[]
 }> => {
     return createRequestInstance(true).post('/group/categoryList', params);
 }
