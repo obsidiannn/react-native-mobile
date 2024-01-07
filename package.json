@@ -50,7 +50,6 @@
     "react-native-actions-sheet": "^0.9.0-alpha.24",
     "react-native-buffer": "^6.0.3",
     "react-native-device-info": "^10.12.0",
-    "react-native-fast-base64": "^0.1.2",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.13.4",
     "react-native-get-random-values": "^1.9.0",

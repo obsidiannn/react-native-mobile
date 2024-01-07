@@ -8179,7 +8179,7 @@ react-native-device-info@^10.12.0:
   resolved "https://mirrors.cloud.tencent.com/npm/react-native-device-info/-/react-native-device-info-10.12.0.tgz#be4e71cbcc9a05e8643b1a419a4450d4cef9bbcc"
   integrity sha512-gnBkjyZNEqRd+5BNrdzuvmlraHTCH/to2x0Gp9rtDt0O9xWWW1MTYohUVWX9A0Ad2HVYcGanDCIvjWp4ngMZFg==
 
-react-native-fast-base64@^0.1.1, react-native-fast-base64@^0.1.2:
+react-native-fast-base64@^0.1.1:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/react-native-fast-base64/-/react-native-fast-base64-0.1.2.tgz#1f2c88a8b07b543b2f9057c98e1ed2f7e960444f"
   integrity sha512-LBwGGdAQirfU++1r4DX1ufkWKUhY6wwVEbVhyH247YXeubW0jxl7+yl8xlOchz6W/J1KFzXrGTcMiHlv+OpIig==
