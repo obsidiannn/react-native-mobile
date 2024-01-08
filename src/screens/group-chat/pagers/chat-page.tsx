@@ -93,9 +93,9 @@ export default forwardRef((_,ref) => {
             sharedSecretRef.current = quickAes.De(res.enc_key, sharedSecret);
             console.log('sharedSecretRef.current', sharedSecretRef.current);
             loadMessages('up');
-            intervalRef.current = setInterval(() => {
-                loadMessages('down');
-            }, 2000);
+            // intervalRef.current = setInterval(() => {
+            //     loadMessages('down');
+            // }, 2000);
         })
         setAuthUser(a);
     }, []);

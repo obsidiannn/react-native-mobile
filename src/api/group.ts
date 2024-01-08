@@ -161,6 +161,7 @@ export interface GroupCategoryListParams {
 export interface GroupCategoryListItem {
     id: string;
     name: string;
+    checked: boolean;
 }
 const categoryList = (params: GroupCategoryListParams): Promise<{
     items: GroupCategoryListItem[]

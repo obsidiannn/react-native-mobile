@@ -19,7 +19,6 @@ import {
     UserSettingScreen,
     UserChatInfoScreen,
     GroupInfoScreen,
-    GroupCategoryListScreen
 } from '../screens/index'
 import { RootStackParamList } from '@/types';
 export default () => {
@@ -47,7 +46,6 @@ export default () => {
             <Stack.Screen name="UserSetting" component={UserSettingScreen} />
             <Stack.Screen name="UserChatInfo" component={UserChatInfoScreen} />
             <Stack.Screen name="GroupInfo" component={GroupInfoScreen} />
-            <Stack.Screen name="GroupCategory" component={GroupCategoryListScreen} />
         </Stack.Navigator>
     );
 }
