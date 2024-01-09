@@ -1,4 +1,4 @@
-import { StyleSheet, View,Text } from "react-native";
+import { StyleSheet, View,Text,ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Navbar from "@/components/navbar";
 import { forwardRef, useImperativeHandle, useState } from "react";
@@ -35,7 +35,8 @@ export default forwardRef((props: {
       owner: "",
       notice_md5: "",
       pub: "",
-  }, {
+  },
+   {
     id: "2",
     name: "name2",
     avatar: "https://avatars.githubusercontent.com/u/122279700?v=4",
@@ -58,29 +59,29 @@ export default forwardRef((props: {
   notice_md5: "",
   pub: "",
 },
-// {
-//   id: "4",
-//   name: "name3",
-//   avatar: "https://avatars.githubusercontent.com/u/122279700?v=4",
-//   notice: "null",
-//   desc: "",
-//   member_total: 1,
-//   member_limit: 1,
-//   owner: "",
-//   notice_md5: "",
-//   pub: "",
-// }, {
-//   id: "5",
-//   name: "name3",
-//   avatar: "https://avatars.githubusercontent.com/u/122279700?v=4",
-//   notice: "null",
-//   desc: "",
-//   member_total: 1,
-//   member_limit: 1,
-//   owner: "",
-//   notice_md5: "",
-//   pub: "",
-// }
+{
+  id: "4",
+  name: "name3",
+  avatar: "https://avatars.githubusercontent.com/u/122279700?v=4",
+  notice: "null",
+  desc: "",
+  member_total: 1,
+  member_limit: 1,
+  owner: "",
+  notice_md5: "",
+  pub: "",
+}, {
+  id: "5",
+  name: "name3",
+  avatar: "https://avatars.githubusercontent.com/u/122279700?v=4",
+  notice: "null",
+  desc: "",
+  member_total: 1,
+  member_limit: 1,
+  owner: "",
+  notice_md5: "",
+  pub: "",
+}
 ])
 
   useImperativeHandle(ref, () => ({
@@ -100,7 +101,7 @@ export default forwardRef((props: {
             paddingBottom: insets.bottom,}
         }>
           <Navbar title="管理员" backgroundColor="white" onLeftPress={() => setVisible(false)}/>
-          <View style={styles.mainContainer}>
+          <ScrollView style={styles.mainContainer}>
             <View style={{marginTop:"5%"}}>
               <Text style={styles.titleStyle}>群管理员可以拥有以下权利</Text>
               <View style={styles.groupDescribe}>
@@ -137,7 +138,7 @@ export default forwardRef((props: {
             <Button style={[styles.button,{backgroundColor: "#5B6979"}]} label='确定' labelStyle={[styles.buttonFont]} size='small' >
             </Button>
             
-          </View>
+          </ScrollView>
           </View>
       </Modal>
   );
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
   container: {
       flex: 1,
   },
-  mainContainer: {
+  mainContainer: {flex: 1,
     padding: "5%"
   },
 
@@ -159,7 +160,6 @@ const styles = StyleSheet.create({
     marginTop:"5%",
     marginBottom: "5%",
     fontWeight: "bold",
-    // fontFamily: 'Alibaba PuHuiTi 2.0'
   },
   groupDescribe:{
     backgroundColor:"#f3f4f6",
@@ -190,13 +190,10 @@ const styles = StyleSheet.create({
 
 
 button: {
-  // width: scale(122),
-  margin: scale(5),
-  marginTop: scale(20),
+  marginTop: scale(40),
+  marginBottom: scale(40),
   borderRadius: scale(15),
   paddingVertical:scale(15),
-  // paddingHorizontal: scale(20),
-
   justifyContent: 'center',
 },
 buttonFont:{

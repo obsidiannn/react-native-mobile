@@ -29,7 +29,7 @@ const CategoryItemContainer = (
             <View style={styles.itemContainer}>
                 {
               props.categoryList.map((item,index)=>{
-                return <Chip key={item.id}
+                return <Chip key={item.id + "cate"}
                   containerStyle={[styles.item,item.checked?styles.itemChecked:styles.itemUnCheck]}
                   labelStyle={item.checked?{color:"white"}:{color:"black"}}
                   label={item.name} 
@@ -55,17 +55,18 @@ const CategoryItemContainer = (
 
 const styles = StyleSheet.create({
   container:{
-    backgroundColor:"#f3f4f6",
-    justifyContent:"center",
-    alignItems: "center"
+    flex:1,
+    justifyContent:"flex-start",
+    alignItems: "center",
+
   },
   textArea: {
-    width: '90%',
     marginTop: scale(50),
-    marginLeft: scale(20),
     marginBottom: scale(20),
     flexDirection: "row",
     alignItems: "baseline",
+    alignSelf:"flex-start",
+    marginLeft: scale(10)
   },
   textA:{
     fontSize: scale(16),    
@@ -77,11 +78,11 @@ const styles = StyleSheet.create({
     marginLeft: scale(10)
   },
   listContainer:{
-    width: '90%',
-    height: '80%',
+    flex:0.9,
     backgroundColor: "white",
     borderRadius: scale(24),
-    padding: '5%',
+    alignSelf:"flex-start",
+    padding: scale(20),
     justifyContent: 'space-between',
   },
   itemContainer:{
@@ -93,6 +94,7 @@ const styles = StyleSheet.create({
   item:{
     marginBottom: scale(20),
     marginRight: scale(10),
+    marginLeft: scale(10),
     height: scale(40),
     borderWidth: scale(1),
     textAlign:"center",
@@ -112,7 +114,6 @@ const styles = StyleSheet.create({
     paddingLeft: "5%",
     paddingRight: "5%",
     marginBottom: "5%"
-    
   },
 
   button: {
@@ -125,8 +126,6 @@ const styles = StyleSheet.create({
   buttonFont:{
     fontSize: scale(14),
     textAlign: "center"
-// align-items: center;
-// text-align: center;
   }
 
 

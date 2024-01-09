@@ -6,6 +6,7 @@ import CategoryItemContainer  from "./group-category-item";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import group,{GroupCategoryListParams,GroupCategoryListItem} from "@/api/group"
 import { Modal } from "react-native-ui-lib"
+import { scale } from "react-native-size-matters/extend";
 
 //  群分类
 export interface GroupCategoryModalRef {
@@ -39,7 +40,6 @@ export default forwardRef((props: {
     {id: "6",name: "分类4",checked: false},
     {id: "7",name: "分类4",checked: false},
     {id: "8",name: "分类4",checked: false},
-    
   ])
 
   useImperativeHandle(ref, () => ({
@@ -59,7 +59,7 @@ export default forwardRef((props: {
             paddingBottom: insets.bottom,}
         }>
           <Navbar title="群分类" backgroundColor="gray-100" onLeftPress={() => setVisible(false)}/>
-          <View style={{backgroundColor: 'write'}}>
+          <View style={{flex:1,backgroundColor: "#f3f4f6",padding:scale(15)}}>
               <CategoryItemContainer  
                   groupId={groupId} 
                   categoryList={categoryList} 
