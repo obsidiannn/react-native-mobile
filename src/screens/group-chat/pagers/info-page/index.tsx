@@ -10,6 +10,7 @@ import ApplyListModal, { ApplyListModalRef } from "./components/apply-list-modal
 import ConfirmModal, { ConfirmModalType } from "@/components/confirm-modal";
 import ApplyInfoModal, { ApplyInfoModalRef } from "./components/apply-info-modal";
 import GoodCategory,{GroupCategoryModalRef} from "./components/group-category";
+import GoodManager,{GroupManagerModalRef} from "./components/group-manager";
 import { useCallback, useRef } from "react";
 import SelectMemberModal, { SelectMemberModalType, SelectMemberOption } from "@/components/select-member-modal";
 import groupService from "@/service/group.service";
@@ -32,6 +33,8 @@ export default (props: {
     const applyInfoModalRef = useRef<ApplyInfoModalRef>(null);
     const selectMemberModalRef = useRef<SelectMemberModalType>(null)
     const groupCategoryModalRef = useRef<GroupCategoryModalRef>(null)
+    const groupManagerModalRef = useRef<GroupManagerModalRef>(null)
+
     const batchInviteJoin = useCallback(async (gid: string, uids: string[]) => {
         const encInfo = await groupService.encInfo(gid);
         const group = await groupService.getInfo(gid);
@@ -187,9 +190,16 @@ export default (props: {
             if (!props.group) {
                 return;
             }
-            console.log("分类进入" );
             groupCategoryModalRef.current?.open(props.group?.id);
         }} icon={require('@/assets/icons/arrow-right-gray.svg')} label="群分类" />
+
+       <MenuItem onPress={() => {
+            if (!props.group) {
+                return;
+            }
+            console.log("管理进入" );
+            groupManagerModalRef.current?.open(props.group?.id);
+        }} icon={require('@/assets/icons/arrow-right-gray.svg')} label="管理员" />
 
         <MenuItem onPress={() => {
             if (!props.group) {
@@ -237,6 +247,11 @@ export default (props: {
           console.log("打开群分类");
           
         }} />
+
+        <GoodManager ref={groupManagerModalRef} onCheck={()=>{
+          console.log("打开群管理");
+        }} />
+
         <ApplyInfoModal onCheck={() => {
             console.log('查看用户');
             props.onChangeMemberList?.();
