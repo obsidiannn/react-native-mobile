@@ -23,7 +23,6 @@ import GroupApplyListScreen from './group-apply-list';
 import UserSettingScreen from './user-setting';
 import UserChatInfoScreen from './user-chat-info/index';
 import GroupInfoScreen from './group-info/index';
-import GroupCategoryListScreen from './group-category/index';
 export {
     EntryScreen,
     RegisterScreen,
@@ -50,5 +49,4 @@ export {
     UserSettingScreen,
     UserChatInfoScreen,
     GroupInfoScreen,
-    GroupCategoryListScreen,
 }
