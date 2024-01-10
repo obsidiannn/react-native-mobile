@@ -7,7 +7,7 @@ import {
 } from '../types/system'
 
 
-const systemGetPubKey = ():Promise<SystemPubKeyResp> => {
+const getPubKey = ():Promise<SystemPubKeyResp> => {
   return createRequestInstance(true).post('/sys/info');
 }
 

@@ -27,6 +27,10 @@ export interface AuthChangeSignReq{
 };
 
 export interface AuthBlackListItem{
-	id:string;
+  uid: string;
+  created_at: number;
+};
+
+export interface AuthBlackReq{
   uid: string;
 };
