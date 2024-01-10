@@ -7,7 +7,8 @@ import {
   GroupMemberResp,GroupInviteJoinReq,
   GroupKickOutReq,GroupChangeNameReq ,
   GroupDetailResp,MineGroupInfoItem,
-  GroupInfoItem,GroupTransferReq
+  GroupInfoItem,GroupTransferReq,
+  GroupIdsReq,GroupListIdResp
 } from "../types/group"; 
 import { createRequestInstance } from "../lib/request";
 import { BaseIdReq,BaseIdArrayReq } from "../types/common";
@@ -31,8 +32,8 @@ const inviteJoin = (param: GroupInviteJoinReq) => {
 const kickOut = (param: GroupKickOutReq) => {
   return createRequestInstance(true).post('/groups/kick-out', param);
 }
-const mineGroupList = () => {
-  return createRequestInstance(true).post('/groups/list');
+const mineGroupList = (param: GroupIdsReq) :Promise<GroupListIdResp> => {
+  return createRequestInstance(true).post('/groups/list',param);
 }
 const changeName = (param: GroupChangeNameReq) => {
   return createRequestInstance(true).post('/groups/update-name',param);
