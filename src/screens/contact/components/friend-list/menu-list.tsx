@@ -19,7 +19,7 @@ export default () => {
                 <Text style={styles.text}>添加好友</Text>
             </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {
+        {/* <TouchableOpacity onPress={() => {
             navigate('NewFriend')
         }} style={{
             ...styles.item,
@@ -28,6 +28,17 @@ export default () => {
             <Image style={styles.icon} source={require('@/assets/icons/userchecked-green.svg')} />
             <View style={styles.rightContainer}>
                 <Text style={styles.text}>等待验证</Text>
+            </View>
+        </TouchableOpacity> */}
+        <TouchableOpacity onPress={() => {
+            navigate('GroupList')
+        }} style={{
+            ...styles.item,
+            marginTop: verticalScale(10)
+        }}>
+            <Image style={styles.icon} source={require('@/assets/icons/userchecked-green.svg')} />
+            <View style={styles.rightContainer}>
+                <Text style={styles.text}>群聊</Text>
             </View>
         </TouchableOpacity>
     </View>

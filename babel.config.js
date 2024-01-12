@@ -1,7 +1,18 @@
 module.exports = {
-  presets: ['babel-preset-expo'],
+  // 'babel-preset-expo',
+  presets: ["module:metro-react-native-babel-preset"],
   plugins: [
     'react-native-reanimated/plugin',
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "helpers": true,
+        "regenerator": true
+      }
+    ],
+
     ["@babel/plugin-transform-flow-strip-types", { "loose": true }],
     ["@babel/plugin-transform-class-properties", { "loose": true }],
     ["@babel/plugin-proposal-private-methods", { "loose": true }],

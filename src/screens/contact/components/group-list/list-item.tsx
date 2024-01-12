@@ -7,15 +7,15 @@ import { FriendListItem } from "@/api/friend";
 import { Image } from "@/components/image";
 dayjs.extend(relativeTime)
 export default (props: {
-    item:FriendListItem,
+    item: FriendListItem,
     isLast: boolean,
 }) => {
     const { item, isLast } = props;
     return <TouchableOpacity onPress={() => {
-        // navigate('UserChat',{
-        //     chatId: item.chat_id,
-        //     uid: item.uid,
-        // })
+        navigate('GroupInfo',{
+          chatId: item.chat_id,
+          uid: item.uid,
+      })
     }} style={styles.container}>
         <View style={styles.avatarContainer}>
             <Image source={item.avatar} style={styles.avatar} />
@@ -38,6 +38,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: scale(16),
         display: 'flex',
         flexDirection: 'row',
+        backgroundColor:"white",
+        borderBottomColor: "e5e7eb",
     },
     avatarContainer: {
         width: scale(57),
@@ -46,9 +48,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     avatar: {
-        width: scale(40),
-        height: scale(40),
-        borderRadius: scale(20),
+        width: scale(50),
+        height: scale(50),
+        borderRadius: scale(10),
         marginRight: scale(10),
         borderWidth: 1,
         borderColor: '#F0F0F0'
@@ -62,6 +64,7 @@ const styles = StyleSheet.create({
     nameContainer: {
         flex: 1,
         display: 'flex',
+        marginLeft: scale(10),
         justifyContent: 'center',
     },
     nameText: {

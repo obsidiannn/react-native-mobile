@@ -6,49 +6,61 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "re
 import { FriendListItem } from "@/api/friend";
 import AlphabetIndex from "./alphabet-index";
 import MenuList from "./menu-list";
-
+import Navbar from "@/components/navbar";
 import group from "@/api/v2/group"
-import groupService from "@/service/group-service"
+import { createRecordInTransaction } from "@/model/index"
 
 export interface GroupListType {
     focus: () => void;
 }
 export default forwardRef((_,ref) => {
     const listRef = useRef<FlashList<any>>(null);
-    const [contacts, setContacts] = useState<(FriendListItem)[]>([]);
+   
     const [contactAlphabetIndex, setContactAlphabetIndex] = useState<{ [key: string]: number }>({});
     const [aplphabet, setAplphabet] = useState<string[]>([]);
-    let fitem:FriendListItem = {
+    let one:FriendListItem = {
       uid: "string",
       gender: 1,
-      name_index: "1",
+      name_index:"string",
       chat_id: "string",
-      avatar: "123",
-      pub_key: "321",
-      name: "demo"
+      avatar: "https://avatars.githubusercontent.com/u/122279700?v=4",
+      pub_key:"string",
+      name:"Ream Mixin",
     }
+    const [contacts, setContacts] = useState<(FriendListItem)[]>([one,one,one,one,one,one,one,one,one,one,one,one,one]);
+    console.log("sqlite");
+              
+    createRecordInTransaction("posts",(e)=>{
+                e.title = "title"
+                e.body= "body"
+                e.subtitle ="sub",
+                e.isPinned = false
+              }).then(r=>{
+                console.log("插入数据库");
+                console.log(r)
+              })
     useImperativeHandle(ref, () => ({
         focus: () => {
-          groupService.getList().then((d)=>{
-            console.log(d);
-          })            
+              
         }
     }));
     return <View style={{
         flex: 1,
         display: 'flex',
-        flexDirection: 'row'
+        // flexDirection: 'row'
     }}>
+        
         <View style={{
             flex: 1,
-            paddingTop: verticalScale(15)
+            // paddingTop: verticalScale(15)
         }}>
+          <Navbar title="群聊" backgroundColor="white" />
             <View style={{
                 flex: 1,
                 flexDirection: 'row',
             }}>
                 <FlashList
-                    ListHeaderComponent={() => <MenuList />}
+                    // ListHeaderComponent={() => <MenuList />}
                     ref={listRef}
                     data={contacts}
                     renderItem={({ item, index }) => {

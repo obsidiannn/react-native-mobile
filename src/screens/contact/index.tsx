@@ -34,7 +34,7 @@ const ContactScreen = ({ navigation }: Props) => {
             <View>
                 <Navbar title="通讯录" renderLeft={() => null} />
             </View>
-            <View style={{
+            {/* <View style={{
                 paddingHorizontal: scale(10),
                 paddingVertical: scale(20),
                 backgroundColor: '#F4F4F4'
@@ -43,13 +43,13 @@ const ContactScreen = ({ navigation }: Props) => {
                     setPageIndex(v)
                     pagerViewRef.current?.setPage(v);
                 }} />
-            </View>
+            </View> */}
             <PagerView ref={pagerViewRef} onPageSelected={(e) => {
                 const index = e.nativeEvent.position;
                 setPageIndex(index);
             }} style={{ flex: 1 }} initialPage={pageIndex} scrollEnabled={true}>
                 <FriendList ref={friendListRef} key="0" />
-                <GroupList ref={groupListRef} key="1" />
+                {/* <GroupList ref={groupListRef} key="1" /> */}
             </PagerView>
         </View>
     )

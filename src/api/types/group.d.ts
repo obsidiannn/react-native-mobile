@@ -30,6 +30,14 @@ export interface GroupMemberResp extends BasePageResp<GroupMemberItem>{
   
 }
 
+export interface GroupIdsReq {
+  gids?: stirng []
+}
+
+export interface GroupListIdResp{
+  gids:  string[]
+}
+
 export interface GroupInviteJoinItem {
   uid: string,
   enc_key?: string 

@@ -2,50 +2,55 @@ import { createRequestInstance } from "../lib/request";
 import { BaseIdReq,BaseIdArrayReq, BaseArrayResp } from "../types/common";
 import { AuthCheckRegisterResp ,AuthRegisterResp,
   AuthChangeNameReq,AuthChangeAvatarReq,AuthChangeGenderReq,
-  AuthChangeSignReq,AuthBlackListItem
+  AuthChangeSignReq,AuthBlackReq,AuthBlackListItem
 } from '../types/auth'
 
 // 是否已注册 todo
-const authCheckRegister = ():Promise<AuthCheckRegisterResp> => {
+const checkRegister = ():Promise<AuthCheckRegisterResp> => {
   return createRequestInstance(true).post('/auth/is-register');
 }
 
 // 注册
-const authRegister = ():Promise<AuthRegisterResp> => {
+const register = ():Promise<AuthRegisterResp> => {
   return createRequestInstance(true).post('/auth/is-register');
 }
 
 // 修改昵称
-const authChangeName = (param: AuthChangeNameReq) => {
+const changeName = (param: AuthChangeNameReq) => {
   return createRequestInstance(true).post('/auth/update-name',param);
 }
 
-// 修改昵称
-const authChangeAvatar = (param: AuthChangeAvatarReq) => {
+// 修改头像
+const changeAvatar = (param: AuthChangeAvatarReq) => {
   return createRequestInstance(true).post('/auth/update-avatar',param);
 }
 
 // 修改性别
-const authChangeGender = (param: AuthChangeGenderReq) => {
+const changeGender = (param: AuthChangeGenderReq) => {
   return createRequestInstance(true).post('/auth/update-gender',param);
 }
 
 // 修改签名
-const authChangeSign = (param: AuthChangeSignReq) => {
+const changeSign = (param: AuthChangeSignReq) => {
   return createRequestInstance(true).post('/auth/update-sign',param);
 }
 
 // 账号注销
-const authSignOut = () => {
+const signOut = () => {
   return createRequestInstance(true).post('/auth/unsubscribe');
 }
 
 // 黑名单列表
-const authBlackList = ():Promise<BaseArrayResp<AuthBlackListItem>> => {
+const blackList = ():Promise<BaseArrayResp<AuthBlackListItem>> => {
   return createRequestInstance(true).post('/auth/user-black-list');
 }
 
 // 执行拉黑
-const authAddBlackList = (param: AuthBlackListItem) => {
+const authAddBlackList = (param: AuthBlackReq) => {
   return createRequestInstance(true).post('/auth/add-user-black',param);
+}
+
+// 移出黑名单
+const removeBlackList = (param: AuthBlackReq) => {
+  return createRequestInstance(true).post('/auth/remove-user-black',param);
 }
