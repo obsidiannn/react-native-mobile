@@ -8,6 +8,7 @@ import AlphabetIndex from "./alphabet-index";
 import MenuList from "./menu-list";
 import Navbar from "@/components/navbar";
 import group from "@/api/v2/group"
+import { createRecordInTransaction } from "@/model/index"
 
 export interface GroupListType {
     focus: () => void;
@@ -27,6 +28,17 @@ export default forwardRef((_,ref) => {
       name:"Ream Mixin",
     }
     const [contacts, setContacts] = useState<(FriendListItem)[]>([one,one,one,one,one,one,one,one,one,one,one,one,one]);
+    console.log("sqlite");
+              
+    createRecordInTransaction("posts",(e)=>{
+                e.title = "title"
+                e.body= "body"
+                e.subtitle ="sub",
+                e.isPinned = false
+              }).then(r=>{
+                console.log("插入数据库");
+                console.log(r)
+              })
     useImperativeHandle(ref, () => ({
         focus: () => {
               
