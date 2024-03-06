@@ -26,10 +26,6 @@ export interface GroupMemberResp extends BasePageResp<GroupMemberItem>{
   
 }
 
-export interface GroupMemberResp extends BasePageResp<GroupMemberItem>{
-  
-}
-
 export interface GroupIdsReq {
   gids?: stirng []
 }
