@@ -84,6 +84,15 @@ android {
         pickFirst 'lib/arm64-v8a/libc++_shared.so'
         pickFirst 'lib/arm64-v8a/liblog.so'
         pickFirst 'lib/armeabi-v7a/liblog.so'
+
+        pickFirst 'lib/x86/libreact_nativemodule_core.so'
+        pickFirst 'lib/x86_64/libreact_nativemodule_core.so'
+        pickFirst 'lib/armeabi-v7a/libreact_nativemodule_core.so'
+        pickFirst 'lib/arm64-v8a/libreact_nativemodule_core.so'
+        pickFirst 'lib/x86/libturbomodulejsijni.so'
+        pickFirst 'lib/x86_64/libturbomodulejsijni.so'
+        pickFirst 'lib/armeabi-v7a/libturbomodulejsijni.so'
+        pickFirst 'lib/arm64-v8a/libturbomodulejsijni.so'
     }
     ndkVersion rootProject.ext.ndkVersion
 
@@ -130,7 +139,7 @@ android {
             reset()
             enable true
             universalApk false
-            include "armeabi-v7a", "arm64-v8a"
+            include "armeabi-v7a", "arm64-v8a","x86","x86_64"
         }
     }
 }
@@ -141,6 +150,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.facebook.soloader:soloader:0.10.1+")
+    implementation 'com.facebook.fresco:fresco:2.0.0'
+
     // implementation "com.facebook.react:react-native:+" // From node_modules
     // implementation ("com.facebook.react:react-native") version {
     //         strictly "0.72.6" // pass in your react-native version
