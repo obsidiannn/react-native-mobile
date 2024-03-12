@@ -1,7 +1,6 @@
 import { Platform } from 'react-native';
-import { check, Permission, PERMISSIONS, RESULTS, request, openSettings,checkNotifications } from 'react-native-permissions';
+import { NotificationOption, check, Permission, PERMISSIONS, RESULTS, request, openSettings,checkNotifications ,requestNotifications, NotificationsResponse} from 'react-native-permissions';
 import toast from './toast';
-import { StorageAccessFramework } from 'expo-file-system';
 import RNFS from 'react-native-fs';
 // 请求写入权限
 export const requestWritePermission = async () => {
@@ -42,8 +41,25 @@ export const requestDocumentPermission = async () => {
     return requestPermission(Platform.OS === 'ios' ? PERMISSIONS.IOS.MEDIA_LIBRARY : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
 }
 
+/**
+ * 请求通知权限
+ * @returns
+ */
 export const requestNotificationPermission = async () => {
-    return requestPermission(Platform.OS === 'ios' ? PERMISSIONS.IOS.REMINDERS : PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+    const result = await checkNotifications()
+    if(result.status === RESULTS.GRANTED){
+        return;   
+    }
+    const permission = Platform.OS === 'ios' ? PERMISSIONS.IOS.REMINDERS : PERMISSIONS.ANDROID.POST_NOTIFICATIONS
+    const options:NotificationOption[] = ['alert','sound','badge','provisional','providesAppSettings']
+    return requestNotifications(options).then((result:NotificationsResponse) => {
+        console.log('notify result = ',result.status);
+        if (result.status === RESULTS.GRANTED) {
+            console.log('开启权限成功')
+        } else {
+            toast(permission + ' is ' + result.status);
+        }
+    });
 }
 
 export const requestPermission = async (permission: Permission) => {

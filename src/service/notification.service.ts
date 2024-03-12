@@ -10,38 +10,63 @@ export const initNotification = async ()=>{
 }
 
 const initService = async ()=>{
-  messaging().requestPermission().then(res=>{
-  })
-  
+  await messaging().requestPermission()
   try {
     await requestNotificationPermission()
   }catch(e){
     console.log(e)
   }
-    // 获取firebase token
-  await messaging().registerDeviceForRemoteMessages();
+  // 获取firebase token ,如果不存在，则发起注册
+
   const token = await messaging().getToken();
+  if(!token){
+    await messaging().registerDeviceForRemoteMessages()
+    const newToken = await messaging().getToken()
+    globalThis.token = newToken    
+  }else{
+    globalThis.token = token
+  }
+
   console.log('====================================');
-  console.log('firebase token is : ', token);
+  console.log('firebase token : ', globalThis.token);
   console.log('====================================');
 
-  await notifee.createChannel({
-    id: 'com.tdchat.default',
-    name: 'Default Channel',
-    importance: AndroidImportance.HIGH
+  messaging().onTokenRefresh(res=>{
+    console.log('on refresh');
+    globalThis.token = res
   })
+
+  // 注册channel
+  if(Platform.OS === 'android'){
+    await notifee.createChannel({
+      id: channelId,
+      name: 'Default Channel',
+      importance: AndroidImportance.HIGH
+    })
+      
+  }
   
+  // 注册
   notifee.registerForegroundService((notification):Promise<void> => {
     return new Promise(() => {
       console.log('get');
-      
     });
   });
 
 }
 
+/**
+ * 提交token 与 wallet的address传至server
+ */
+export const sumbitToken = () => {
+  if(globalThis.wallet){
+    //
+  } 
+}
+
+// 订阅
 const subscribe = async ()=>{
- 
+  // 后台消息处理
   messaging().setBackgroundMessageHandler(async(msg)=>{
     await onDisplayNotification(msg)
   })
@@ -49,14 +74,17 @@ const subscribe = async ()=>{
   notifee.onBackgroundEvent(async ({ type, detail }) => {
     console.log('onBackgroundEvent ',type,detail);
     const {notification, pressAction} = detail;
-    if (
-      type === EventType.ACTION_PRESS
-    ) {
+    if (type === EventType.ACTION_PRESS) {
       console.log('[onBackgroundEvent] ACTION_PRESS: first_action_reply');
       if (notification?.id) {
         await notifee.cancelNotification(notification?.id);
       }
     }
+
+    // if (type === EventType.APP_BLOCKED) {
+    //   if(detail.blocked){
+    //   }  
+    // }
   });
 
   if(Platform.OS !== 'ios'){
@@ -74,11 +102,13 @@ const subscribe = async ()=>{
   }
 }
 
-// react native 权限申请 ： 自启动权限，后台通知权限
+
+/**
+ * 发送消息
+ * @param message 
+ */
 const onDisplayNotification = async (message: FirebaseMessagingTypes.RemoteMessage) => {
   try {
-    console.log('receive');
-    
     await notifee.displayNotification({
       title: message.notification?.title,
       body: message.notification?.body,
@@ -88,9 +118,9 @@ const onDisplayNotification = async (message: FirebaseMessagingTypes.RemoteMessa
         importance: AndroidImportance.HIGH,
         smallIcon: 'ic_react_icon',
         color: '#9c27b0',
+        sound: 'default',
         pressAction:{
           id: 'default',
-          mainComponent: 'UserCard',
         }
       },
     });
