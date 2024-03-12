@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { check, Permission, PERMISSIONS, RESULTS, request, openSettings } from 'react-native-permissions';
+import { check, Permission, PERMISSIONS, RESULTS, request, openSettings,checkNotifications } from 'react-native-permissions';
 import toast from './toast';
 import { StorageAccessFramework } from 'expo-file-system';
 import RNFS from 'react-native-fs';
@@ -41,6 +41,11 @@ export const requestPhotoPermission = async () => {
 export const requestDocumentPermission = async () => {
     return requestPermission(Platform.OS === 'ios' ? PERMISSIONS.IOS.MEDIA_LIBRARY : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
 }
+
+export const requestNotificationPermission = async () => {
+    return requestPermission(Platform.OS === 'ios' ? PERMISSIONS.IOS.REMINDERS : PERMISSIONS.ANDROID.POST_NOTIFICATIONS);
+}
+
 export const requestPermission = async (permission: Permission) => {
     return new Promise((resolve, reject) => {
         check(permission)

@@ -9,6 +9,8 @@ import { format, uploadFile } from './file.service';
 import { SaveFormat, manipulateAsync } from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
 import { UserInfo } from '../api/user';
+
+// 注册
 const register = async (password: string): Promise<Wallet | null> => {
     try {
         const mn = bip39.generateMnemonic(wordlist);
