@@ -10,15 +10,17 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-
 public class OpenSettingsModule extends ReactContextBaseJavaModule {
+
+    private ReactApplicationContext mContext;
+       /* constructor */
+    public OpenSettingsModule(ReactApplicationContext reactContext) {
+        super(reactContext);
+    }
+
     @Override
     public String getName() {
-        /**
-* return the string name of the NativeModule which represents this class in JavaScript
-* In JS access this module through React.NativeModules.OpenSettings
-*/
-        return "OpenSettings";
+        return "OpenSettingsModule";
     }
     @ReactMethod
     public void openNotificationSettings(Callback cb) {
@@ -39,8 +41,5 @@ public class OpenSettingsModule extends ReactContextBaseJavaModule {
         }
         currentActivity.startActivity(intent);
     }
-    /* constructor */
-    public OpenSettingsModule(ReactApplicationContext reactContext) {
-        super(reactContext);
-    }
+
 }
