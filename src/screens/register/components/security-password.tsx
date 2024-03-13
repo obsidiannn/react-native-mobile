@@ -31,7 +31,11 @@ export default (props: {
             <Text style={styles.tipsText}>请设置安全密码，安全密码将用于保护你的助词</Text>
         </View>
         <View style={styles.buttonContainer}>
-            <Button disabled={!ready || props.loading} size="large" style={styles.loginButton} backgroundColor={colors.primary} onPress={() => props.onNext()} label="创建账号" labelStyle={styles.loginButtonLabel}>
+            <Button disabled={!ready || props.loading}
+                size="large" style={styles.loginButton} 
+                backgroundColor={colors.primary} 
+                onPress={() => props.onNext()} 
+                label="创建账号" labelStyle={styles.loginButtonLabel}>
                 {props.loading ? <ActivityIndicator color="white" /> : null}
             </Button>
             <Button size="large" style={styles.registerButton} backgroundColor="white" onPress={() => {

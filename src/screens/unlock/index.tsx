@@ -7,13 +7,18 @@ import { NowAccount } from "../../stores/app";
 import SecurityComponent from "./components/security-password";
 import Navbar from "../../components/navbar";
 import { readAccount } from "../../lib/account";
+import { navigate } from '../../lib/root-navigation'
 import { scale } from "react-native-size-matters/extend";
+import { RootStackParamList } from "@/types";
+import { DrawerActions } from "@react-navigation/native";
 type Props = StackScreenProps<RootStackParamList, 'Unlock'>;
 
-const UnlockScreen = ({ navigation }: Props) => {
+const UnlockScreen = ({ navigation,route }: Props) => {
     const [password, setPassword] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [, setNowAccount] = useRecoilState(NowAccount);
+    const params:any = route.params??{}
+    
     useEffect(() => {
         // (async () => {
         //     const oneWallet = await readAccount('147258');
@@ -44,7 +49,12 @@ const UnlockScreen = ({ navigation }: Props) => {
                             setNowAccount(oneWallet);
                             globalThis.wallet = oneWallet;
                             navigation.popToTop();
-                            navigation.replace('AuthStackNav');
+                            if(params.jumpTo &&( params.jumpTo??null !== null)){
+                                navigation.navigate('AuthStackNav',{ screen: params.jumpTo })
+                            }else{
+                                navigation.replace('AuthStackNav');
+                            }
+                            
                         } catch (error) {
 
                         } finally {

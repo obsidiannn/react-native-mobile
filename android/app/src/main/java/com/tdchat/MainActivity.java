@@ -1,10 +1,16 @@
 package com.tdchat;
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
+
 import expo.modules.ReactActivityDelegateWrapper;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
+
+import java.util.List;
 
 public class MainActivity extends ReactActivity {
 
@@ -29,5 +35,23 @@ public class MainActivity extends ReactActivity {
         getMainComponentName(),
         // If you opted-in for the New Architecture, we enable the Fabric Renderer.
         DefaultNewArchitectureEntryPoint.getFabricEnabled()));
+  }
+
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    // 判断应用程序是否进入后台，如果是，则取消 Activity 的销毁
+    if (isAppInBackground()) {
+      moveTaskToBack(false);
+    }
+  }
+
+  // 判断应用程序是否进入后台
+  private boolean isAppInBackground() {
+    ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+    List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+    ComponentName componentInfo = taskInfo.get(0).topActivity;
+    return !componentInfo.getPackageName().equals(getPackageName());
   }
 }

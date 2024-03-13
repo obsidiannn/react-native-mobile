@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "441981274957",
+    "project_id": "bobo-chat-d0c99",
+    "storage_bucket": "bobo-chat-d0c99.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441981274957:android:c16cfc2580e2122e60c504",
+        "android_client_info": {
+          "package_name": "com.tdchat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCj-fJz5EkpTeskS8VQ9dbMfSkt7BeAbo8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

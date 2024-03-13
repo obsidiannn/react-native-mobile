@@ -1,8 +1,9 @@
-import { Platform } from 'react-native';
-import { check, Permission, PERMISSIONS, RESULTS, request, openSettings } from 'react-native-permissions';
+import { Alert, NativeModules, Platform } from 'react-native';
+import { NotificationOption, check, Permission, PERMISSIONS, RESULTS, request, openSettings,checkNotifications ,requestNotifications, NotificationsResponse} from 'react-native-permissions';
 import toast from './toast';
-import { StorageAccessFramework } from 'expo-file-system';
 import RNFS from 'react-native-fs';
+import { globalStorage } from '../lib/storage'
+
 // 请求写入权限
 export const requestWritePermission = async () => {
     if (Platform.OS === 'android') {
@@ -41,6 +42,51 @@ export const requestPhotoPermission = async () => {
 export const requestDocumentPermission = async () => {
     return requestPermission(Platform.OS === 'ios' ? PERMISSIONS.IOS.MEDIA_LIBRARY : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
 }
+
+/**
+ * 请求通知权限
+ * @returns
+ */
+export const requestNotificationPermission = async () => {
+    const result = await checkNotifications()
+    if(result.status === RESULTS.GRANTED){
+        return;   
+    }
+    const permission = Platform.OS === 'ios' ? PERMISSIONS.IOS.REMINDERS : PERMISSIONS.ANDROID.POST_NOTIFICATIONS
+    const options:NotificationOption[] = ['alert','sound','badge','provisional','providesAppSettings']
+    return requestNotifications(options).then((result:NotificationsResponse) => {
+        console.log('notify result = ',result.status);
+        if (result.status === RESULTS.GRANTED) {
+            console.log('开启权限成功')
+        } else {
+            if(result.status === RESULTS.BLOCKED||result.status === RESULTS.DENIED){
+                if(!(globalStorage.contains(IGNORE_NOTIFY_APPLY_KEY) && globalStorage.getBoolean(IGNORE_NOTIFY_APPLY_KEY))){
+                    if(Platform.OS === 'android'){
+                        Alert.alert('通知开启','是否开启通知',[
+                            {text:'确认',onPress:() =>  {openNotifySetting()} },
+                            {text:'不再提醒',onPress:() =>  {ignoreNotifyPermissionApply()} },
+                            {text:'取消',style:'cancel'}
+                        ],{cancelable:false});
+                    }
+                }
+            }
+        }
+    });
+}
+// 跳转到权限设置
+const openNotifySetting = ()=>{
+    const notifyModule = NativeModules.OpenSettingsModule
+    notifyModule.openNotificationSettings((res)=>{
+        console.log(res);
+    })
+}
+
+const IGNORE_NOTIFY_APPLY_KEY = "IGNORE_NOTIFY_PERMISSION_APPLY"
+// 忽略权限申请
+const ignoreNotifyPermissionApply = () =>{
+    globalStorage.setItem(IGNORE_NOTIFY_APPLY_KEY,true)
+}
+
 export const requestPermission = async (permission: Permission) => {
     return new Promise((resolve, reject) => {
         check(permission)
