@@ -1,12 +1,12 @@
 import { createRequestInstance } from "../lib/request";
 import { BaseIdReq,BaseIdsArrayReq,BaseUIdArrayReq, BaseArrayResp } from "../types/common";
 import {FriendRelationItem,FriendInviteApplyReq,FriendInviteApplyItem
-,FriendInviteAgreeReq,FriendInviteRejectReq,FriendInfoItem,FriendChangeAliasReq
+,FriendInviteAgreeReq,FriendInviteRejectReq,FriendInfoItem,FriendChangeAliasReq, RelationListItem
 
 } from "../types/friend"
 
 // 获取用户关系
-const getRelationList = (param: BaseUIdArrayReq): Promise<BaseArrayResp<FriendRelationItem>>=>{
+const getRelationList = (param: BaseUIdArrayReq): Promise<BaseArrayResp<RelationListItem>>=>{
   return createRequestInstance(true).post('/friends/relation-list', param);
 }
 
@@ -15,10 +15,16 @@ const inviteApply = (param: FriendInviteApplyReq)=>{
   return createRequestInstance(true).post('/friends/invite-apply', param);
 }
 
-// 申请列表
-const getApplyList = ():Promise<BaseArrayResp<FriendInviteApplyItem>>=>{
+// 我的申请列表
+const getInviteList = ():Promise<BaseArrayResp<FriendInviteApplyItem>>=>{
   return createRequestInstance(true).post('/friends/invite-list');
 }
+
+// 我的审核列表
+const getApplyList = ():Promise<BaseArrayResp<FriendInviteApplyItem>>=>{
+  return createRequestInstance(true).post('/friends/invite-apply-list');
+}
+
 
 // 申请同意
 const inviteAgree = (param: FriendInviteAgreeReq)=>{
@@ -40,7 +46,7 @@ const getFriendList = (param: BaseUIdArrayReq):Promise<BaseArrayResp<FriendInfoI
   return createRequestInstance(true).post('/friends/list', param);
 }
 // 变更好友备注
-const changeAlias = (param: FriendChangeAliasReq)=>{
+const changeAlias = (param: FriendChangeAliasReq): Promise<void> =>{
   return createRequestInstance(true).post('/friends/update-alias', param);
 }
 
@@ -52,4 +58,19 @@ const dropRelationSingle = (param: BaseUIdArrayReq)=>{
 // 删除所有好友（双向）
 const dropRelationDouble = (param: BaseUIdArrayReq)=>{
   return createRequestInstance(true).post('/friends/delete-bilateral', param);
+}
+
+
+export default {
+  getRelationList,
+  inviteApply,
+  getApplyList,
+  inviteAgree,
+  inviteReject,
+  inviteRead,
+  getFriendList,
+  changeAlias,
+  dropRelationSingle,
+  dropRelationDouble,
+  getInviteList
 }

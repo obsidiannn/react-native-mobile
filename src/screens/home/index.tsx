@@ -12,7 +12,7 @@ import NavbarRight from "./components/navbar-right";
 import ConversationItem, { Conversation } from "./components/conversation-item";
 import dayjs from "dayjs";
 
-import chatApi from '@/api/chat';
+import chatApi from '@/api/v2/chat';
 import SelectMemberModal, { SelectMemberModalType, SelectMemberOption } from "@/components/select-member-modal";
 import authService from "@/service/auth.service";
 import groupService from "@/service/group.service";
@@ -44,13 +44,13 @@ const HomeScreen = ({ navigation }: Props) => {
     }, [menus]);
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            chatApi.getList().then((res) => {
+            chatApi.mineChatList().then((res) => {
                 console.log('chatApi.getList', res.items);
                 const items = res.items.map((item) => {
                     return {
                         ...item,
-                        timestamp: item.last_time > 0 ? dayjs(item.last_time) : undefined,
-                        unread: item.last_sequence - item.last_read_sequence,
+                        // timestamp: item.last_time > 0 ? dayjs(item.last_time) : undefined,
+                        // unread: item.last_sequence - item.last_read_sequence,
                     }
                 });
                 setConversations(items);
@@ -67,7 +67,7 @@ const HomeScreen = ({ navigation }: Props) => {
                             icon: item.avatar,
                             title: item.name,
                             name: item.name,
-                            name_index: item.name_index,
+                            name_index: item.nameIndex,
                             status: false,
                             disabled: false,
                         }

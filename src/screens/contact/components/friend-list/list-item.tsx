@@ -3,17 +3,17 @@ import { navigate } from '@/lib/root-navigation';
 import { scale } from "react-native-size-matters/extend";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { FriendListItem } from "@/api/friend";
+import { FriendInfoItem } from "@/api/types/friend";
 import { Image } from "@/components/image";
 dayjs.extend(relativeTime)
 export default (props: {
-    item:FriendListItem,
+    item:FriendInfoItem,
     isLast: boolean,
 }) => {
     const { item, isLast } = props;
     return <TouchableOpacity onPress={() => {
         navigate('UserChat',{
-            chatId: item.chat_id,
+            chatId: item.chatId,
             uid: item.uid,
         })
     }} style={styles.container}>

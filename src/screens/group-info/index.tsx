@@ -8,7 +8,7 @@ import { scale } from "react-native-size-matters/extend";
 import { Image } from "@/components/image";
 import { Button } from "react-native-ui-lib";
 import colors from "@/config/colors";
-import { GroupInfoItem } from "@/api/group";
+import { GroupInfoItem } from "@/api/types/group";
 import groupService from "@/service/group.service";
 import toast from "@/lib/toast";
 import ApplyJoinModal, { ApplyJoinModalRef } from "./components/apply-join-modal";

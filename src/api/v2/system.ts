@@ -6,11 +6,16 @@ import {
 
 } from '../types/system'
 
-
-const getPubKey = ():Promise<SystemPubKeyResp> => {
-  return createRequestInstance(true).post('/sys/info');
+// 获取系统公钥
+const getInfo = ():Promise<SystemPubKeyResp> => {
+  return createRequestInstance(false).post('/system/info');
 }
 
 const uploadPreSignUrl = (param: SystemPreSignUrlUploadReq) =>{
  return createRequestInstance(true).post('/pre-sign-url',param);
+}
+
+export default {
+  getInfo,
+  uploadPreSignUrl
 }

@@ -1,8 +1,17 @@
 import { BasePageReq,BasePageResp,CommonEnum,GroupTypeEnum } from "./common";
 
-export interface FriendRelationItem{
+export interface RelationListItem {
 	uid: string;
-	is_friend: number;
+	isFriend: number;
+	remark?: string;
+	name: string;
+	sign: string;
+	avatar: string;
+	gender: number;
+  }
+export interface FriendRelationItem {
+	uid: string;
+	isFriend: number;
 };
 
 export interface FriendInviteApplyReq{
@@ -14,8 +23,9 @@ export interface FriendInviteApplyReq{
 export interface FriendInviteApplyItem{
 	id: string;
 	uid: string;
+	objUid: string
 	remark: string;
-	reject_reason: string;
+	rejectReason: string;
 	status: number;
 };
 
@@ -28,13 +38,19 @@ export interface FriendInviteAgreeReq{
 
 export interface FriendInviteRejectReq{
 	id: string;
-	alias: string;
+	reason: string;
 };
 
 export interface FriendInfoItem  {
 	uid: string;
-	chat_id: string;
-	alias: string;
+	chatId: string;
+	remark: string
+	remarkIndex: string
+	name: string
+	nameIndex: string
+	gender: number;
+	avatar: string;
+	pubKey: string;
 };
 
 export interface FriendChangeAliasReq{

@@ -1,14 +1,14 @@
 import * as bip39 from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { deleteAccount, writeAccount } from "../lib/account";
-import authApi from "../api/auth";
+import authApi from "../api/v2/auth";
 import { Wallet } from 'ethers';
 import dayjs from 'dayjs';
 import Crypto from 'react-native-quick-crypto';
 import { format, uploadFile } from './file.service';
 import { SaveFormat, manipulateAsync } from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
-import { UserInfo } from '../api/user';
+import { UserInfoItem } from '../api/types/user';
 
 // 注册
 const register = async (password: string): Promise<Wallet | null> => {
@@ -19,19 +19,20 @@ const register = async (password: string): Promise<Wallet | null> => {
         await authApi.register();
         return wallet;
     } catch (error) {
+        console.error(error);
         globalThis.wallet = null;
         deleteAccount(password);
         return null;
     }
 }
-const updateName = async (name: string): Promise<null> => {
-    return await authApi.updateName(name);
+const updateName = async (name: string): Promise<void> => {
+     await authApi.changeName({name});
 }
-const updateGender = async (gender: number): Promise<null> => {
-    return await authApi.updateGender(gender);
+const updateGender = async (gender: number): Promise<void> => {
+     await authApi.changeGender({gender});
 }
-const updateSign = async (sign: string):  Promise<null> => {
-    return await authApi.updateSign(sign);
+const updateSign = async (sign: string):  Promise<void> => {
+     await authApi.changeSign({sign});
 }
 const updateAvatar = async (avatar: string): Promise<string> => {
     // 判断是否为upload开头
@@ -54,13 +55,13 @@ const updateAvatar = async (avatar: string): Promise<string> => {
         await uploadFile(avatar, key);
         avatar = key;
     }
-    await authApi.updateAvatar(avatar);
+    await authApi.changeAvatar({avatar});
     return avatar;
 }
 const logout = (password: string) => {
     return true;
 }
-const info = async (): Promise<UserInfo> => {
+const info = async (): Promise<UserInfoItem> => {
     return await authApi.info();
 }
 export default {

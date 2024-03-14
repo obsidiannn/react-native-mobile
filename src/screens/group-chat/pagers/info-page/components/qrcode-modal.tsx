@@ -1,4 +1,4 @@
-import { GroupInfoItem } from "@/api/group";
+import { GroupInfoItem } from "@/api/types/group";
 import { Image } from "@/components/image";
 import Navbar from "@/components/navbar";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";

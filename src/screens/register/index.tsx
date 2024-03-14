@@ -10,6 +10,7 @@ import BaseInfoForm, { RegisterFormData } from "./components/base-info-form";
 import Navbar from "@/components/navbar";
 import toast from "@/lib/toast";
 import authService from "@/service/auth.service";
+import { RootStackParamList } from "@/types";
 type Props = StackScreenProps<RootStackParamList, 'Register'>;
 
 const RegisterScreen = ({ navigation }: Props) => {

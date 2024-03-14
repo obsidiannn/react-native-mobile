@@ -1,15 +1,15 @@
 import { BasePageReq,BasePageResp,CommonEnum,GroupTypeEnum } from "./common";
 
 export interface AuthCheckRegisterResp {
-	is_register: number;
+	isRegister: number;
 };
 
 export interface AuthRegisterResp{
 	address: string;
 	avatar: string;
 	name: string;
-	pub_key: string;
-	create_time: number;
+	pubKey: string;
+	createTime: number;
 };
 
 
@@ -28,7 +28,7 @@ export interface AuthChangeSignReq{
 
 export interface AuthBlackListItem{
   uid: string;
-  created_at: number;
+  createdAt: number;
 };
 
 export interface AuthBlackReq{

@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Navbar from "@/components/navbar";
-import { RelationListItem } from "@/api/friend";
+import { RelationListItem } from "@/api/types/friend";
 import { useEffect, useRef, useState } from "react";
 import { scale } from "react-native-size-matters/extend";
 import { Image } from "@/components/image";
@@ -11,6 +11,7 @@ import colors from "@/config/colors";
 import ConfirmModal, { ConfirmModalType } from "@/components/confirm-modal";
 import UpdateRemarkModal, { UpdateRemarkModalType } from "./components/update-remark-modal";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { RootStackParamList } from "@/types";
 
 type Props = StackScreenProps<RootStackParamList, 'UserSetting'>;
 

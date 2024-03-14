@@ -1,7 +1,8 @@
 import { Keyboard, ScrollView, StyleSheet, TouchableNativeFeedback, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCallback, useEffect, useRef, useState } from "react";
-import FriendApi, { RelationListItem } from "../../api/friend";
+import friendApi from "../../api/v2/friend";
+import { RelationListItem } from '@/api/types/friend'
 import Navbar from "../../components/navbar";
 import { scale } from "react-native-size-matters/extend";
 import NavbarRight from "./components/navbar-right";
@@ -24,7 +25,7 @@ const AddFriendScreen = () => {
             return;
         }
         setLoading(true);
-        FriendApi.relationList([v.toLowerCase()]).then((res) => {
+        friendApi.getRelationList({uids: [v]}).then((res) => {
             setUsers(res.items);
         }).catch((err) => {
             console.log('err', err)

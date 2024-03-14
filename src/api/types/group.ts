@@ -1,14 +1,14 @@
-import { BasePageReq,BasePageResp,CommonEnum,GroupTypeEnum } from "./common";
+import { BaseIdReq, BasePageReq,BasePageResp,CommonEnum,GroupTypeEnum } from "./common.js";
 
 export interface GroupCreateReq {
 	id: string;
-	pub_key: string;
+	pubKey: string;
 	avatar: string;
 	name: string;
-	is_enc: CommonEnum;
+	isEnc: CommonEnum;
 	type: number;
-	ban_type: number;
-	search_type: number;
+	banType: number;
+	searchType: number;
 };
 
 export interface GroupMemberItem {
@@ -16,9 +16,9 @@ export interface GroupMemberItem {
 	uid: string;
 	gid: string;
 	role: number;
-	my_alias: string;
+	myAlias: string;
 	admin_at: number;
-	created_at: number;
+	createdAt: number;
 };
  
 
@@ -39,9 +39,20 @@ export interface GroupInviteJoinItem {
   enc_key?: string 
 }
 
+// 审核群加入申请
+export interface GroupApplyJoinReq {
+	id: string,
+	uids: string[]
+  }
+
 export interface GroupInviteJoinReq {
   id: string,
   items: GroupInviteJoinItem[]
+}
+
+export interface GroupRequireJoinReq extends BaseIdReq {
+	encKey: string
+	encPri: string
 }
 
 export interface GroupKickOutReq {
@@ -81,14 +92,27 @@ export interface GroupTransferReq{
 }
 
 export interface GroupInfoItem{
-  id: string;
+  	id: string;
 	gid: string;
 	uid: string;
-	enc_key: string;
+	encKey: string;
 	role: number;
 	status: number;
-	created_at: number;
+	createdAt: number;
+	pubKey: string
 }
+
+export interface GroupApplyItem{
+	id: string;
+	gid: string;
+	uid: string;
+	encKey: string;
+	role: number;
+	status: number;
+	createdAt: number;
+	pubKey: string
+  }
+
 export interface MineGroupInfoItem{
   id: string;
 	gid: string;
@@ -103,24 +127,35 @@ export interface GroupDetailItem{
 	name: string;
 	avatar: string;
 	created_at: number;
-	member_limit: number;
+	memberLimit: number;
 	total: number;
-	pub_key: string;
-	owner_id: string;
-	creator_id: string;
+	pubKey: string;
+	ownerId: string;
+	creatorId: string;
 	notice: string;
-	notice_md5: string;
+	noticeMd5: string;
 	desc: string;
-	desc_md5: string;
+	descMd5: string;
 	cover: string;
-	is_enc: CommonEnum;
+	isEnc: CommonEnum;
 	type: GroupTypeEnum;
-	ban_type: number;
-	search_type: number;
+	banType: number;
+	searchType: number;
 	status: number;
 };
 
 export interface GroupDetailResp{
   items: GroupDetailItem[];
   status: number
+}
+
+// 群分类列表
+export interface GroupCategoryListParams {
+    id: string;
+}
+// 群分类结构
+export interface GroupCategoryListItem {
+    id: string;
+    name: string;
+    checked: boolean;
 }

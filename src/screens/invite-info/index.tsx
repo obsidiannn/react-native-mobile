@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "react-native-ui-lib";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
-import friendApi from "@/api/friend";
+import friendApi from "@/api/v2/friend";
 import { scale, verticalScale } from "react-native-size-matters/extend";
 import colors from "@/config/colors";
 import Remark from "./components/remark";
@@ -93,7 +93,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                                 return
                             };
                             setLoading(true);
-                            friendApi.inviteAgree(info.id).then(() => {
+                            friendApi.inviteAgree({id: info.id,alias: info.name}).then(() => {
                                 navigation.goBack();
                             }).finally(() => {
                                 setLoading(false);
@@ -104,7 +104,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                                 return
                             };
                             setLoading(true);
-                            await friendApi.inviteReject(info.id);
+                            await friendApi.inviteReject({id: info.id,reason: ''});
                             try {
                                 await friendService.updateRemark(info.uid, remark);
                             } catch (error) {

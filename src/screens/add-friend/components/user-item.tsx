@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { navigate } from "../../../lib/root-navigation"
-import { RelationListItem } from "../../../api/friend";
+import { RelationListItem } from "../../../api/types/friend";
 import { Image } from "../../../components/image";
 import { scale } from "react-native-size-matters/extend";
 

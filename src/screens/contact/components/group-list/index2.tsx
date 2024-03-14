@@ -3,7 +3,7 @@ import { scale, verticalScale } from "react-native-size-matters/extend"
 import ListItem from "./list-item"
 import { FlashList } from "@shopify/flash-list"
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
-import { FriendListItem } from "@/api/friend";
+import { FriendInfoItem } from "@/api/types/friend";
 import AlphabetIndex from "./alphabet-index";
 import MenuList from "./menu-list";
 import Navbar from "@/components/navbar";
@@ -18,16 +18,18 @@ export default forwardRef((_,ref) => {
    
     const [contactAlphabetIndex, setContactAlphabetIndex] = useState<{ [key: string]: number }>({});
     const [aplphabet, setAplphabet] = useState<string[]>([]);
-    let one:FriendListItem = {
+    let one:FriendInfoItem = {
       uid: "string",
       gender: 1,
-      name_index:"string",
-      chat_id: "string",
+      nameIndex:"string",
+      chatId: "string",
       avatar: "https://avatars.githubusercontent.com/u/122279700?v=4",
-      pub_key:"string",
+      pubKey:"string",
       name:"Ream Mixin",
+      remark: '',
+      remarkIndex: ''
     }
-    const [contacts, setContacts] = useState<(FriendListItem)[]>([one,one,one,one,one,one,one,one,one,one,one,one,one]);
+    const [contacts, setContacts] = useState<(FriendInfoItem)[]>([one,one,one,one,one,one,one,one,one,one,one,one,one]);
     console.log("sqlite");
               
     createRecordInTransaction("posts",(e)=>{

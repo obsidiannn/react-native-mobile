@@ -12,7 +12,7 @@ const checkRegister = ():Promise<AuthCheckRegisterResp> => {
 
 // 注册
 const register = ():Promise<AuthRegisterResp> => {
-  return createRequestInstance(true).post('/auth/is-register');
+  return createRequestInstance(true).post('/auth/register');
 }
 
 // 修改昵称
@@ -53,4 +53,25 @@ const authAddBlackList = (param: AuthBlackReq) => {
 // 移出黑名单
 const removeBlackList = (param: AuthBlackReq) => {
   return createRequestInstance(true).post('/auth/remove-user-black',param);
+}
+
+/**
+ * 是否注册
+ */
+export const isRegister = ():Promise<AuthCheckRegisterResp>=>{
+  return createRequestInstance(true).post('/auth/is-register',{});
+}
+
+export default {
+  checkRegister,
+  register,
+  changeName,
+  changeAvatar,
+  changeGender,
+  changeSign,
+  signOut,
+  blackList,
+  authAddBlackList,
+  removeBlackList,
+  isRegister
 }

@@ -1,4 +1,4 @@
-import { ApplyListItem } from "@/api/group";
+import { GroupApplyItem } from "@/api/types/group";
 import Navbar from "@/components/navbar";
 import groupService from "@/service/group.service";
 import { forwardRef, useImperativeHandle, useState } from "react";
@@ -10,13 +10,13 @@ export interface ApplyListModalRef {
     open: (id: string) => void;
 }
 export default forwardRef((props: {
-    onCheck: (item: ApplyListItem) => void;
+    onCheck: (item: GroupApplyItem) => void;
 }, ref) => {
     const [visible, setVisible] = useState(false);
 
     const insets = useSafeAreaInsets();
     const [gid, setGid] = useState<string>('');
-    const [items, setItems] = useState<ApplyListItem[]>([]);
+    const [items, setItems] = useState<GroupApplyItem[]>([]);
     useImperativeHandle(ref, () => ({
         open: (id: string) => {
             setGid(id);

@@ -1,4 +1,4 @@
-import { ApplyListItem } from "@/api/group";
+import { GroupApplyItem } from "@/api/types/group";
 import Navbar from "@/components/navbar";
 import groupService from "@/service/group.service";
 import { forwardRef, useImperativeHandle, useState } from "react";
@@ -15,18 +15,18 @@ import quickAes from "@/lib/quick-aes";
 import { ethers } from "ethers";
 import userService from "@/service/user.service";
 export interface ApplyInfoModalRef {
-    open: (item: ApplyListItem) => void;
+    open: (item: GroupApplyItem) => void;
 }
 export default forwardRef((props: {
-    onCheck: (item: ApplyListItem) => void;
-    onReject: (item: ApplyListItem) => void;
+    onCheck: (item: GroupApplyItem) => void;
+    onReject: (item: GroupApplyItem) => void;
 }, ref) => {
     const [visible, setVisible] = useState(false);
     const insets = useSafeAreaInsets();
-    const [item, setItem] = useState<ApplyListItem>();
+    const [item, setItem] = useState<GroupApplyItem>();
     const [loading, setLoading] = useState(false);
     useImperativeHandle(ref, () => ({
-        open: (v: ApplyListItem) => {
+        open: (v: GroupApplyItem) => {
             setItem(v);
             setVisible(true);
         }

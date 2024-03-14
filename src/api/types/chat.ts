@@ -2,13 +2,13 @@ import { BasePageReq,BasePageResp,CommonEnum,GroupTypeEnum } from "./common";
 
 export interface ChatListItem {
 	id: string;
-	chat_id: string;
-	is_top: number;
-	is_mute: number;
-	is_show: number;
-	is_hide: number;
-	max_read_seq: number;
-	last_online_time: number;
+	chatId: string;
+	isTop: number;
+	isMute: number;
+	isShow: number;
+	isHide: number;
+	maxReadSeq: number;
+	lastOnlineTime: number;
 };
 
 export interface ChatDetailItem {

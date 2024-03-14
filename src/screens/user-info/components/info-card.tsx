@@ -2,13 +2,13 @@ import { StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as clipboard from 'expo-clipboard';
 import toast from "@/lib/toast";
-import { RelationListItem } from "@/api/friend";
 import { handleAddress } from "@/lib/account";
 import { scale, verticalScale } from "react-native-size-matters/extend";
 import { Image } from "@/components/image";
 import GenderIcon from "@/components/gender-icon";
+import { UserInfoItem } from "@/api/types/user";
 export default (props: {
-    user: RelationListItem
+    user: UserInfoItem
 }) => {
     const { user } = props;
     return <View style={styles.container}>
@@ -19,9 +19,9 @@ export default (props: {
                 <View style={styles.infoContainer}>
                     <GenderIcon name={user.gender} style={styles.genderIcon} />
                     <View style={styles.genderLine}></View>
-                    <Text style={styles.signText}>{handleAddress(user.uid)}</Text>
+                    <Text style={styles.signText}>{handleAddress(user.id)}</Text>
                     <TouchableOpacity onPress={async () => {
-                        await clipboard.setStringAsync(user.uid);
+                        await clipboard.setStringAsync(user.id);
                         toast('复制成功');
                     }}>
                         <Image source={require('@/assets/icons/copy.svg')} style={styles.copyIcon} />

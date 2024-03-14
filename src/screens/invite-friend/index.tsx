@@ -4,7 +4,7 @@ import Navbar from "../../components/navbar";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "react-native-ui-lib";
-import friendApi from "../../api/friend";
+import friendApi from "../../api/v2/friend";
 import toast from "../../lib/toast";
 import { scale, verticalScale } from "react-native-size-matters/extend";
 import colors from "../../config/colors";
@@ -48,7 +48,7 @@ export default ({ navigation, route }: Props) => {
                     style={styles.button} backgroundColor={colors.primary} onPress={() => {
                         setState(true);
                         friendApi.inviteApply({
-                            obj_uid: uid,
+                            uid,
                             remark: remark,
                         }).then(res => {
                             toast('发送邀请成功');

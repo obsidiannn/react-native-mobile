@@ -5,7 +5,7 @@ import { Image } from "expo-image";
 import { Button } from "react-native-ui-lib";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
-import friendApi from "@/api/friend";
+import friendApi from "@/api/v2/friend";
 import * as clipboard from 'expo-clipboard';
 import { scale, verticalScale } from "react-native-size-matters/extend";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -132,7 +132,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                                 return
                             };
                             setLoading(true);
-                            friendApi.inviteAgree(info.id).then(() => {
+                            friendApi.inviteAgree({id: info.id,alias: info.name}).then(() => {
                                 navigation.goBack();
                             }).finally(() => {
                                 setLoading(false);
@@ -151,7 +151,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                                 return
                             };
                             setLoading(true);
-                            friendApi.inviteReject(info.id).then(() => {
+                            friendApi.inviteReject({id: info.id,reason: ''}).then(() => {
                                 navigation.goBack();
                             }).finally(() => {
                                 setLoading(false);

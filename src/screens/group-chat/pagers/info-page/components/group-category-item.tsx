@@ -1,7 +1,8 @@
 import {useState,useEffect} from 'react'
 import { StyleSheet, View,TouchableOpacity,Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import group,{GroupCategoryListParams,GroupCategoryListItem} from "@/api/group"
+import groupApi from "@/api/v2/group"
+import {GroupCategoryListParams,GroupCategoryListItem} from '@/api/types/group'
 import {Chip,Button} from 'react-native-ui-lib'
 import { scale } from 'react-native-size-matters/extend';
 import toast from '@/lib/toast';

@@ -3,11 +3,11 @@ import { navigate } from '@/lib/root-navigation';
 import { scale } from "react-native-size-matters/extend";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { InviteListItem } from "@/api/friend";
 import { Image } from "@/components/image";
+import { FriendInviteApplyItem } from "@/api/types/friend";
 dayjs.extend(relativeTime)
 export default (props: {
-    item: InviteListItem,
+    item: FriendInviteApplyItem,
     isLast: boolean,
 }) => {
     const { item, isLast } = props;
@@ -15,7 +15,7 @@ export default (props: {
         if (item.status === 1) {
             navigate('InviteInfo', {
                 id: item.id,
-                obj_uid: item.obj_uid,
+                obj_uid: item.objUid,
                 uid: item.uid,
                 name: item.name,
                 avatar: item.avatar,
@@ -25,7 +25,7 @@ export default (props: {
         } else {
             const authUid = globalThis.wallet?.address.toLowerCase() || '';
             navigate('UserInfo', {
-                uid: authUid === item.uid ? item.obj_uid : item.uid,
+                uid: authUid === item.uid ? item.objUid : item.uid,
             });
         }
     }} style={styles.container}>
