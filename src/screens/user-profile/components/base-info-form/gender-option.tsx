@@ -1,3 +1,4 @@
+import { GenderEnum } from "@/api/types/enums";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
@@ -15,17 +16,17 @@ export default (props: {
         {
             title: '保密',
             icon: require('@/assets/icons/gender-unknown.svg'),
-            value: 2
+            value: GenderEnum.UNKNOWN
         },
         {
             title: '男',
             icon: require('@/assets/icons/gender-man.svg'),
-            value: 1
+            value: GenderEnum.MALE
         },
         {
             title: '女',
             icon: require('@/assets/icons/gender-woman.svg'),
-            value: 0
+            value: GenderEnum.FAMALE
         },
     ]);
     const [value, setValue] = useState(2);

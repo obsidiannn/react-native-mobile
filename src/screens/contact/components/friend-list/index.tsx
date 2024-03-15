@@ -25,7 +25,6 @@ export default forwardRef((_,ref) => {
     },[]);
     useImperativeHandle(ref, () => ({
         focus: () => {
-            console.log('friend list focus');
             init();
         }
     }));

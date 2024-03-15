@@ -7,8 +7,9 @@ import { scale, verticalScale } from "react-native-size-matters/extend";
 import { Image } from "@/components/image";
 import GenderIcon from "@/components/gender-icon";
 import { UserInfoItem } from "@/api/types/user";
+import { FreindInfoReleationItem } from "@/api/types/friend";
 export default (props: {
-    user: UserInfoItem
+    user: FreindInfoReleationItem
 }) => {
     const { user } = props;
     return <View style={styles.container}>
@@ -19,9 +20,9 @@ export default (props: {
                 <View style={styles.infoContainer}>
                     <GenderIcon name={user.gender} style={styles.genderIcon} />
                     <View style={styles.genderLine}></View>
-                    <Text style={styles.signText}>{handleAddress(user.id)}</Text>
+                    <Text style={styles.signText}>{handleAddress(user.uid)}</Text>
                     <TouchableOpacity onPress={async () => {
-                        await clipboard.setStringAsync(user.id);
+                        await clipboard.setStringAsync(user.uid);
                         toast('复制成功');
                     }}>
                         <Image source={require('@/assets/icons/copy.svg')} style={styles.copyIcon} />

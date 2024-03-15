@@ -1,13 +1,11 @@
 import { BasePageReq,BasePageResp,CommonEnum,GroupTypeEnum } from "./common";
 
-export interface RelationListItem {
-	uid: string;
-	isFriend: number;
-	remark?: string;
+export interface FreindInfoReleationItem extends FriendRelationItem{
 	name: string;
 	sign: string;
 	avatar: string;
 	gender: number;
+	pubKey: string
   }
 export interface FriendRelationItem {
 	uid: string;

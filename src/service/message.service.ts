@@ -181,6 +181,8 @@ const getList = async (chatId: string, key: string, sequence: number, direction:
 const removeBatch = async (chatId: string, mids: string[]) => {
     return true;
 }
+
+// 清除所有消息
 const clearAll = async (cids: string[]) => {
     return true;
 }

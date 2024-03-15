@@ -58,11 +58,14 @@ const updateAvatar = async (avatar: string): Promise<string> => {
     await authApi.changeAvatar({avatar});
     return avatar;
 }
+
+// 登出
 const logout = (password: string) => {
     return true;
 }
+// 当前登录人详情
 const info = async (): Promise<UserInfoItem> => {
-    return await authApi.info();
+    return await authApi.userInfo();
 }
 export default {
     register,

@@ -1,4 +1,4 @@
-import { UserInfo } from "@/api/user";
+import { UserInfoItem } from "@/api/types/user";
 import dayjs from "dayjs";
 export interface IMessageImage {
     w: number;
@@ -48,7 +48,7 @@ export interface IMessage<T extends DataType> {
     mid: string;
     type: T;
     sequence?: number;
-    user?: UserInfo;
+    user?: UserInfoItem;
     time: dayjs.Dayjs;
     state: number; // 0: 发送中 1: 发送成功 2: 发送失败
     data: IMessageTypeMap[T];

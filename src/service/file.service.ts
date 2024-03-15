@@ -1,7 +1,7 @@
 
 import * as ImagePicker from 'expo-image-picker';
 import { requestCameraPermission, requestDirectoryPermission, requestPhotoPermission } from '@/lib/permissions';
-import s3Api from '../api/s3';
+import s3Api from '../api/v2/s3';
 
 import { FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
 import * as FileSystem from 'expo-file-system';
@@ -60,7 +60,7 @@ export const uploadFile = async (path: string, key: string): Promise<boolean> =>
         const data = await s3Api.getPresignedUrl(key)
         try {
 
-            const response = await FileSystem.uploadAsync(data.url, path, {
+            const response = await FileSystem.uploadAsync(data.result, path, {
                 httpMethod: 'PUT',
                 uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
             });

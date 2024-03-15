@@ -2,7 +2,9 @@ import { Keyboard, ScrollView, StyleSheet, TouchableNativeFeedback, View } from 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCallback, useEffect, useRef, useState } from "react";
 import friendApi from "../../api/v2/friend";
-import { RelationListItem } from '@/api/types/friend'
+import friendService from '@/service/friend.service'
+import userApi from '@/api/v2/user'
+import { FreindInfoReleationItem } from '@/api/types/friend'
 import Navbar from "../../components/navbar";
 import { scale } from "react-native-size-matters/extend";
 import NavbarRight from "./components/navbar-right";
@@ -10,13 +12,15 @@ import ScanQrcodeModal, { ScanQrcodeModalType } from "../../components/scan-qrco
 import SearchInput from "./components/search-input";
 import UserItem from "./components/user-item";
 import toast from "../../lib/toast";
+import { UserInfoItem } from "@/api/types/user";
+import { GenderEnum } from "@/api/types/enums";
 
 const AddFriendScreen = () => {
     const insets = useSafeAreaInsets();
     const [loading, setLoading] = useState(false);
-    const [users, setUsers] = useState<RelationListItem[]>([]);
-
+    const [users, setUsers] = useState<FreindInfoReleationItem[]>([]);
     const search = useCallback((v: string, l: boolean) => {
+        
         if (!v.match(/^0x[a-fA-F0-9]{40}$/)) {
             toast('请输入正确的以太坊地址！');
             return;
@@ -25,8 +29,8 @@ const AddFriendScreen = () => {
             return;
         }
         setLoading(true);
-        friendApi.getRelationList({uids: [v]}).then((res) => {
-            setUsers(res.items);
+        friendService.getReleationList([v]).then(res=>{
+            setUsers(res)
         }).catch((err) => {
             console.log('err', err)
         }).finally(() => setLoading(false));

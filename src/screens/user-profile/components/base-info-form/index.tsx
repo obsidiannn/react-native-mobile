@@ -10,6 +10,7 @@ import AddressInfo from "./address-info";
 import colors from "../../../../config/colors";
 import { Button } from "react-native-ui-lib";
 import toast from "../../../../lib/toast";
+import { GenderEnum } from "@/api/types/enums";
 export interface FormData {
     avatar: string;
     gender: number;
@@ -21,7 +22,7 @@ export interface BaseInfoFormType {
 export default forwardRef((_, ref) => {
     const [formData, setFormData] = useState({
         avatar: '',
-        gender: 2,
+        gender: GenderEnum.UNKNOWN,
         name: '',
         sign: ''
     });
@@ -139,8 +140,10 @@ export default forwardRef((_, ref) => {
                         return;
                     }
                     setLoading(true);
-                    try {
+                    try { 
+                        // TODO: 服务端待集成s3
                         await authService.updateAvatar(formData.avatar);
+                
                         await authService.updateName(formData.name);
                         await authService.updateGender(formData.gender);
                         await authService.updateSign(formData.sign);

@@ -39,6 +39,7 @@ const UnlockScreen = ({ navigation,route }: Props) => {
                     onChange={(v) => {
                         setPassword(v);
                     }} onNext={async () => {
+
                         if (loading) {
                             return;
                         }
@@ -49,9 +50,11 @@ const UnlockScreen = ({ navigation,route }: Props) => {
                             setNowAccount(oneWallet);
                             globalThis.wallet = oneWallet;
                             navigation.popToTop();
+
                             if(params.jumpTo &&( params.jumpTo??null !== null)){
                                 navigation.navigate('AuthStackNav',{ screen: params.jumpTo })
                             }else{
+
                                 navigation.replace('AuthStackNav');
                             }
                             

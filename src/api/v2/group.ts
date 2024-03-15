@@ -8,10 +8,10 @@ import {
   GroupKickOutReq,GroupChangeNameReq ,
   GroupDetailResp,MineGroupInfoItem,
   GroupInfoItem,GroupTransferReq,
-  GroupIdsReq,GroupListIdResp, GroupApplyItem, GroupApplyJoinReq, GroupRequireJoinReq
+  GroupIdsReq,GroupListIdResp, GroupApplyItem, GroupApplyJoinReq, GroupRequireJoinReq, GroupInfoDto
 } from "../types/group"; 
 import { createRequestInstance } from "../lib/request";
-import { BaseIdReq,BaseIdArrayReq, BaseIdsArrayReq } from "../types/common";
+import { BaseIdReq,BaseIdArrayReq, BaseIdsArrayReq, BaseArrayResp } from "../types/common";
 
 const create = (param: GroupCreateReq) => {
   return createRequestInstance(true).post('/groups/create', param);
@@ -41,9 +41,15 @@ const requireJoin = (param: GroupRequireJoinReq) => {
 const kickOut = (param: GroupKickOutReq) => {
   return createRequestInstance(true).post('/groups/kick-out', param);
 }
+
 const mineGroupList = (param: GroupIdsReq) :Promise<GroupListIdResp> => {
   return createRequestInstance(true).post('/groups/list',param);
 }
+
+const groupInfoList = (param: GroupIdsReq): Promise<BaseArrayResp<GroupInfoDto>> =>{
+  return createRequestInstance(true).post('/groups/list-by-ids',param);
+}
+
 const changeName = (param: GroupChangeNameReq) => {
   return createRequestInstance(true).post('/groups/update-name',param);
 }
@@ -118,6 +124,7 @@ export default {
   requireJoin,
   kickOut,
   mineGroupList,
+  groupInfoList, 
   changeName,
   changeAvatar,
   changeAlias,

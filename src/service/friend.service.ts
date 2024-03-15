@@ -1,4 +1,8 @@
+import { GenderEnum } from "@/api/types/enums";
+import { FreindInfoReleationItem, FriendRelationItem } from "@/api/types/friend";
+import { UserInfoItem } from "@/api/types/user";
 import friendApi from "@/api/v2/friend";
+import userApi from '@/api/v2/user'
 const getBatchInfo = async (uids: string[]) => {
     const data = await friendApi.getFriendList({uids});
     return data.items;
@@ -9,6 +13,28 @@ const getInfo = async (uid: string) => {
         return items[0];
     }
     return null;
+}
+
+const getReleationList = async (uids: string[]):Promise<FreindInfoReleationItem[]>=>{
+   const releations =  await friendApi.getRelationList({uids })
+   const users = await userApi.getBatchInfo({uids}) 
+   const userHash : Map<string,UserInfoItem> = new Map<string,UserInfoItem>();
+    (users.items??[]).forEach(u=>{
+        userHash.set(u.id,u)
+    })
+    const result = (releations.items??[]).map(i=>{
+        const user = userHash.get(i.uid)
+        const item:FreindInfoReleationItem = {
+            ...i,
+            name: user?.name ??'',
+            sign: user?.sign??'',
+            avatar: user?.avatar??'',
+            gender: user?.gender??GenderEnum.UNKNOWN,
+            pubKey: user?.pubKey??''
+        }
+        return item
+    })
+    return result
 }
 const getList = async () => {
     const data = await friendApi.getFriendList({uids:[]});
@@ -49,5 +75,6 @@ export default {
     removeAll,
     removeBatch,
     remove,
-    updateRemark
+    updateRemark,
+    getReleationList
 };

@@ -4,6 +4,7 @@ import { AuthCheckRegisterResp ,AuthRegisterResp,
   AuthChangeNameReq,AuthChangeAvatarReq,AuthChangeGenderReq,
   AuthChangeSignReq,AuthBlackReq,AuthBlackListItem
 } from '../types/auth'
+import { UserInfoItem } from "../types/user";
 
 // 是否已注册 todo
 const checkRegister = ():Promise<AuthCheckRegisterResp> => {
@@ -62,6 +63,10 @@ export const isRegister = ():Promise<AuthCheckRegisterResp>=>{
   return createRequestInstance(true).post('/auth/is-register',{});
 }
 
+export const userInfo = ():Promise<UserInfoItem>=>{
+  return createRequestInstance(true).post('/auth/user-info',{});
+}
+
 export default {
   checkRegister,
   register,
@@ -73,5 +78,6 @@ export default {
   blackList,
   authAddBlackList,
   removeBlackList,
-  isRegister
+  isRegister,
+  userInfo
 }

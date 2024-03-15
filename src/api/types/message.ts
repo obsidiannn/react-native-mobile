@@ -17,7 +17,7 @@ export interface MessageSendResp {
 	content: string;
 }
 
-export class MessageListReq{
+export interface MessageListReq{
 	chatId: string
 	sequence: number
 	direction: string

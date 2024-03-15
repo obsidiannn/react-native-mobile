@@ -1,12 +1,12 @@
 import { createRequestInstance } from "../lib/request";
 import { BaseIdReq,BaseIdsArrayReq,BaseUIdArrayReq, BaseArrayResp } from "../types/common";
 import {FriendRelationItem,FriendInviteApplyReq,FriendInviteApplyItem
-,FriendInviteAgreeReq,FriendInviteRejectReq,FriendInfoItem,FriendChangeAliasReq, RelationListItem
+,FriendInviteAgreeReq,FriendInviteRejectReq,FriendInfoItem,FriendChangeAliasReq
 
 } from "../types/friend"
 
 // 获取用户关系
-const getRelationList = (param: BaseUIdArrayReq): Promise<BaseArrayResp<RelationListItem>>=>{
+const getRelationList = (param: BaseUIdArrayReq): Promise<BaseArrayResp<FriendRelationItem>>=>{
   return createRequestInstance(true).post('/friends/relation-list', param);
 }
 

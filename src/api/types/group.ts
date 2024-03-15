@@ -27,7 +27,7 @@ export interface GroupMemberResp extends BasePageResp<GroupMemberItem>{
 }
 
 export interface GroupIdsReq {
-  gids?: stirng []
+  gids?: string[]
 }
 
 export interface GroupListIdResp{
@@ -89,6 +89,17 @@ export interface GroupChangeDescReq{
 export interface GroupTransferReq{
 	id: string;
   uid: string;
+}
+
+export interface GroupInfoDto {
+	id: string
+	name: string
+	avatar: string
+	memberLimit: number
+	total: number
+	pubKey: string
+	desc: string
+	isEnc: string
 }
 
 export interface GroupInfoItem{

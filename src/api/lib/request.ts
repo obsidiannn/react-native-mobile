@@ -93,6 +93,9 @@ export const createRequestInstance = (en = true) => {
 instance.interceptors.request.use(async (config) => {
   console.log('====================================');
   console.log('[request]',config.url);
+  console.log('[reqBody]',config.data??{});
+  console.log('====================================');
+  
   if (en) {
 
     const wallet = globalThis.wallet;
@@ -107,14 +110,9 @@ instance.interceptors.request.use(async (config) => {
 
     const content = typeof config.data === 'string' ? config.data : JSON.stringify(config.data??{})
     const time = String(Math.floor(new Date().getTime() / 1000))
-    // const sharedSecret = wallet.signingKey.computeSharedSecret(sysPubKey)
     const sharedSecret = wallet.signingKey.computeSharedSecret(Buffer.from(sysPubKey, 'hex'))
-
-    console.log(sharedSecret);
-    // const dataHash = Crypto.createHash('sha256').update(content).digest('hex')
     const dataHash = quickAes.En(content,sysPubKey)
     const sign = wallet.signMessageSync(dataHash + ':' + time)
-
 
     config.headers.set('X-Sign', sign);
     config.headers.set('X-Data-Hash', dataHash);
@@ -124,12 +122,10 @@ instance.interceptors.request.use(async (config) => {
     config.headers.set('X-UID', wallet.address.toLowerCase());
     config.headers.set('X-Pub-Key', wallet.signingKey.publicKey);
     
-    console.log('address', wallet.address)
     const enData = quickAes.En(content, sharedSecret);
     config.data = {
       data: enData
     }
-    console.log('====================================');
 
   }
   return config
@@ -158,20 +154,18 @@ instance.interceptors.response.use(async (rep): Promise<any> => {
       sysPubKey = '0x' + sysPubKey
     }
     const sharedSecret = wallet.signingKey.computeSharedSecret(sysPubKey)
-    console.log('[data]',data);
-    console.log(quickAes.De(data, sharedSecret))
     let rel: any = {}
     if (data != ""){
       rel = JSON.parse(quickAes.De(data, sharedSecret) ?? {});
     }
-    console.log('[body]',rel)
+    console.log('[respBody]',rel.data)
     if (rel?.code && Number(rel?.code) != 200) {
       toast(rel.msg);
       throw new Error(rel.err_msg);
     }
     return rel.data;
   }else{
-    console.log('[body]',rep.data.data)
+    console.log('[respBody]',rep.data.data)
   }
   
   console.log('====================================');  
