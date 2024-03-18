@@ -9,6 +9,7 @@ import { captureImage, captureVideo, pickerDocument, pickerImage } from "./utils
 import TextInput from "./text-input";
 import Accessory from "./accessory";
 import { globalStorage } from "@/lib/storage";
+import util from '@/lib/utils'
 export interface InputToolKitRef {
     down: () => void;
 }
@@ -63,17 +64,57 @@ export default forwardRef((props: InputToolKitProps,ref) => {
             {mode == 'tool' ? <Accessory tools={tools} onPress={async (tool) => {
                 switch (tool.key) {
                     case 'camera':
-                        await captureImage();
+                        const photo = await captureImage();
+                        if(photo !== undefined){
+                            const message: IMessage<'image'> = {
+                                mid: util.generateId(),
+                                type: 'image',
+                                state: 0,
+                                time: dayjs(),
+                                data: {
+                                    w: photo.width,
+                                    h: photo.height,
+                                    thumbnail: photo.uri,
+                                    original: photo.uri,
+                                    t_md5: '',
+                                    o_md5: '',
+                                    t_enc_md5: '',
+                                    o_enc_md5: '',
+                                },
+                            }
+                            await props.onSend(message)
+                        }
                         break;
                     case 'video':
-                        await captureVideo();
+                        const video = await captureVideo();
+                        if(video !== undefined){
+                            const message: IMessage<'video'> = {
+                                mid: util.generateId(),
+                                type: 'video',
+                                state: 0,
+                                time: dayjs(),
+                                data: {
+                                    w: video.width,
+                                    h: video.height,
+                                    thumbnail: video.uri,
+                                    original: video.uri,
+                                    t_md5: '',
+                                    o_md5: '',
+                                    t_enc_md5: '',
+                                    o_enc_md5: '',
+                                    duration: video.duration??0
+                                },
+                            }
+                            await props.onSend(message)
+                        }
+                           
                         break;
                     case 'albums':
                         const images = await pickerImage();
                         for (let i = 0; i < images.length; i++) {
                             const uri = images[i].uri;
                             const message: IMessage<'image'> = {
-                                mid: crypto.randomUUID(),
+                                mid: util.generateId(),
                                 type: 'image',
                                 state: 0,
                                 time: dayjs(),
@@ -96,7 +137,7 @@ export default forwardRef((props: InputToolKitProps,ref) => {
                         for (let i = 0; i < assets.length; i++) {
                             const uri = assets[i].uri;
                             const message: IMessage<'file'> = {
-                                mid: crypto.randomUUID(),
+                                mid: util.generateId(),
                                 type: 'file',
                                 state: 0,
                                 time: dayjs(),

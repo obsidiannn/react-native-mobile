@@ -26,6 +26,7 @@ export interface MessageListReq{
 
 export interface MessageListItem {
 	id: string;
+	msgId: string;
 	isRead: number;
 	sequence: number;
 	createdAt: Date;
@@ -34,6 +35,11 @@ export interface MessageListItem {
 export type MessageExtra = {};
 
 export type MessageAction = {};
+
+export interface MessageDetailReq{
+	chatId: string
+	ids: string[]
+}
 
 export interface MessageDetailItem {
 	id: string;

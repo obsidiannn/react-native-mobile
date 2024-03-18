@@ -8,7 +8,7 @@ import { scale, verticalScale } from "react-native-size-matters/extend";
 import { IMessage } from "./types";
 import { Button } from "react-native-ui-lib";
 import colors from "@/config/colors";
-
+import util from '@/lib/utils'
 export interface InputToolKitProps {
     tools: InputAccessoryItemType[];
     onSend: (message: IMessage<'text'>) => Promise<void>;
@@ -63,7 +63,7 @@ export default (props: InputToolKitProps) => {
                 <Button onPress={async () => {
                     if (content.length > 0) {
                         const message: IMessage<'text'> = {
-                            mid: crypto.randomUUID(),
+                            mid: util.generateId(),
                             type: 'text',
                             state: 0,
                             time: dayjs(),

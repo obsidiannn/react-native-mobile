@@ -22,7 +22,7 @@ export default (
     }, [props.image.w, props.image.h]); 
     return <EncImage
         source={props.image.thumbnail}
-        enc_key={props.encKey}
+        encKey={props.encKey}
         style={{
             width: size[0],
             height: size[1],

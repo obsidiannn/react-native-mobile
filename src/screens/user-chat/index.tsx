@@ -9,7 +9,7 @@ type Props = StackScreenProps<RootStackParamList, 'UserChat'>;
 import { UserInfoItem } from "@/api/types/user";
 import friendService from "@/service/friend.service";
 import userService from "@/service/user.service";
-import MessageService from "@/service/message.service";
+import messageService from "@/service/message.service";
 import ToastException from "@/exception/toast-exception";
 import { FriendInfoItem } from "@/api/types/friend";
 import { scale, verticalScale } from "react-native-size-matters/extend";
@@ -50,7 +50,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             return;
         }
         const seq = direction == 'up' ? firstSeq.current : lastSeq.current;
-        MessageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction).then((res) => {
+        messageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction).then((res) => {
             if (res.length > 0) {
                 if (direction == 'up') {
                     firstSeq.current = res[res.length - 1].sequence ?? 0;
@@ -63,7 +63,9 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             }
             console.log('消息列表', res);
             setMessages((items) => {
-                return res.concat(items);
+                const result = res.concat(items);
+                
+                return result
             });
             // 存储图片
             const tmps: IMessageImage[] = [];
@@ -83,6 +85,8 @@ const UserChatScreen = ({ navigation, route }: Props) => {
     useEffect(() => {
         // 监听页面获取焦点
         const focusEvent = navigation.addListener('focus', () => {
+            console.log('focus');
+            
             setMessages([]);
             imagesRef.current = [];
             conversationIdRef.current = route.params.chatId ?? '';
@@ -99,11 +103,13 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     let pubKey = res.pubKey;
                     sharedSecretRef.current = globalThis.wallet.signingKey.computeSharedSecret(pubKey);
                     setUser(res);
-                    setTitle((res?.remark ?? '') || res.name);
+                    setTitle((res?.remark ) || res.name);
                     loadMessages('up');
-                    intervalRef.current = setInterval(() => {
-                        loadMessages('down');
-                    }, 2000);
+                    loadMessages('down');
+                    // TODO: 这里临时是定时调用的
+                    // intervalRef.current = setInterval(() => {
+                    //     loadMessages('down');
+                    // }, 2000);
                 }
             })
         });
@@ -132,7 +138,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             setKeyboardState(false);
         });
         if (globalThis.wallet) {
-            userService.getInfo(globalThis.wallet.address.toLowerCase()).then((res) => {
+            userService.getInfo(globalThis.wallet.address).then((res) => {
                 if (res) {
                     setAuthUser(res);
                 }
@@ -199,7 +205,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     <MessageList authUid={authUser?.id ?? ''} encKey={sharedSecretRef.current} messages={messages} onLongPress={(m)=>{
                         console.log('长按',m);
                     }} onPress={(m) => {
-                        const data = m.data as IMessageTypeMap[DataType];
+                        // const data = m.data as IMessageTypeMap[DataType];
                         if (m.type == 'image') {
                             console.log('点击图片', m);
                             const data = m.data as IMessageImage;
@@ -213,6 +219,14 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                             }
                         }
                         if (m.type == 'file') {
+                            if (m.data && m.state == 1) {
+                                encFilePreviewRef.current?.open({
+                                    encKey: sharedSecretRef.current,
+                                    file: m.data as IMessageFile,
+                                })
+                            }
+                        }
+                        if (m.type == 'video') {
                             if (m.data && m.state == 1) {
                                 encFilePreviewRef.current?.open({
                                     encKey: sharedSecretRef.current,
@@ -244,7 +258,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                         if(message.type == 'image' || message.type =="file"){
                             loadingModalRef.current?.open('加密处理中...');
                         }
-                        MessageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
+                        messageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
                             if (!res) {
                                 return;
                             }

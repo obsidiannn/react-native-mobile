@@ -39,12 +39,14 @@ export const captureImage = async () => {
         exif: false,
         quality: 1,
     });
-
+    
     if (!result.canceled) {
         const s = await PhotoEditor.open({
             stickers: [],
             path: result.assets[0].uri,
         })
+        result.assets[0].uri = s.toString()
+        return result.assets[0]
     }
 }
 
@@ -63,15 +65,29 @@ export const captureVideo = async () => {
         const output = input.replace(/(.*)(\..*$)/, '$1_output.mp4');
 
         const cmd = `-i ${input} -c:v mpeg4 ${output}`;
-        FFmpegKit.execute(cmd).then(async (session) => {
-            const returnCode = await session.getReturnCode();
-            if (ReturnCode.isSuccess(returnCode)) {
-                // SUCCESS
-            } else if (ReturnCode.isCancel(returnCode)) {
-                // CANCEL
-            } else {
-                // ERROR
-            }
-        });
+        // FFmpegKit.execute(cmd).then(async (session) => {
+        //     const returnCode = await session.getReturnCode();
+        //     if (ReturnCode.isSuccess(returnCode)) {
+        //         // SUCCESS
+                
+        //     } else if (ReturnCode.isCancel(returnCode)) {
+        //         // CANCEL
+        //     } else {
+        //         // ERROR
+        //     }
+        // });
+       const session = await FFmpegKit.execute(cmd)
+       const returnCode = await session.getReturnCode() 
+        if (ReturnCode.isSuccess(returnCode)) {
+        // SUCCESS
+            result.assets[0].uri = output
+            console.log('video return:',result.assets[0].uri);
+            
+            return result.assets[0]
+        } else if (ReturnCode.isCancel(returnCode)) {
+        // CANCEL
+        } else {
+        // ERROR
+        }
     }
 };

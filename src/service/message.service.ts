@@ -7,6 +7,7 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import fileService, { format, uploadFile } from "./file.service";
 import { DataType, IMessage, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
 import { MessageTypeEnum } from "@/api/types/enums";
+import { MessageDetailItem, MessageListItem } from "@/api/types/message";
 const _send = async (chatId: string, key: string, mid: string, type: MessageTypeEnum, data: {
     t: string;
     d: any;
@@ -125,6 +126,43 @@ const sendFile = async (chatId: string, key: string, message: IMessage<'file'>) 
         console.log('发送文件 error', error);
     }
 }
+
+
+const sendVideo = async (chatId: string, key: string, message: IMessage<'video'>) => {
+    const file = message.data;
+    if (!file) {
+        throw new ToastException('文件不能为空');
+    }
+    try {
+        const fileEnc = await fileService.encryptFile(file.original, key);
+        const date = dayjs().format('YYYY/MM/DD');
+        const fileKey = `upload/chat/video/${date}/${message.mid}.enc`;
+        await uploadFile(fileEnc.path, fileKey);
+        file.t_md5 = fileEnc.enc_md5;
+        file.o_md5 = fileEnc.md5;
+        const fileInfo = await fileService.getFileInfo(file.original);
+        fileInfo?.exists && (file.o_md5 = fileInfo.md5 ?? '');
+        console.log('处理完成准备发送', file);
+        const result = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, {
+            t: 'file',
+            d: {
+                ...file,
+                path: fileKey,
+            }
+        });
+        return {
+            ...result,
+            path: fileKey,
+            data: {
+                ...file,
+                path: fileKey,
+            }
+        }
+    } catch (error) {
+        console.log('发送文件 error', error);
+    }
+}
+
 const send = async (chatId: string, key: string, message: IMessage<DataType>) => {
     switch (message.type) {
 
@@ -132,8 +170,8 @@ const send = async (chatId: string, key: string, message: IMessage<DataType>) =>
             return await sendText(chatId, key, message as IMessage<'text'>);
         case 'image':
             return await sendImage(chatId, key, message as IMessage<'image'>);
-        // case 'video':
-        //     return await sendVideo(chatId, key, message);
+        case 'video':
+            return await sendVideo(chatId, key, message as IMessage<'video'>);
         // case 'audio':
         //     return await sendAudio(chatId, key, message);
         case 'file':
@@ -153,6 +191,15 @@ const decrypt = (key: string, content: string) => {
         }
     }
 }
+
+/**
+ * 获取消息列表
+ * @param chatId 
+ * @param key 
+ * @param sequence 
+ * @param direction 
+ * @returns 
+ */
 const getList = async (chatId: string, key: string, sequence: number, direction: 'up' | 'down'): Promise<IMessage<DataType>[]> => {
     const data = await messageApi.getMessageList({
         chatId,
@@ -160,13 +207,26 @@ const getList = async (chatId: string, key: string, sequence: number, direction:
         sequence,
         direction,
     });
-    const users = await userService.getBatchInfo(data.items.map((item) => item.from_uid));
+    if(data.items.length <= 0){
+        return []
+    }
+    // const users = await userService.getBatchInfo(data.items.map((item) => item.fromUid));
+    const mids = data.items.map(i=>i.msgId)
+    const details = await messageApi.getMessageDetail({chatId,ids: mids})
+    const messageHash = new Map<string,MessageDetailItem>();
+    const userIds:string[] = []
+    details.items.forEach(d=>{
+        messageHash.set(d.id,d)
+        userIds.push(d.fromUid)
+    })
+    const userHash = await userService.getUserHash(userIds)
     return data.items.map((item) => {
-        const data = decrypt(key, item.content);
+        const detail = messageHash.get(item.msgId)
+        const data = decrypt(key, detail?.content??'');
         const t = data.t as DataType;
 
-        const time = dayjs(item.create_time)
-        const user = users.find((user) => user.id === item.from_uid)
+        const time = dayjs(item.createdAt)
+        const user = userHash.get(detail?.fromUid??'')
         return {
             mid: item.id,
             type: t,
