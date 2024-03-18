@@ -7,8 +7,7 @@ import { wordlist } from '@scure/bip39/wordlists/english';
 import PagerView from "react-native-pager-view";
 import { useRecoilState } from "recoil";
 import { NowAccount } from "../../stores/app";
-import UserApi from "../../api/user";
-import AuthApi from "../../api/auth";
+import authApi from "../../api/v2/auth";
 import Navbar from "../../components/navbar";
 import toast from "../../lib/toast";
 import { ScrollView } from "react-native";
@@ -16,6 +15,7 @@ import SetMnemonicWordComponent from "./components/set-mnemonic-word";
 import SetPasswordComponent from "./components/set-password";
 import { deleteAccount, writeAccount } from "../../lib/account";
 import ToastException from "../../exception/toast-exception";
+import { RootStackParamList } from "@/types";
 type Props = StackScreenProps<RootStackParamList, 'Login'>;
 
 const LoginScreen = ({ navigation }: Props) => {
@@ -69,10 +69,10 @@ const LoginScreen = ({ navigation }: Props) => {
                                 const oneWallet = await writeAccount(password, mnemonicWord);
                                 setNowAccount(oneWallet);
                                 globalThis.wallet = oneWallet;
-                                const res = await UserApi.isRegister();
-                                if (!res.is_register) {
-                                    await AuthApi.register()
-                                    await UserApi.updateName('新用户');
+                                const res = await authApi.isRegister();
+                                if (!res.isRegister) {
+                                    await authApi.register()
+                                    await authApi.changeName({name: '新用户'});
                                 }
                                 navigation.navigate('AuthStackNav');
                             } catch (e: any) {

@@ -1,4 +1,4 @@
-import { FriendListItem } from "./api/friend";
+import { FriendInfoItem } from "./api/types/friend";
 
 type RootStackParamList = {
     Entry: undefined;
@@ -48,6 +48,7 @@ type RootStackParamList = {
         mnemonic: string;
     };
     GroupApplyList: undefined;
+    GroupList: undefined;
     UserSetting: undefined;
     UserChatInfo: {
         uid: string;
@@ -80,7 +81,7 @@ interface FriendRelation extends Member {
     is_friend: number;
 }
 
-interface MemberOption extends FriendListItem {
+interface MemberOption extends FriendInfoItem {
     status: boolean;
     disabled: boolean;
 }

@@ -3,12 +3,11 @@ import { navigate } from '@/lib/root-navigation';
 import { scale } from "react-native-size-matters/extend";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { InviteListItem } from "@/api/friend";
 import { Image } from "@/components/image";
-import { ApplyListItem } from "@/api/group";
+import { GroupApplyItem } from "@/api/types/group";
 dayjs.extend(relativeTime)
 export default (props: {
-    item: ApplyListItem,
+    item: GroupApplyItem,
     isLast: boolean,
     onCheck: () => void;
 }) => {

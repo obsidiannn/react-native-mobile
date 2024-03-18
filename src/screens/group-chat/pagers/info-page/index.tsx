@@ -1,5 +1,5 @@
-import { GroupInfoItem } from "@/api/group";
-import { UserInfo } from "@/api/user";
+import { GroupInfoItem } from "@/api/types/group";
+import { UserInfoItem } from "@/api/types/user";
 import { Text } from "react-native"
 import { scale } from "react-native-size-matters/extend";
 import { Button, View } from "react-native-ui-lib"
@@ -19,12 +19,12 @@ import friendService from "@/service/friend.service";
 import quickAes from "@/lib/quick-aes";
 import { ethers } from "ethers";
 import userService from "@/service/user.service";
-import groupApi from "@/api/group";
+import groupApi from "@/api/v2/group";
 
 export default (props: {
     group?: GroupInfoItem;
-    authUser?: UserInfo;
-    members?: UserInfo[];
+    authUser?: UserInfoItem;
+    members?: UserInfoItem[];
     onChangeMemberList?: () => void;
 }) => {
     const qrcodeModalRef = useRef<QRcodeModalRef>(null);
@@ -55,7 +55,7 @@ export default (props: {
         }[] = [];
         for (let index = 0; index < users.length; index++) {
             const user = users[index];
-            const userSharedSecret = groupWallet.signingKey.computeSharedSecret(Buffer.from(user.pub_key.substring(2), 'hex')).substring(4);
+            const userSharedSecret = groupWallet.signingKey.computeSharedSecret(Buffer.from(user.pubKey.substring(2), 'hex')).substring(4);
             const userGroupEncKey = quickAes.En(groupKey, userSharedSecret)
             items.push({
                 uid: user.id,
@@ -63,7 +63,7 @@ export default (props: {
             })
         }
         if (items.length > 0) {
-            await groupApi.invite({
+            await groupApi.inviteJoin({
                 id: group.id,
                 items,
             })
@@ -114,7 +114,7 @@ export default (props: {
                             status: false,
                             name: item.name,
                             title: item.name,
-                            name_index: item.name_index,
+                            name_index: item.nameIndex,
                             disabled,
                         } as SelectMemberOption;
                     })
@@ -144,7 +144,7 @@ export default (props: {
                                 icon: item.avatar,
                                 status: false,
                                 title: item.name,
-                                name_index: item.name_index,
+                                name_index: item.nameIndex,
                                 disabled,
                             } as SelectMemberOption;
                         })

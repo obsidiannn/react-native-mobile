@@ -4,7 +4,7 @@ import 'react-native-get-random-values';
 import 'text-encoding-polyfill';
 import { RootSiblingParent } from 'react-native-root-siblings';
 import { RecoilRoot } from 'recoil';
-import SysApi from './src/api/sys';
+import sysApi from './src/api/v2/system';
 import { Platform, UIManager } from 'react-native';
 import { globalStorage } from './src/lib/storage'
 import KeyboardManager from 'react-native-keyboard-manager';
@@ -13,7 +13,7 @@ import toast from './src/lib/toast';
 import { initNotification } from './src/service/notification.service'
 
 import { navigate } from "./src/lib/root-navigation";
-import messaging,{FirebaseMessagingTypes} from '@react-native-firebase/messaging';
+import messaging from '@react-native-firebase/messaging';
 
 
 if (
@@ -30,9 +30,9 @@ if (Platform.OS === 'ios') {
 globalThis.TextEncoder = TextEncoder;
 function App(): JSX.Element {
   const init = useCallback(async () => {
-    const res = await SysApi.getInfo()
-    globalStorage.setItem('sys-pub-key', res.pub_key);
-    globalStorage.setItem('sys-static-url', res.static_url);
+    const res = await sysApi.getInfo()
+    globalStorage.setItem('sys-pub-key', res.pubKey);
+    globalStorage.setItem('sys-static-url', res.staticUrl);
 
     await initNotification()
 
@@ -76,7 +76,7 @@ function App(): JSX.Element {
         </RootSiblingParent>
       </SafeAreaProvider>
     </RecoilRoot>
-  );
+  );  
 }
 
 export default App;

@@ -1,4 +1,4 @@
-import messageApi from "../api/message"
+import messageApi from "../api/v2/message"
 import ToastException from "../exception/toast-exception";
 import quickAes from "../lib/quick-aes";
 import dayjs from 'dayjs';
@@ -6,7 +6,8 @@ import userService from "./user.service";
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import fileService, { format, uploadFile } from "./file.service";
 import { DataType, IMessage, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
-const _send = async (chatId: string, key: string, mid: string, data: {
+import { MessageTypeEnum } from "@/api/types/enums";
+const _send = async (chatId: string, key: string, mid: string, type: MessageTypeEnum, data: {
     t: string;
     d: any;
 }) => {
@@ -17,9 +18,11 @@ const _send = async (chatId: string, key: string, mid: string, data: {
         throw new ToastException('请先登录');
     }
     console.log('send', data);
-    return await messageApi.send({
-        chat_id: chatId,
-        mid: mid,
+    return await messageApi.sendMessage({
+        id: mid,
+        chatId: chatId,
+        type,
+        isEnc: 1,
         content: quickAes.En(JSON.stringify(data), key),
     });
 }
@@ -28,7 +31,7 @@ const sendText = async (chatId: string, key: string, message: IMessage<'text'>) 
         t: 'text',
         d: message.data,
     }
-    const res = await _send(chatId, key, message.mid, data);
+    const res = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, data);
     message.sequence = res.sequence;
     return {
         ...res,
@@ -63,7 +66,7 @@ const sendImage = async (chatId: string, key: string, message: IMessage<'image'>
     const originalKey = `upload/chat/original/${date}/${message.mid}.webp`;
     await uploadFile(thumbnailEnc.path, thumbnailKey);
     await uploadFile(originalEnc.path, originalKey);
-    const result = await _send(chatId, key, message.mid, {
+    const result = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, {
         t: 'image',
         d: {
             t_md5: thumbnailEnc.md5,
@@ -103,7 +106,7 @@ const sendFile = async (chatId: string, key: string, message: IMessage<'file'>) 
         const fileInfo = await fileService.getFileInfo(file.path);
         fileInfo?.exists && (file.md5 = fileInfo.md5 ?? '');
         console.log('处理完成准备发送', file);
-        const result = await _send(chatId, key, message.mid, {
+        const result = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, {
             t: 'file',
             d: {
                 ...file,
@@ -151,10 +154,10 @@ const decrypt = (key: string, content: string) => {
     }
 }
 const getList = async (chatId: string, key: string, sequence: number, direction: 'up' | 'down'): Promise<IMessage<DataType>[]> => {
-    const data = await messageApi.getList({
-        chat_id: chatId,
+    const data = await messageApi.getMessageList({
+        chatId,
         limit: 20,
-        sequence: sequence,
+        sequence,
         direction,
     });
     const users = await userService.getBatchInfo(data.items.map((item) => item.from_uid));
@@ -178,6 +181,8 @@ const getList = async (chatId: string, key: string, sequence: number, direction:
 const removeBatch = async (chatId: string, mids: string[]) => {
     return true;
 }
+
+// 清除所有消息
 const clearAll = async (cids: string[]) => {
     return true;
 }

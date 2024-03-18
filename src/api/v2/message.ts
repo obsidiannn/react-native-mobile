@@ -4,17 +4,19 @@ import {
   MessageSendReq,
   MessageListItem,
   MessageDetailItem,
-  MessageDeleteByIdReq
+  MessageDeleteByIdReq,
+  MessageSendResp,
+  MessageListReq
  } from '../types/message'
 
  // 发送消息
-const sendMessage = (param: MessageSendReq) =>{
+const sendMessage = (param: MessageSendReq):Promise<MessageSendResp> =>{
   return createRequestInstance(true).post('/messages/send',param);
 }
 
 // 消息列表
-const mineMessageList = (): Promise<BaseArrayResp<MessageListItem>>=>{
-  return createRequestInstance(true).post('/messages/list');
+const getMessageList = (param:MessageListReq): Promise<BaseArrayResp<MessageListItem>>=>{
+  return createRequestInstance(true).post('/messages/list',param);
 }
 
 // 消息列表
@@ -52,3 +54,15 @@ const clearChatByChatIds = (param: MessageDeleteByIdReq) =>{
   return createRequestInstance(true).post('/messages/clear-chat-ids',param);
 }
 
+export default {
+  sendMessage,
+  getMessageList,
+  getMessageDetail,
+  pullBack,
+  deleteSelfMsg,
+  deleteChatByIds,
+  deleteSelfChatByIds,
+  pullBackByChatIds,
+  clearChatByChatIds,
+
+}

@@ -4,10 +4,10 @@ import { scale } from "react-native-size-matters/extend";
 import { Image } from "expo-image";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { InviteListItem } from "../../../api/friend";
+import { FriendInviteApplyItem } from "../../../api/types/friend";
 dayjs.extend(relativeTime)
 export default (props: {
-    item: InviteListItem,
+    item: FriendInviteApplyItem,
     isLast: boolean,
 }) => {
     const { item, isLast } = props;
@@ -15,29 +15,30 @@ export default (props: {
         if (item.status === 1) {
             navigate('InviteInfo', {
                 id: item.id,
-                obj_uid: item.obj_uid,
+                obj_uid: item.objUid,
                 uid: item.uid,
-                name: item.name,
-                avatar: item.avatar,
+                // name: item.name,
+                // avatar: item.avatar,
                 status: item.status,
                 remark: item.remark,
             });
         } else {
             const authUid = globalThis.wallet?.address.toLowerCase() || '';
             navigate('UserInfo', {
-                uid: authUid === item.uid ? item.obj_uid : item.uid,
+                uid: authUid === item.uid ? item.objUid : item.uid,
             });
         }
     }} style={styles.container}>
+        {/* TODO: */}
         <View style={styles.avatarContainer}>
-            <Image source={{ uri: item.avatar }} style={styles.avatar} />
+            <Image source={{ uri: '' }} style={styles.avatar} />
         </View>
         <View style={{
             ...styles.rightContainer,
             borderBottomColor: isLast ? 'white' : '#F4F4F4',
         }}>
             <View style={styles.nameContainer}>
-                <Text style={styles.nameText}>{item.name}</Text>
+                <Text style={styles.nameText}>{''}</Text>
             </View>
             <View style={styles.statusContainer}>
                 <Text style={{

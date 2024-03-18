@@ -19,12 +19,18 @@ import {
     UserSettingScreen,
     UserChatInfoScreen,
     GroupInfoScreen,
-    GroupList,
+    GroupListScreen,
 } from '../screens/index'
 import { RootStackParamList } from '@/types';
+import { useNavigation } from '@react-navigation/native';
 export default () => {
-
     const Stack = createStackNavigator<RootStackParamList>();
+    
+    const navigation = useNavigation();
+    const state = navigation.getState()
+    const parentState = state.routes[state.index]
+    console.log('[route]',(parentState.state?.routeNames??[])[parentState.state?.index??0]);
+    
     return (
         <Stack.Navigator initialRouteName='Tab' screenOptions={{
             headerShown: false,
@@ -47,7 +53,7 @@ export default () => {
             <Stack.Screen name="UserSetting" component={UserSettingScreen} />
             <Stack.Screen name="UserChatInfo" component={UserChatInfoScreen} />
             <Stack.Screen name="GroupInfo" component={GroupInfoScreen} />
-            <Stack.Screen name="GroupList" component={GroupList} />
+            <Stack.Screen name="GroupList" component={GroupListScreen} />
             
         </Stack.Navigator>
     );

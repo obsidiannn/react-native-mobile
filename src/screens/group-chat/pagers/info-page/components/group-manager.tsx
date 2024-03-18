@@ -2,7 +2,7 @@ import { StyleSheet, View,Text,ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Navbar from "@/components/navbar";
 import { forwardRef, useImperativeHandle, useState } from "react";
-import group,{GroupInfoItem} from "@/api/group"
+import {GroupInfoItem, GroupMemberItem} from "@/api/types/group"
 import { Modal,Button } from "react-native-ui-lib"
 import { scale } from 'react-native-size-matters/extend';
 import { Image } from "@/components/image";
@@ -23,7 +23,7 @@ export default forwardRef((props: {
   const [managerDescribe,setManagerDescribe] = useState([
     "1.修改群聊名称","2.发表群公告","3.设置退群方式，并可确认退群申请","4.移除成员"
   ]);
-  const [managers,setManagers] = useState<GroupInfoItem[]>([
+  const [managers,setManagers] = useState<GroupMemberItem[]>([
     {
       id: "1",
       name: "name1",

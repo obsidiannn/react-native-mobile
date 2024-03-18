@@ -3,7 +3,9 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "react-native-ui-lib";
 import Navbar from "@/components/navbar";
-import friendApi, { RelationListItem } from "@/api/friend";
+import friendApi from "@/api/v2/friend";
+import friendService from '@/service/friend.service'
+import { FreindInfoReleationItem } from '@/api/types/friend'
 import { useEffect, useState } from "react";
 import { scale, verticalScale } from "react-native-size-matters/extend";
 import InfoCard from "./components/info-card";
@@ -11,18 +13,23 @@ import RemarkCard from "./components/remark-card";
 import colors from "@/config/colors";
 import { Image } from "@/components/image";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { RootStackParamList } from "@/types";
 type Props = StackScreenProps<RootStackParamList, 'UserInfo'>;
 
 const UserInfoScreen = ({ navigation, route }: Props) => {
     const insets = useSafeAreaInsets();
-    const [user, setUser] = useState<RelationListItem>();
+    const [user, setUser] = useState<FreindInfoReleationItem>();
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            friendApi.relationList([route.params?.uid ?? '0x1319b5152a93a33a8102241903da0097960e5c49']).then(res => {
-                if (res.items.length > 0) {
-                    setUser(res.items[0]);
-                }
-            })
+            const uid = route.params?.uid??''
+            if(uid !== ''){
+                friendService.getReleationList([uid]).then(res => {
+                    if (res.length > 0) {
+                        setUser(res[0]);
+                    }
+                })
+            }
+            
         });
         return unsubscribe;
     }, [navigation])
@@ -58,7 +65,7 @@ const UserInfoScreen = ({ navigation, route }: Props) => {
                     }}>
                         <InfoCard user={user} />
                     </View>
-                    {user.is_friend != 1 ? null : <View style={{
+                    {user.isFriend != 1 ? null : <View style={{
                         paddingHorizontal: scale(15),
                         marginTop: verticalScale(21),
                     }}>
@@ -74,7 +81,7 @@ const UserInfoScreen = ({ navigation, route }: Props) => {
                             height: verticalScale(50),
                             borderRadius: verticalScale(16),
                         }} backgroundColor={colors.primary} onPress={() => {
-                            if (user.is_friend != 1) {
+                            if (user.isFriend != 1) {
                                 navigation.navigate('InviteFriend', {
                                     uid: user.uid
                                 })
@@ -84,7 +91,7 @@ const UserInfoScreen = ({ navigation, route }: Props) => {
                                     chatId: ''
                                 })
                             }
-                        }} label={user.is_friend != 1 ? '添加好友' : '开始聊天'} />
+                        }} label={user.isFriend != 1 ? '添加好友' : '开始聊天'} />
                     </View>
                 </View> : null}
 

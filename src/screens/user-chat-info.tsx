@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Navbar from "@/components/navbar";
-import { RelationListItem } from "@/api/friend";
+import { RelationListItem } from "@/api/types/friend";
 import { useEffect, useRef, useState } from "react";
 import { scale } from "react-native-size-matters/extend";
 import { Image } from "@/components/image";
@@ -23,7 +23,7 @@ const UserChatInfoScreen = ({ navigation, route }: Props) => {
             avatar: 'https://img1.baidu.com/it/u=3709586903,1286591012&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500',
             name: 'xxxxxx',
             remark: '',
-            is_friend: 0,
+            isFriend: 0,
             sign: '',
             gender: 0,
         })

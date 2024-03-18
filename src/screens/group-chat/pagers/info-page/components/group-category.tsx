@@ -4,7 +4,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Navbar from "@/components/navbar";
 import CategoryItemContainer  from "./group-category-item";
 import { forwardRef, useImperativeHandle, useState } from "react";
-import group,{GroupCategoryListParams,GroupCategoryListItem} from "@/api/group"
+import groupApi from "@/api/v2/group"
+import {GroupCategoryListParams,GroupCategoryListItem} from '@/api/types/group'
 import { Modal } from "react-native-ui-lib"
 import { scale } from "react-native-size-matters/extend";
 

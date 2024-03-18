@@ -1,58 +1,60 @@
-import { View } from "react-native"
+import { StyleSheet, View } from "react-native"
 import { scale, verticalScale } from "react-native-size-matters/extend"
 import ListItem from "./list-item"
 import { FlashList } from "@shopify/flash-list"
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react"
-import { FriendListItem } from "@/api/friend";
+import { FriendInfoItem } from "@/api/types/friend";
 import AlphabetIndex from "./alphabet-index";
-import MenuList from "./menu-list";
 import Navbar from "@/components/navbar";
-import group from "@/api/v2/group"
-import { createRecordInTransaction } from "@/model/index"
-
+import groupApi from "@/api/v2/group"
+import { RootStackParamList } from "@/types"
+import { StackScreenProps } from "@react-navigation/stack"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { GroupInfoDto, GroupInfoItem } from "@/api/types/group"
+type Props = StackScreenProps<RootStackParamList, 'GroupList'>;
 export interface GroupListType {
     focus: () => void;
 }
-export default forwardRef((_,ref) => {
-    const listRef = useRef<FlashList<any>>(null);
-   
+
+const GroupListScreen = ({ navigation, route }: Props) => {
+    const insets = useSafeAreaInsets();
     const [contactAlphabetIndex, setContactAlphabetIndex] = useState<{ [key: string]: number }>({});
+    const listRef = useRef<FlashList<any>>(null);
     const [aplphabet, setAplphabet] = useState<string[]>([]);
-    let one:FriendListItem = {
-      uid: "string",
-      gender: 1,
-      name_index:"string",
-      chat_id: "string",
-      avatar: "https://avatars.githubusercontent.com/u/122279700?v=4",
-      pub_key:"string",
-      name:"Ream Mixin",
-    }
-    const [contacts, setContacts] = useState<(FriendListItem)[]>([one,one,one,one,one,one,one,one,one,one,one,one,one]);
-    console.log("sqlite");
+    const [groupList, setGroupList] = useState<(GroupInfoDto)[]>([]);
+    
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            groupApi.mineGroupList({}).then(res =>{
+                const gids = res.gids??[]
+                if(gids.length > 0){
+                    groupApi.groupInfoList(res).then(resp=>{
+                        setGroupList(resp.items)
+                    })
+                }
+            })
+        });
+        return unsubscribe;
+    }, [navigation])
               
-    createRecordInTransaction("posts",(e)=>{
-                e.title = "title"
-                e.body= "body"
-                e.subtitle ="sub",
-                e.isPinned = false
-              }).then(r=>{
-                console.log("插入数据库");
-                console.log(r)
-              })
-    useImperativeHandle(ref, () => ({
-        focus: () => {
-              
-        }
-    }));
+    // createRecordInTransaction("posts",(e)=>{
+    //     e.title = "title"
+    //     e.body= "body"
+    //     e.subtitle ="sub",
+    //     e.isPinned = false
+    // }).then(r=>{
+    // console.log("插入数据库");
+    // console.log(r)
+    // })
+   
     return <View style={{
-        flex: 1,
-        display: 'flex',
-        // flexDirection: 'row'
+        ...styles.container,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
     }}>
         
         <View style={{
             flex: 1,
-            // paddingTop: verticalScale(15)
         }}>
           <Navbar title="群聊" backgroundColor="white" />
             <View style={{
@@ -60,11 +62,10 @@ export default forwardRef((_,ref) => {
                 flexDirection: 'row',
             }}>
                 <FlashList
-                    // ListHeaderComponent={() => <MenuList />}
                     ref={listRef}
-                    data={contacts}
+                    data={groupList}
                     renderItem={({ item, index }) => {
-                        return <ListItem item={item} isLast={index === contacts.length - 1} />;
+                        return <ListItem item={item} isLast={index === groupList.length - 1} />;
                     }}
                     estimatedItemSize={scale(60)}
                 />
@@ -82,4 +83,14 @@ export default forwardRef((_,ref) => {
         </View>
 
     </View>
+}
+
+
+export default GroupListScreen;
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        display: 'flex',
+        backgroundColor: 'white',
+    },
 });

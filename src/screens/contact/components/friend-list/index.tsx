@@ -3,7 +3,7 @@ import { scale, verticalScale } from "react-native-size-matters/extend"
 import ListItem from "./list-item"
 import { FlashList } from "@shopify/flash-list"
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react"
-import { FriendListItem } from "@/api/friend"
+import { FriendInfoItem } from "@/api/types/friend"
 import AlphabetIndex from "./alphabet-index"
 import MenuList from "./menu-list"
 import friendService from "@/service/friend.service"
@@ -14,7 +14,7 @@ export interface FriendListType {
 
 export default forwardRef((_,ref) => {
     const listRef = useRef<FlashList<any>>(null);
-    const [contacts, setContacts] = useState<(FriendListItem)[]>([]);
+    const [contacts, setContacts] = useState<(FriendInfoItem)[]>([]);
     const [contactAlphabetIndex, setContactAlphabetIndex] = useState<{ [key: string]: number }>({});
     const [aplphabet, setAplphabet] = useState<string[]>([]);
     const init = useCallback(async () => {
@@ -25,7 +25,6 @@ export default forwardRef((_,ref) => {
     },[]);
     useImperativeHandle(ref, () => ({
         focus: () => {
-            console.log('friend list focus');
             init();
         }
     }));

@@ -18,3 +18,11 @@ const chatDetail = (param: BaseIdsArrayReq): Promise<BaseArrayResp<ChatDetailIte
 const deleteChat = (param: BaseIdsArrayReq)=>{
   return createRequestInstance(true).post('/chat/delete', param);
 }
+
+
+
+export default {
+  mineChatList,
+  chatDetail,
+  deleteChat
+}

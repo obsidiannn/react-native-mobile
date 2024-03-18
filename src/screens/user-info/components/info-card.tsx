@@ -2,13 +2,14 @@ import { StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as clipboard from 'expo-clipboard';
 import toast from "@/lib/toast";
-import { RelationListItem } from "@/api/friend";
 import { handleAddress } from "@/lib/account";
 import { scale, verticalScale } from "react-native-size-matters/extend";
 import { Image } from "@/components/image";
 import GenderIcon from "@/components/gender-icon";
+import { UserInfoItem } from "@/api/types/user";
+import { FreindInfoReleationItem } from "@/api/types/friend";
 export default (props: {
-    user: RelationListItem
+    user: FreindInfoReleationItem
 }) => {
     const { user } = props;
     return <View style={styles.container}>

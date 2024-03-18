@@ -8,12 +8,13 @@ import NavbarRight from "./components/navbar-right";
 import { scale } from "react-native-size-matters/extend";
 import InviteItem from "./components/invite-item";
 type Props = StackScreenProps<RootStackParamList, 'NewFriend'>;
-import friendApi, { InviteListItem } from "@/api/friend";
+import friendApi from "@/api/v2/friend";
+import { FriendInviteApplyItem } from '@/api/types/friend'
 import { RootStackParamList } from "@/types";
 
 const NewFriendScreen = ({navigation }: Props) => {
     const insets = useSafeAreaInsets();
-    const [items, setItems] = useState<InviteListItem[]>([]);
+    const [items, setItems] = useState<FriendInviteApplyItem[]>([]);
     useEffect(()=>{
         const unsubscribe = navigation.addListener('focus', () => {
             friendApi.getInviteList().then(res =>{

@@ -1,6 +1,10 @@
-import friendApi from "@/api/friend";
+import { GenderEnum } from "@/api/types/enums";
+import { FreindInfoReleationItem, FriendRelationItem } from "@/api/types/friend";
+import { UserInfoItem } from "@/api/types/user";
+import friendApi from "@/api/v2/friend";
+import userApi from '@/api/v2/user'
 const getBatchInfo = async (uids: string[]) => {
-    const data = await friendApi.getList(uids);
+    const data = await friendApi.getFriendList({uids});
     return data.items;
 }
 const getInfo = async (uid: string) => {
@@ -10,19 +14,41 @@ const getInfo = async (uid: string) => {
     }
     return null;
 }
+
+const getReleationList = async (uids: string[]):Promise<FreindInfoReleationItem[]>=>{
+   const releations =  await friendApi.getRelationList({uids })
+   const users = await userApi.getBatchInfo({uids}) 
+   const userHash : Map<string,UserInfoItem> = new Map<string,UserInfoItem>();
+    (users.items??[]).forEach(u=>{
+        userHash.set(u.id,u)
+    })
+    const result = (releations.items??[]).map(i=>{
+        const user = userHash.get(i.uid)
+        const item:FreindInfoReleationItem = {
+            ...i,
+            name: user?.name ??'',
+            sign: user?.sign??'',
+            avatar: user?.avatar??'',
+            gender: user?.gender??GenderEnum.UNKNOWN,
+            pubKey: user?.pubKey??''
+        }
+        return item
+    })
+    return result
+}
 const getList = async () => {
-    const data = await friendApi.getList([]);
+    const data = await friendApi.getFriendList({uids:[]});
     const {items} = data;
     items.forEach((item,i) => {
         item.name = item.remark || item.name;
-        item.name_index = item.remark_index || item.name_index;
+        item.nameIndex = item.remarkIndex || item.nameIndex;
         items[i] = item;
     });
-    items.sort((a, b) => a.name_index.charCodeAt(0) - b.name_index.charCodeAt(0));
-    const alphabet = [...new Set(items.map(item => item.name_index))];
+    items.sort((a, b) => a.nameIndex.charCodeAt(0) - b.nameIndex.charCodeAt(0));
+    const alphabet = [...new Set(items.map(item => item.nameIndex))];
     const alphabetIndex:{ [key: string]: number } = {}
     alphabet.forEach((item) => {
-        alphabetIndex[item] = items.findIndex((i) => i.name_index === item);
+        alphabetIndex[item] = items.findIndex((i) => i.nameIndex === item);
     })
     return {
         items,
@@ -39,8 +65,8 @@ const removeBatch = async (uids: string[]) => {
 const remove = async (uid: string) => {
     return removeBatch([uid]);
 }
-const updateRemark = (uid: string, remark: string):Promise<null> => {
-    return friendApi.updateRemark(uid, remark);
+const updateRemark = (uid: string, remark: string):Promise<void> => {
+    return friendApi.changeAlias({id: uid,alias: remark});
 }
 export default {
     getList,
@@ -49,5 +75,6 @@ export default {
     removeAll,
     removeBatch,
     remove,
-    updateRemark
+    updateRemark,
+    getReleationList
 };

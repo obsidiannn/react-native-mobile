@@ -6,12 +6,12 @@ import { FlashList } from "@shopify/flash-list";
 import Navbar from "@/components/navbar";
 import tools from './tools';
 type Props = StackScreenProps<RootStackParamList, 'UserChat'>;
-import { UserInfo } from "@/api/user";
+import { UserInfoItem } from "@/api/types/user";
 import friendService from "@/service/friend.service";
 import userService from "@/service/user.service";
 import MessageService from "@/service/message.service";
 import ToastException from "@/exception/toast-exception";
-import { FriendListItem } from "@/api/friend";
+import { FriendInfoItem } from "@/api/types/friend";
 import { scale, verticalScale } from "react-native-size-matters/extend";
 import { TouchableOpacity } from "react-native";
 import { Image } from "@/components/image";
@@ -31,8 +31,8 @@ const UserChatScreen = ({ navigation, route }: Props) => {
     const [keyboardState, setKeyboardState] = useState(false);
     const conversationIdRef = useRef<string>('');
     const [title, setTitle] = useState<string>('');
-    const [authUser, setAuthUser] = useState<UserInfo>();
-    const [user, setUser] = useState<FriendListItem>();
+    const [authUser, setAuthUser] = useState<UserInfoItem>();
+    const [user, setUser] = useState<FriendInfoItem>();
     const sharedSecretRef = useRef<string>('');
     const firstSeq = useRef<number>(0);
     const lastSeq = useRef<number>(0);
@@ -96,7 +96,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             friendService.getInfo(uid).then((res) => {
                 console.log('好友信息', res);
                 if (res && globalThis.wallet) {
-                    let pubKey = res.pub_key;
+                    let pubKey = res.pubKey;
                     sharedSecretRef.current = globalThis.wallet.signingKey.computeSharedSecret(pubKey);
                     setUser(res);
                     setTitle((res?.remark ?? '') || res.name);

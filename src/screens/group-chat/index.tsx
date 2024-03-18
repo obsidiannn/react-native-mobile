@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Navbar from "@/components/navbar";
 type Props = StackScreenProps<RootStackParamList, 'GroupChat'>;
-import { UserInfo } from "@/api/user";
+import { UserInfoItem } from "@/api/types/user";
 import userService from "@/service/user.service";
 import { scale } from "react-native-size-matters/extend";
 import { TouchableOpacity } from "react-native";
@@ -14,7 +14,7 @@ import { globalStorage } from "@/lib/storage";
 import groupService from "@/service/group.service";
 import toast from "@/lib/toast";
 import authService from "@/service/auth.service";
-import { GroupInfoItem } from "@/api/group";
+import { GroupInfoItem } from "@/api/types/group";
 import PagerView from "react-native-pager-view";
 import ChatPage, { ChatPageRef } from './pagers/chat-page';
 import InfoPage from "./pagers/info-page/index";
@@ -24,12 +24,12 @@ const GroupChatScreen = ({ navigation, route }: Props) => {
     const [keyboardState, setKeyboardState] = useState(false);
     const conversationIdRef = useRef<string>('');
     const [title, setTitle] = useState<string>('');
-    const [authUser, setAuthUser] = useState<UserInfo>();
+    const [authUser, setAuthUser] = useState<UserInfoItem>();
     const [group, setGroup] = useState<GroupInfoItem | null>(null);
     const [pageIndex, setPageIndex] = useState(0);
     const chatPageRef = useRef<ChatPageRef>(null);
     const pagerViewRef = useRef<PagerView>(null);
-    const [members, setMembers] = useState<UserInfo[]>([]);
+    const [members, setMembers] = useState<UserInfoItem[]>([]);
     const loadMembers = useCallback(async () => {
         console.log(conversationIdRef.current,'群成员###')
         groupService.getMembers(conversationIdRef.current).then(async (res) => {

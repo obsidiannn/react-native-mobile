@@ -2,7 +2,7 @@ import { Keyboard, View, Platform, TouchableWithoutFeedback } from "react-native
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import tools from '../tools';
-import { UserInfo } from "@/api/user";
+import { UserInfoItem } from "@/api/types/user";
 import userService from "@/service/user.service";
 import MessageService from "@/service/message.service";
 import ToastException from "@/exception/toast-exception";
@@ -17,9 +17,9 @@ import { globalStorage } from "@/lib/storage";
 import groupService from "@/service/group.service";
 import toast from "@/lib/toast";
 import quickAes from "@/lib/quick-aes";
-import { GroupInfoItem } from "@/api/group";
+import { GroupInfoItem } from "@/api/types/group";
 export interface ChatPageRef {
-    init: (chatId: string,group: GroupInfoItem,authUser: UserInfo) => void;
+    init: (chatId: string,group: GroupInfoItem,authUser: UserInfoItem) => void;
     close: () => void;
 }
 export default forwardRef((_,ref) => {
@@ -29,7 +29,7 @@ export default forwardRef((_,ref) => {
     const [keyboardHeight, setKeyboardHeight] = useState<number>(300);
     const [keyboardState, setKeyboardState] = useState(false);
     const conversationIdRef = useRef<string>('');
-    const [authUser, setAuthUser] = useState<UserInfo>();
+    const [authUser, setAuthUser] = useState<UserInfoItem>();
     const [group, setGroup] = useState<GroupInfoItem | null>(null);
     const sharedSecretRef = useRef<string>('');
     const firstSeq = useRef<number>(0);
@@ -76,17 +76,17 @@ export default forwardRef((_,ref) => {
             loadingRef.current = false;
         })
     }, [])
-    const init = useCallback((chatId: string,g: GroupInfoItem,a: UserInfo) => {
+    const init = useCallback((chatId: string,g: GroupInfoItem,a: UserInfoItem) => {
         setMessages([]);
         imagesRef.current = [];
         conversationIdRef.current = chatId;
         console.log('会话id conversationIdRef', conversationIdRef.current)
         setGroup(g);
-        if (!globalThis.wallet || !g?.pub) {
+        if (!globalThis.wallet || !g?.pubKey) {
             toast('钱包未初始化');
             return;
         }
-        const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(g.pub.substring(2), 'hex')).substring(4);
+        const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(g.pubKey.substring(2), 'hex')).substring(4);
         console.log('sharedSecret', sharedSecret);
         groupService.encInfo(conversationIdRef.current).then((res) => {
             console.log('群加密信息', res);

@@ -23,7 +23,7 @@ import GroupApplyListScreen from './group-apply-list';
 import UserSettingScreen from './user-setting';
 import UserChatInfoScreen from './user-chat-info/index';
 import GroupInfoScreen from './group-info/index';
-import GroupList from './contact/components/group-list/index2'
+import GroupListScreen from './contact/components/group-list/index2'
 import NotificationClick from './notification-click';
 export {
     EntryScreen,
@@ -51,6 +51,6 @@ export {
     UserSettingScreen,
     UserChatInfoScreen,
     GroupInfoScreen,
-    GroupList,
+    GroupListScreen,
     NotificationClick,
 }
