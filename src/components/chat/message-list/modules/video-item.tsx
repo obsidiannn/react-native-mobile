@@ -1,10 +1,9 @@
-import EncImage from "@/components/common/enc-image";
 import { scale } from "react-native-size-matters/extend";
 import { IMessageVideo } from "../../input-toolkit/types";
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native-ui-lib";
 import { StyleSheet } from "react-native";
-
+import CustomVideo from '@/components/common/video'
 export default (
     props: {
         video: IMessageVideo;
@@ -22,11 +21,14 @@ export default (
         const { w, h } = getWH(props.video.w, props.video.h);
         setSize([w, h]);
     }, [props.video.w, props.video.h]); 
+
+    console.log('video=',props.video);
+    
     return <View style={[
         styles.container,styles.userContainer,
-    ]}>
-        <Text numberOfLines={2} style={styles.text}>播放视频
-        </Text>
+    ]}> 
+        
+        <CustomVideo encKey={props.encKey} video={props.video}></CustomVideo>
     </View>
 }
 

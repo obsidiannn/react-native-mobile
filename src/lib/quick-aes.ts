@@ -40,9 +40,21 @@ const DeBuffer = (val: Buffer, key: string) => {
     data += decipher.final('hex');
     return Buffer.from(data as string, 'hex');
 }
+
+const DeBufferBin = (val: Buffer, key: string) => {
+    const iv = getIV(key);
+    const decipher = Crypto.createDecipheriv('aes-128-cbc', iv, iv, {
+        padding: 'pkcs7',
+    });
+    let data = decipher.update(val, 'binary', 'binary')
+    data += decipher.final('hex');
+    return Buffer.from(data as string, 'binary');
+}
+
 export default {
     En,
     De,
     EnBuffer,
-    DeBuffer
+    DeBuffer,
+    DeBufferBin
 };

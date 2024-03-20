@@ -37,17 +37,17 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
     });
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            const authUid = globalThis.wallet?.address.toLowerCase() || '';
+            const authUid = globalThis.wallet?.address??''
+            const isSelf = authUid === route.params.obj_uid
             setInfo({
                 id: route.params.id,
-                uid: authUid === route.params.uid ? route.params.obj_uid : route.params.uid,
+                uid: isSelf? route.params.obj_uid:route.params.uid,
                 avatar: route.params.avatar,
                 name: route.params.name,
                 status: route.params.status,
                 remark: route.params.remark,
-                isSelf: authUid === route.params.uid,
+                isSelf: isSelf
             })
-
         });
         return unsubscribe;
     }, [navigation])

@@ -17,10 +17,11 @@ import { TouchableOpacity } from "react-native";
 import { Image } from "@/components/image";
 import EncImagePreview, { IEncImagePreviewRef } from "@/components/chat/enc-image-preview-modal";
 import EncFilePreview, { IEncFilePreviewRef } from "@/components/chat/enc-file-preview-modal";
+import EncVideoPreview, { IEncVideoPreviewRef } from "@/components/chat/enc-video-preview-model";
 import LoadingModal,{ILoadingModalRef} from "@/components/common/loading-modal";
 import { RootStackParamList } from "@/types";
 import InputToolkit, { InputToolKitRef } from "@/components/chat/input-toolkit";
-import { DataType, IMessage, IMessageFile, IMessageImage, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
+import { DataType, IMessage, IMessageFile, IMessageImage, IMessageTypeMap, IMessageVideo } from "@/components/chat/input-toolkit/types";
 import MessageList from "@/components/chat/message-list";
 import { globalStorage } from "@/lib/storage";
 const UserChatScreen = ({ navigation, route }: Props) => {
@@ -40,6 +41,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
     const intervalRef = useRef<NodeJS.Timeout>();
     const encImagePreviewRef = useRef<IEncImagePreviewRef>();
     const encFilePreviewRef = useRef<IEncFilePreviewRef>();
+    const encVideoPreviewRef = useRef<IEncVideoPreviewRef>();
     const imagesRef = useRef<IMessageImage[]>([]);
 
     const listRef = useRef<FlashList<IMessage<DataType>>>();
@@ -228,9 +230,10 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                         }
                         if (m.type == 'video') {
                             if (m.data && m.state == 1) {
-                                encFilePreviewRef.current?.open({
+
+                                encVideoPreviewRef.current?.open({
                                     encKey: sharedSecretRef.current,
-                                    file: m.data as IMessageFile,
+                                    video: m.data as IMessageVideo,
                                 })
                             }
                         }
@@ -310,6 +313,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             </View>
             <EncImagePreview ref={encImagePreviewRef} />
             <EncFilePreview ref={encFilePreviewRef} />
+            <EncVideoPreview ref={encVideoPreviewRef}/>
             <LoadingModal ref={loadingModalRef}/>
         </View>
 

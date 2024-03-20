@@ -9,7 +9,7 @@ export interface FreindInfoReleationItem extends FriendRelationItem{
   }
 export interface FriendRelationItem {
 	uid: string;
-	isFriend: number;
+	isFriend: FriendReleationEnum;
 };
 
 export interface FriendInviteApplyReq{
@@ -25,6 +25,8 @@ export interface FriendInviteApplyItem{
 	remark: string;
 	rejectReason: string;
 	status: number;
+	name?: string
+	avatar?: string
 };
 
 
@@ -55,3 +57,10 @@ export interface FriendChangeAliasReq{
 	id: string;
 	alias: string;
 };
+
+export enum FriendReleationEnum {
+	FRIEND_NONE = 0,
+	FRIEND_EACH = 1,
+	FRIEND_MINE = 2,
+	FRIEND_HIM = 3
+}

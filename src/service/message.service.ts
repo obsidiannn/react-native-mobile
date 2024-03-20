@@ -144,7 +144,7 @@ const sendVideo = async (chatId: string, key: string, message: IMessage<'video'>
         fileInfo?.exists && (file.o_md5 = fileInfo.md5 ?? '');
         console.log('处理完成准备发送', file);
         const result = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, {
-            t: 'file',
+            t: 'video',
             d: {
                 ...file,
                 path: fileKey,
@@ -159,7 +159,7 @@ const sendVideo = async (chatId: string, key: string, message: IMessage<'video'>
             }
         }
     } catch (error) {
-        console.log('发送文件 error', error);
+        console.log('发送视频 error', error);
     }
 }
 

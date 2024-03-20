@@ -13,9 +13,11 @@ import * as MediaLibrary from 'expo-media-library';
 import ToastException from '@/exception/toast-exception';
 import { Platform } from 'react-native';
 import { StorageAccessFramework } from 'expo-file-system';
-import * as RNFS from 'react-native-fs';
+import * as _RNFS from 'react-native-fs';
 import * as Sharing from 'expo-sharing';
 import toast from '@/lib/toast';
+
+
 export interface ChooseImageOption {
     aspect?: [number, number],
     quality: number,
@@ -100,7 +102,7 @@ const encryptFile = async (path: string, key: string): Promise<{
     enc_md5: string;
     md5: string;
 }> => {
-    const content = Buffer.from(await FileSystem.readAsStringAsync(path, {
+   const content = Buffer.from(await FileSystem.readAsStringAsync(path, {
         encoding: FileSystem.EncodingType.Base64,
     }), 'base64');
     const md5 = crypto.Hash('md5').update(content).digest('hex');
@@ -120,15 +122,22 @@ const encryptFile = async (path: string, key: string): Promise<{
 const checkDownloadFileExists = async (url: string) => {
     const key = crypto.Hash('sha256').update(url).digest('hex');
     const path = `${FileSystem.cacheDirectory}/${key}`;
-    return await RNFS.exists(path);
+    return await _RNFS.exists(path);
 }
+
+
+const urlToPath = (url: string) =>{
+    const key = crypto.Hash('sha256').update(url).digest('hex');
+    return `${FileSystem.cacheDirectory}/${key}`;
+}
+
 const downloadFile = async (url: string, path: string = ''): Promise<string> => {
     if (!path) {
         const key = crypto.Hash('sha256').update(url).digest('hex');
         path = `${FileSystem.cacheDirectory}/${key}`;
     }
     // 判断文件是否存在
-    if (await RNFS.exists(path)) {
+    if (await _RNFS.exists(path)) {
         console.log('文件已存在', path);
         return path;
     }
@@ -138,7 +147,7 @@ const downloadFile = async (url: string, path: string = ''): Promise<string> => 
     console.log('download result', result)
     if (result.status !== 200) {
         // 删除文件
-        await RNFS.unlink(path);
+        await _RNFS.unlink(path);
         throw new Error('下载失败5');
     }
     // if (result.md5 !== md5) {
@@ -162,6 +171,35 @@ const getEnFileContent = async (uri: string, encKey: string): Promise<string | n
     const decData = quickAes.DeBuffer(Buffer.from(encData, 'base64'), encKey);
     return Buffer.from(decData).toString('base64');
 }
+
+const getEnVideoContent = async (uri: string, encKey: string): Promise<string | null> => {
+    const data = await getEnFileContent(uri,encKey)
+    if(data !== null){
+        const name = getFileNameSign(uri)
+        const path =`${FileSystem.cacheDirectory}/${name}_decode.mp4`;
+        const md5 = crypto.Hash('md5').update(data).digest('hex');
+        console.log('md5==',md5);
+        
+        const exists = await _RNFS.exists(path);
+        if (exists) {
+            console.log('文件已存在');
+            await _RNFS.unlink(path)
+        }
+        
+        await _RNFS.writeFile(path,Buffer.from(data,'base64').toString('ascii'))
+        return path
+    }
+    return null
+}
+
+const base64ToMp4 = (data: string,outputPath: string) => {
+}
+
+
+const getFileNameSign = (key: string) => {
+    return crypto.Hash('sha256').update(key).digest('hex');
+}
+
 // 保存到相册
 const saveToAlbum = async (uri: string): Promise<boolean> => {
     const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -209,7 +247,7 @@ const saveFile = async (data: string, name: string): Promise<string | null> => {
         // 生成文件名 保存在缓存目录
         let path = `${dir}/${name}`;
         // 判断文件是否存在
-        const exists = await RNFS.exists(path);
+        const exists = await _RNFS.exists(path);
         if (exists) {
             console.log('文件已存在');
             // 在原来的文件名的基础上加上时间戳
@@ -218,7 +256,7 @@ const saveFile = async (data: string, name: string): Promise<string | null> => {
             name = name.replace(`.${ext}`, `_${time}.${ext}`);
             path = `${dir}/${name}`;
         }
-        await RNFS.writeFile(path, data, {
+        await _RNFS.writeFile(path, data, {
             encoding: 'base64',
         });
         return path;
@@ -254,4 +292,7 @@ export default {
     saveFile,
     getFileInfo,
     checkDownloadFileExists,
+    getEnVideoContent,
+    urlToPath,
+    getFileNameSign
 }

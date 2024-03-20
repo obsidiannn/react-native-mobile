@@ -64,25 +64,13 @@ export const captureVideo = async () => {
         const input = result.assets[0].uri;
         const output = input.replace(/(.*)(\..*$)/, '$1_output.mp4');
 
-        const cmd = `-i ${input} -c:v mpeg4 ${output}`;
-        // FFmpegKit.execute(cmd).then(async (session) => {
-        //     const returnCode = await session.getReturnCode();
-        //     if (ReturnCode.isSuccess(returnCode)) {
-        //         // SUCCESS
-                
-        //     } else if (ReturnCode.isCancel(returnCode)) {
-        //         // CANCEL
-        //     } else {
-        //         // ERROR
-        //     }
-        // });
+       const cmd = `-i ${input} -c:v mpeg4 ${output}`;
+       
        const session = await FFmpegKit.execute(cmd)
        const returnCode = await session.getReturnCode() 
         if (ReturnCode.isSuccess(returnCode)) {
         // SUCCESS
             result.assets[0].uri = output
-            console.log('video return:',result.assets[0].uri);
-            
             return result.assets[0]
         } else if (ReturnCode.isCancel(returnCode)) {
         // CANCEL

@@ -77,6 +77,7 @@
     "react-native-toast-notifications": "^3.4.0",
     "react-native-ui-lib": "^7.10.0",
     "react-native-vector-icons": "^10.0.2",
+    "react-native-video": "^5.2.1",
     "react-native-view-shot": "^3.8.0",
     "react-native-webview": "^13.6.3",
     "react-native-worklets-core": "^0.2.4",

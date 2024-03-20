@@ -43,7 +43,7 @@ export default (props: {
             } else {
                 const w = scale(video.w) > scale(180) ? scale(180) : scale(video.w);
                 const h = scale(Math.floor(video.h * (w / video.w)));
-                message = <VideoItem
+                message = <VideoItem 
                     video={video}
                     encKey={props.encKey} />;
             }
