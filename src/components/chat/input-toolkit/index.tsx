@@ -96,7 +96,7 @@ export default forwardRef((props: InputToolKitProps,ref) => {
                                 data: {
                                     w: video.width,
                                     h: video.height,
-                                    thumbnail: video.uri,
+                                    thumbnail: '',
                                     original: video.uri,
                                     t_md5: '',
                                     o_md5: '',

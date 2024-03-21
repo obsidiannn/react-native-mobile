@@ -28,24 +28,33 @@ export default (
         styles.container,styles.userContainer,
     ]}> 
         
-        <CustomVideo encKey={props.encKey} video={props.video}></CustomVideo>
+        <CustomVideo
+         encKey={props.encKey}
+         source={props.video.thumbnail}
+         style={{
+            width: size[0],
+            height: size[1],
+            margin: scale(0),
+            padding: scale(0)
+        }} 
+        ></CustomVideo>
     </View>
 }
 
 const styles = StyleSheet.create({
     container: {
-        paddingLeft: scale(15),
-        paddingRight: scale(20),
-        paddingTop: scale(15),
-        paddingBottom: scale(13),
-        borderRadius: scale(15),
+        paddingLeft: scale(10),
+        paddingRight: scale(10),
+        paddingTop: scale(10),
+        paddingBottom: scale(10),
+        borderRadius: scale(10),
         backgroundColor: '#ffffff',
     },
     selfContainer: {
-        borderTopRightRadius: scale(0),
+        // borderTopRightRadius: scale(0),
     },
     userContainer: {
-        borderTopLeftRadius: scale(0),
+        // borderTopLeftRadius: scale(0),
     },
     text: {
         fontSize: scale(15),

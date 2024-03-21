@@ -4,10 +4,11 @@ import quickAes from "../lib/quick-aes";
 import dayjs from 'dayjs';
 import userService from "./user.service";
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import fileService, { format, uploadFile } from "./file.service";
+import fileService, { format,formatVideo, uploadFile } from "./file.service";
 import { DataType, IMessage, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
 import { MessageTypeEnum } from "@/api/types/enums";
-import { MessageDetailItem, MessageListItem } from "@/api/types/message";
+import { MessageDetailItem, MessageExtra, MessageListItem } from "@/api/types/message";
+
 const _send = async (chatId: string, key: string, mid: string, type: MessageTypeEnum, data: {
     t: string;
     d: any;
@@ -18,7 +19,6 @@ const _send = async (chatId: string, key: string, mid: string, type: MessageType
     if (!globalThis.wallet) {
         throw new ToastException('请先登录');
     }
-    console.log('send', data);
     return await messageApi.sendMessage({
         id: mid,
         chatId: chatId,
@@ -134,20 +134,31 @@ const sendVideo = async (chatId: string, key: string, message: IMessage<'video'>
         throw new ToastException('文件不能为空');
     }
     try {
-        const fileEnc = await fileService.encryptFile(file.original, key);
+        const output = fileService.cachePath() + message.mid + '_trans.mp4'
+        const thumbnailPath = await fileService.generateVideoThumbnail(file.original,message.mid)
+        await formatVideo(file.original,output)
+        
+        const fileEnc = await fileService.encryptFile(output, key);
         const date = dayjs().format('YYYY/MM/DD');
         const fileKey = `upload/chat/video/${date}/${message.mid}.enc`;
         await uploadFile(fileEnc.path, fileKey);
+        const thumbnailKey = `upload/chat/video/${date}/thumbnail_${message.mid}.webp`;
+        if(thumbnailPath !== null){
+            const thumbEnc = await fileService.encryptFile(thumbnailPath, key);
+            await uploadFile(thumbEnc.path, thumbnailKey);
+        }
         file.t_md5 = fileEnc.enc_md5;
         file.o_md5 = fileEnc.md5;
         const fileInfo = await fileService.getFileInfo(file.original);
         fileInfo?.exists && (file.o_md5 = fileInfo.md5 ?? '');
         console.log('处理完成准备发送', file);
+   
         const result = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, {
             t: 'video',
             d: {
                 ...file,
                 path: fileKey,
+                thumbnail: thumbnailKey
             }
         });
         return {

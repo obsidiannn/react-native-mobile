@@ -13,7 +13,7 @@ import * as MediaLibrary from 'expo-media-library';
 import ToastException from '@/exception/toast-exception';
 import { Platform } from 'react-native';
 import { StorageAccessFramework } from 'expo-file-system';
-import * as _RNFS from 'react-native-fs';
+import * as RNFS from 'react-native-fs';
 import * as Sharing from 'expo-sharing';
 import toast from '@/lib/toast';
 
@@ -69,7 +69,6 @@ export const uploadFile = async (path: string, key: string): Promise<boolean> =>
             if (!response) {
                 reject(new Error('上传失败'));
             }
-            console.log('upload response', response);
             response?.status === 200 ? resolve(true) : reject(new Error('上传失败'));
             resolve(true)
         } catch (error) {
@@ -90,6 +89,21 @@ export const format = async (input: string, output: string): Promise<boolean> =>
         throw new Error('转码失败');
     }
 }
+
+export const formatVideo = async (input: string, output: string): Promise<boolean> => {
+    const cmd = `-i ${input} -c:v libx264 ${output}`;
+    const session = await FFmpegKit.execute(cmd);
+    const returnCode = await session.getReturnCode();
+    if (ReturnCode.isSuccess(returnCode)) {
+        return true;
+    } else if (ReturnCode.isCancel(returnCode)) {
+        throw new Error('转码取消');
+    } else {
+        console.log(cmd);
+        throw new Error('转码失败');
+    }
+}
+
 let baseUrl: string | undefined;
 const getFullUrl = (key: string) => {
     if (!baseUrl) {
@@ -118,13 +132,38 @@ const encryptFile = async (path: string, key: string): Promise<{
         md5: md5,
     };
 }
+
+const encryptVideo = async (path: string, key: string): Promise<{
+    path: string;
+    enc_md5: string;
+    md5: string;
+}> => {
+    const content = Buffer.from(await FileSystem.readAsStringAsync(path, {
+        encoding: FileSystem.EncodingType.Base64,
+    }), 'base64');
+    const newPath = `${FileSystem.cacheDirectory}${crypto.randomUUID()}.enc`;
+    const encData = await quickAes.En(content.toString('base64'), key);
+    const md5 = crypto.Hash('md5').update(content).digest('hex');
+    await FileSystem.writeAsStringAsync(newPath, encData, {
+    });
+    const encMd5 = crypto.Hash('md5').update(encData).digest('hex');
+    return {
+        path: newPath,
+        enc_md5: encMd5,
+        md5: md5,
+    };
+}
+
 // 判断下载的文件是否存在
 const checkDownloadFileExists = async (url: string) => {
     const key = crypto.Hash('sha256').update(url).digest('hex');
     const path = `${FileSystem.cacheDirectory}/${key}`;
-    return await _RNFS.exists(path);
+    return await RNFS.exists(path);
 }
 
+const checkExist=async (path: string):Promise<boolean> =>{
+    return await RNFS.exists(path);
+}
 
 const urlToPath = (url: string) =>{
     const key = crypto.Hash('sha256').update(url).digest('hex');
@@ -137,7 +176,7 @@ const downloadFile = async (url: string, path: string = ''): Promise<string> => 
         path = `${FileSystem.cacheDirectory}/${key}`;
     }
     // 判断文件是否存在
-    if (await _RNFS.exists(path)) {
+    if (await RNFS.exists(path)) {
         console.log('文件已存在', path);
         return path;
     }
@@ -147,7 +186,7 @@ const downloadFile = async (url: string, path: string = ''): Promise<string> => 
     console.log('download result', result)
     if (result.status !== 200) {
         // 删除文件
-        await _RNFS.unlink(path);
+        await RNFS.unlink(path);
         throw new Error('下载失败5');
     }
     // if (result.md5 !== md5) {
@@ -172,29 +211,49 @@ const getEnFileContent = async (uri: string, encKey: string): Promise<string | n
     return Buffer.from(decData).toString('base64');
 }
 
-const getEnVideoContent = async (uri: string, encKey: string): Promise<string | null> => {
-    const data = await getEnFileContent(uri,encKey)
-    if(data !== null){
-        const name = getFileNameSign(uri)
-        const path =`${FileSystem.cacheDirectory}/${name}_decode.mp4`;
-        const md5 = crypto.Hash('md5').update(data).digest('hex');
-        console.log('md5==',md5);
-        
-        const exists = await _RNFS.exists(path);
-        if (exists) {
-            console.log('文件已存在');
-            await _RNFS.unlink(path)
-        }
-        
-        await _RNFS.writeFile(path,Buffer.from(data,'base64').toString('ascii'))
-        return path
+/**
+ * 生成视频缩略图
+ * @param videoPath 视频地址
+ * @param videoKey 视频key
+ * @returns 
+ */
+const generateVideoThumbnail = async(videoPath: string,videoKey: string) =>{
+    const thumbnailPath = FileSystem.cacheDirectory + videoKey + '.jpg'
+    const cmd = `-i ${videoPath} -ss 00:00:01 -vframes 1 ${thumbnailPath}`
+    const session = await FFmpegKit.execute(cmd)
+    if(ReturnCode.isSuccess(await session.getReturnCode())){
+        return thumbnailPath;
     }
     return null
 }
 
-const base64ToMp4 = (data: string,outputPath: string) => {
+const cachePath = () =>{
+    return FileSystem.cacheDirectory
 }
 
+/**
+ * 加载视频文件
+ * @param uri 
+ * @param encKey 
+ * @returns 
+ */
+const getEnVideoContent = async (uri: string, encKey: string): Promise<string | null> => {
+    const name = getFileNameSign(uri)
+    const path =`${FileSystem.cacheDirectory}/${name}_decode.mp4`;
+    const exists = await RNFS.exists(path);
+    if (exists) {
+        return path
+    }
+    // const encData = await readFile(uri);
+    // const decData = quickAes.DeBuffer(Buffer.from(encData, 'base64'), encKey);
+    // const data = Buffer.from(decData).toString('base64');
+    const data  = await getEnFileContent(uri,encKey)
+    if(data !== null){
+        await RNFS.writeFile(path,data,{encoding: 'base64'})
+        return path
+    }
+    return null
+}
 
 const getFileNameSign = (key: string) => {
     return crypto.Hash('sha256').update(key).digest('hex');
@@ -247,7 +306,7 @@ const saveFile = async (data: string, name: string): Promise<string | null> => {
         // 生成文件名 保存在缓存目录
         let path = `${dir}/${name}`;
         // 判断文件是否存在
-        const exists = await _RNFS.exists(path);
+        const exists = await RNFS.exists(path);
         if (exists) {
             console.log('文件已存在');
             // 在原来的文件名的基础上加上时间戳
@@ -256,7 +315,7 @@ const saveFile = async (data: string, name: string): Promise<string | null> => {
             name = name.replace(`.${ext}`, `_${time}.${ext}`);
             path = `${dir}/${name}`;
         }
-        await _RNFS.writeFile(path, data, {
+        await RNFS.writeFile(path, data, {
             encoding: 'base64',
         });
         return path;
@@ -294,5 +353,9 @@ export default {
     checkDownloadFileExists,
     getEnVideoContent,
     urlToPath,
-    getFileNameSign
+    getFileNameSign,
+    generateVideoThumbnail,
+    cachePath,
+    encryptVideo,
+    checkExist
 }

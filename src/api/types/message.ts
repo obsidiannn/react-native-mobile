@@ -32,7 +32,8 @@ export interface MessageListItem {
 	createdAt: Date;
 };
 
-export type MessageExtra = {};
+export type MessageExtra = {
+};
 
 export type MessageAction = {};
 

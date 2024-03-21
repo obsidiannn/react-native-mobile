@@ -230,7 +230,6 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                         }
                         if (m.type == 'video') {
                             if (m.data && m.state == 1) {
-
                                 encVideoPreviewRef.current?.open({
                                     encKey: sharedSecretRef.current,
                                     video: m.data as IMessageVideo,
@@ -258,7 +257,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                         return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
                     });
                     setTimeout(() => {
-                        if(message.type == 'image' || message.type =="file"){
+                        if(message.type == 'image' || message.type =="file" || message.type == 'video'){
                             loadingModalRef.current?.open('加密处理中...');
                         }
                         messageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
@@ -280,6 +279,17 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                                         imagesRef.current.push(res.data as IMessageImage);
                                     } else if (message.type == 'file') {
                                         const data = res.data as IMessageFile;
+                                        message.data = {
+                                            ...data,
+                                            path: data.path,
+                                        };
+                                        const file = message.data;
+                                        if (file) {
+                                            file.path = data.path;
+                                            items[index].data = file;
+                                        }
+                                    } else if (message.type == 'video') {
+                                        const data = res.data as IMessageVideo;
                                         message.data = {
                                             ...data,
                                             path: data.path,
