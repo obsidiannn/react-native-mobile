@@ -18,27 +18,8 @@ const generateId = () : string  =>{
     return Buffer.from( crypto.randomBytes(12)).toString('hex')
 }
 
-
-
-const getEnVideoContent = async (uri: string, encKey: string): Promise<string | null> => {
-    const data = await fileService.getEnFileContent(uri,encKey)
-    if(data !== null){
-        const name = fileService.getFileNameSign(uri)
-        const path =`${FileSystem.cacheDirectory}/${name}_decode.mp4`;
-        const exists = await (path);
-        if (exists) {
-            console.log('文件已存在');
-            await FileSystem.deleteAsync(path)
-        }
-        const binArray = new Uint8Array(Buffer.from(data,'base64'))
-        await RNFS.writeFile(path,binArray,{encoding: 'binary'})
-        return path
-    }
-    return null
-}
-
+ 
 export default {
     bytesToSize,
-    generateId,
-    getEnVideoContent
+    generateId
 }

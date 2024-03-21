@@ -12,25 +12,27 @@ export default (
 ) => {
     // 计算图片的宽高 宽不超过180 高等比缩放
     const [size, setSize] = useState([0,0]);
+    const [thumbnail,setThumbnail] = useState('')
     const getWH = (w: number, h: number) => {
         w = scale(props.video.w) > scale(180) ? scale(180) : scale(props.video.w);
         h = scale(Math.floor(props.video.h * (w / props.video.w)));
+        
         return { w, h };
     }
     useEffect(() => {
         const { w, h } = getWH(props.video.w, props.video.h);
         setSize([w, h]);
-    }, [props.video.w, props.video.h]); 
+        setThumbnail(props.video.thumbnail)
+        console.log('加载视频',props.video.path);
+    }, [props.video.w, props.video.h,props.video.thumbnail]); 
 
-    console.log('video=',props.video);
-    
     return <View style={[
         styles.container,styles.userContainer,
     ]}> 
         
         <CustomVideo
          encKey={props.encKey}
-         source={props.video.thumbnail}
+         source={thumbnail}
          style={{
             width: size[0],
             height: size[1],

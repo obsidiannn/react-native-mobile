@@ -10,6 +10,7 @@ import TextInput from "./text-input";
 import Accessory from "./accessory";
 import { globalStorage } from "@/lib/storage";
 import util from '@/lib/utils'
+import fileService from "@/service/file.service";
 export interface InputToolKitRef {
     down: () => void;
 }
@@ -88,15 +89,18 @@ export default forwardRef((props: InputToolKitProps,ref) => {
                     case 'video':
                         const video = await captureVideo();
                         if(video !== undefined){
+                            const mid = util.generateId()
+                            // 这里在未经解码的时候，使用最初的视频文件生成缩略图，可能会存在转码问题，留意
+                            const originalThumbnailPath = await fileService.generateVideoThumbnail(video.uri,mid)
                             const message: IMessage<'video'> = {
-                                mid: util.generateId(),
+                                mid: mid,
                                 type: 'video',
                                 state: 0,
                                 time: dayjs(),
                                 data: {
                                     w: video.width,
                                     h: video.height,
-                                    thumbnail: '',
+                                    thumbnail: originalThumbnailPath??'',
                                     original: video.uri,
                                     t_md5: '',
                                     o_md5: '',

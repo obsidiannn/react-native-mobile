@@ -5,7 +5,7 @@ import FileItem from "./modules/file-item";
 import ImageItem from "./modules/image-item";
 import VideoItem from './modules/video-item'
 import Avatar from "./modules/avatar";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MessageContainer from "./modules/message-container";
 import Info from "./modules/info";
 import { DataType, IMessage, IMessageFile, IMessageImage, IMessageVideo } from "../input-toolkit/types";
@@ -17,6 +17,9 @@ export default (props: {
     onPress?: (message: IMessage<DataType>) => void;
     itemOnPress?: () => void;
 }) => {
+
+    const [reload,setReload] = useState(false)
+    useEffect(()=>{},[reload])
     const { item } = props;
     let message: React.ReactNode;
     switch (item.type) {

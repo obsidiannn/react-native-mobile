@@ -134,24 +134,23 @@ const sendVideo = async (chatId: string, key: string, message: IMessage<'video'>
         throw new ToastException('文件不能为空');
     }
     try {
-        const output = fileService.cachePath() + message.mid + '_trans.mp4'
-        const thumbnailPath = await fileService.generateVideoThumbnail(file.original,message.mid)
-        await formatVideo(file.original,output)
-        
-        const fileEnc = await fileService.encryptFile(output, key);
         const date = dayjs().format('YYYY/MM/DD');
         const fileKey = `upload/chat/video/${date}/${message.mid}.enc`;
-        await uploadFile(fileEnc.path, fileKey);
         const thumbnailKey = `upload/chat/video/${date}/thumbnail_${message.mid}.webp`;
-        if(thumbnailPath !== null){
-            const thumbEnc = await fileService.encryptFile(thumbnailPath, key);
+
+        const transFilePath = fileService.cachePath() + message.mid + '_trans.mp4'
+        await formatVideo(file.original,transFilePath)
+        
+        const fileEnc = await fileService.fileSpliteEncode(fileKey,transFilePath, key);
+        await uploadFile(fileEnc.path, fileKey);
+        if((file.thumbnail ?? null) !== null){
+            const thumbEnc = await fileService.encryptFile(file.thumbnail, key);
             await uploadFile(thumbEnc.path, thumbnailKey);
+            file.thumbnail = thumbnailKey
         }
         file.t_md5 = fileEnc.enc_md5;
         file.o_md5 = fileEnc.md5;
-        const fileInfo = await fileService.getFileInfo(file.original);
-        fileInfo?.exists && (file.o_md5 = fileInfo.md5 ?? '');
-        console.log('处理完成准备发送', file);
+        file.trans = transFilePath
    
         const result = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, {
             t: 'video',

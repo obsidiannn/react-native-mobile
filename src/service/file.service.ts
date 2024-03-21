@@ -16,12 +16,20 @@ import { StorageAccessFramework } from 'expo-file-system';
 import * as RNFS from 'react-native-fs';
 import * as Sharing from 'expo-sharing';
 import toast from '@/lib/toast';
+import { enc } from 'crypto-js';
 
 
 export interface ChooseImageOption {
     aspect?: [number, number],
     quality: number,
 }
+
+export interface EncodeFileResult {
+    path: string
+    md5: string
+    enc_md5: string
+}
+
 export const chooseMultipleImage = async (isCamera: boolean, option: ChooseImageOption, multiple: boolean = true, isEdit: boolean = false): Promise<string[] | null> => {
     if (multiple) {
         isEdit = false;
@@ -90,6 +98,12 @@ export const format = async (input: string, output: string): Promise<boolean> =>
     }
 }
 
+/**
+ * 视频的转码
+ * @param input 
+ * @param output 
+ * @returns 
+ */
 export const formatVideo = async (input: string, output: string): Promise<boolean> => {
     const cmd = `-i ${input} -c:v libx264 ${output}`;
     const session = await FFmpegKit.execute(cmd);
@@ -214,11 +228,11 @@ const getEnFileContent = async (uri: string, encKey: string): Promise<string | n
 /**
  * 生成视频缩略图
  * @param videoPath 视频地址
- * @param videoKey 视频key
+ * @param mid 消息主键
  * @returns 
  */
-const generateVideoThumbnail = async(videoPath: string,videoKey: string) =>{
-    const thumbnailPath = FileSystem.cacheDirectory + videoKey + '.jpg'
+const generateVideoThumbnail = async(videoPath: string,mid: string) =>{
+    const thumbnailPath = FileSystem.cacheDirectory + mid + '_thumbnail.jpg'
     const cmd = `-i ${videoPath} -ss 00:00:01 -vframes 1 ${thumbnailPath}`
     const session = await FFmpegKit.execute(cmd)
     if(ReturnCode.isSuccess(await session.getReturnCode())){
@@ -232,28 +246,94 @@ const cachePath = () =>{
 }
 
 /**
- * 加载视频文件
- * @param uri 
+ * 解密视频文件
+ * @param uri 云端文件位置
  * @param encKey 
  * @returns 
  */
-const getEnVideoContent = async (uri: string, encKey: string): Promise<string | null> => {
+const decodeVideo = async (uri: string, encKey: string): Promise<string | null> => {
     const name = getFileNameSign(uri)
-    const path =`${FileSystem.cacheDirectory}/${name}_decode.mp4`;
-    const exists = await RNFS.exists(path);
-    if (exists) {
-        return path
-    }
-    // const encData = await readFile(uri);
-    // const decData = quickAes.DeBuffer(Buffer.from(encData, 'base64'), encKey);
-    // const data = Buffer.from(decData).toString('base64');
-    const data  = await getEnFileContent(uri,encKey)
-    if(data !== null){
-        await RNFS.writeFile(path,data,{encoding: 'base64'})
-        return path
+    const targetPath =`${FileSystem.cacheDirectory}/${name}_decode.mp4`;
+    const encodeFilePath = await downloadFile(getFullUrl(uri));
+    
+    const decodeFilePath = fileSplitDecode(targetPath,encodeFilePath,encKey)
+    if(decodeFilePath !== null){
+        return decodeFilePath
     }
     return null
 }
+
+/**
+ * 文件分片加密
+ * @param encKey 
+ * @param fileKey 文件在云端的路径
+ * @param localPath 待加密的本地文件地址
+ * @returns 
+ */
+const fileSpliteEncode = async (fileKey: string,localPath: string,encKey: string): Promise<EncodeFileResult> =>{
+    const fileKeySign = getFileNameSign(fileKey)
+    const fileInfo = await getFileInfo(localPath)
+    const newPath = `${FileSystem.cacheDirectory}${fileKeySign}.enc`;
+    
+    if(!await RNFS.exists(newPath)){
+        const limit = 65536
+        const total = fileInfo.size
+        for (let start = 0; start < total; start+=limit) {
+            const end = Math.min(start+limit-1,total-1)        
+            const originalData = await chunkFromFile(localPath,start,end)
+            const decData = quickAes.EnPadding(Buffer.from(originalData, 'base64'), encKey);
+            await RNFS.appendFile(newPath,Buffer.from(decData).toString('base64'),'base64')
+        }
+    }
+    
+    const targetInfo = await FileSystem.getInfoAsync(newPath,{size: true,md5: true})
+    return {
+        path: newPath,
+        enc_md5: targetInfo.md5??'',
+        md5: fileInfo.md5,
+    };
+}
+
+/**
+ * 文件分片解密
+ * @param encKey 
+ * @param localPath 本地密文文件地址
+ * @param targetPath 解密后的文件地址
+ * @returns 
+ */
+const fileSplitDecode = async (targetPath: string,localPath: string, encKey: string): Promise<string | null> => {
+    const exists = await RNFS.exists(targetPath);
+    if (exists) {
+        return targetPath
+        // await RNFS.unlink(targetPath)
+    }
+    const encodeFile = await FileSystem.getInfoAsync(localPath,{size: true,md5: true})
+    const total = encodeFile.size    
+    const limit = 65552
+    for (let start = 0; start < total; start+=limit) {
+        const end = Math.min(start+limit-1,total-1)        
+        const encData = await chunkFromFile(localPath,start,end)
+        const decData = quickAes.DePadding(Buffer.from(encData, 'base64'), encKey);
+        
+        await RNFS.appendFile(targetPath,Buffer.from(decData).toString('base64'),'base64')
+    }
+    return targetPath
+}
+
+/**
+ * 分片读取文件
+ * @param filePath 文件地址
+ * @param start 字符下标起点
+ * @param end 字符下标终点
+ * @returns 
+ */
+const chunkFromFile = async (filePath: string,start: number,end: number) =>{
+    const chunk = await RNFS.read(filePath,end-start+1,start,{
+        encoding: 'base64'
+    })
+    return chunk
+}
+
 
 const getFileNameSign = (key: string) => {
     return crypto.Hash('sha256').update(key).digest('hex');
@@ -351,11 +431,13 @@ export default {
     saveFile,
     getFileInfo,
     checkDownloadFileExists,
-    getEnVideoContent,
+    decodeVideo,
     urlToPath,
     getFileNameSign,
     generateVideoThumbnail,
     cachePath,
     encryptVideo,
-    checkExist
+    checkExist,
+    fileSplitDecode,
+    fileSpliteEncode
 }

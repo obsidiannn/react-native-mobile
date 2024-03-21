@@ -9,10 +9,12 @@ import { scale } from "react-native-size-matters/extend";
 
 export interface VideoPreviewProps extends EncImageProps {
     encKey: string;
+    onProcess?: ()=>void ,
 }
 export default (props: VideoPreviewProps) => {
     const [data, setData] = useState<string>();
     const getSource = useCallback(async (source: any) => {
+        
         if (typeof source != 'string') {
             return source;
         }
@@ -25,7 +27,9 @@ export default (props: VideoPreviewProps) => {
         if (source.startsWith('file://')) {
             return source;
         }
-        
+        if(!source || source === '' || source === null){
+            return source
+        }
         const base64 = await fileService.getEnFileContent(source, props.encKey);
         const mimeType = mime.getType(source);
         return `data:${mimeType};base64,${base64}`;

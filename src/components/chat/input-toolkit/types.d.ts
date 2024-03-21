@@ -27,6 +27,8 @@ export interface IMessageVideo {
     o_enc_md5: string;
     duration: number;
     path?: string
+    trans?: string;
+    original_thumbnail?: string
 }
 export interface IMessageFile {
     mime: string;

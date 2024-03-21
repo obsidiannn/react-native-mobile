@@ -10,8 +10,7 @@ import Video, { VideoRef } from 'react-native-video'
 import toast from "@/lib/toast";
 import { IMessageVideo } from "./input-toolkit/types";
 import { TouchableWithoutFeedback } from "react-native";
-import quickAes from "@/lib/quick-aes";
-import video from "../common/video";
+
 
 export interface EncVideoPreviewVideo {
     thumbnail: string;
@@ -42,41 +41,44 @@ export default forwardRef((_, ref) => {
         progress: 0,current: 0
     })
 
-    /**
-     * 0x04caa74a442d0f1f867c0e91dcaa01b2729ec4267ebc7105637846770e9527005079db00f5c952c34ba03f134e8aa79747294bcb581c407f7a32e69ffbebf0b58e
-     * 0x04caa74a442d0f1f867c0e91dcaa01b2729ec4267ebc7105637846770e9527005079db00f5c952c34ba03f134e8aa79747294bcb581c407f7a32e69ffbebf0b58e
-     */
-    
+   
     const loadVideo = async (video: IMessageVideo) => {
-        const path = video.path??video.original
-        if(path === '')        {
+        const path = video.path ?? (video.trans?? video.original)
+        if(!path ||path === '')        {
             toast('数据异常')
             return
         }
+        setDuration(video.duration)
+        
         if(path.startsWith('file://')){
             if(await fileService.checkExist(path)){
                 console.log('使用原始文件');
                 setData(path)
                 return 
-            }   
+            } else {
+                toast('数据异常')
+                return
+            }
         }
-        setDuration(video.duration)
-        const decodePath = await fileService.getEnVideoContent(path, encKey) ?? null;
+        console.log('视频预览',path);
+        
+        const decodePath = await fileService.decodeVideo(path, encKey) ?? null;
         if (decodePath === null) {
             toast('下载失败');
             return;
         }
         console.log('file is',decodePath);
-        setData(decodePath)
+        console.log('original md5:',video.o_md5);
+        console.log('target md5', (await fileService.getFileInfo(decodePath)).md5);
         
-        // const path = 'file:///data/user/0/com.tdchat/cache/f3267f76798cd116ce6f0569_trans.mp4'
-        // const encodePath = await fileService.encryptFile(path,encKey)
-        // const decodePath = await fileService.getEnVideoContent(encodePath.path, encKey) ?? null;
-
+        
+        setData(decodePath)
+        // const originalPath = 'file:///data/user/0/com.tdchat/cache//03b3782126aaaa53202bb447_trans.mp4'
+        // const path = await fileService.fileSpliteEncode(originalPath,encKey)
+        // const decodePath = await fileService.videoSplitDecode(path.path, encKey) ?? null;
+        // console.log('path: ',decodePath);
+        // console.log('原始MD5:',path.md5)
         // setData(decodePath??'')
-        // setData('file:///data/user/0/com.tdchat/cache//fcd55628809e6f42f39fbd9e2868754ace246a69d453da55c2a04df284135029_decode.mp4')
-        // const mimeType = mime.getType(path);
-        // setData(`data:${mimeType};base64,${base64}`);
     }
 
      //自定义进度条
@@ -202,15 +204,15 @@ var styles = StyleSheet.create({
         verticalAlign: 'middle'
     },
     videoStyle:{
-        // flex: 1,
+        flex: 1,
         // position: 'absolute',
         backgroundColor: 'blue',
-        top:0,
-        left: 0,
-        bottom: 0,
-        right: 0,
-        width: 200,
-        height: 200
+        // top:0,
+        // left: 0,
+        // bottom: 0,
+        // right: 0,
+        // width: 200,
+        // height: 200
     },
     progressBox:{
         width:'100%',

@@ -229,7 +229,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                             }
                         }
                         if (m.type == 'video') {
-                            if (m.data && m.state == 1) {
+                            if (m.data && m.state === 1) {
                                 encVideoPreviewRef.current?.open({
                                     encKey: sharedSecretRef.current,
                                     video: m.data as IMessageVideo,
@@ -288,7 +288,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                                             file.path = data.path;
                                             items[index].data = file;
                                         }
-                                    } else if (message.type == 'video') {
+                                    } else if (message.type === 'video') {
                                         const data = res.data as IMessageVideo;
                                         message.data = {
                                             ...data,
@@ -297,6 +297,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                                         const file = message.data;
                                         if (file) {
                                             file.path = data.path;
+                                            file.thumbnail = data.thumbnail
                                             items[index].data = file;
                                         }
 
