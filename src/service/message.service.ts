@@ -253,7 +253,7 @@ const removeBatch = async (chatId: string, mids: string[]) => {
 }
 
 // 清除所有消息
-const clearAll = async (cids: string[]) => {
+const clearAll = async () => {
     return true;
 }
 export default {

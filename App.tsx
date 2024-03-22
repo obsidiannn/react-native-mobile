@@ -14,7 +14,7 @@ import { initNotification } from './src/service/notification.service'
 
 import { navigate } from "./src/lib/root-navigation";
 import messaging from '@react-native-firebase/messaging';
-
+import { SocketProvider } from './src/lib/socket'
 
 if (
   Platform.OS === 'android' &&
@@ -70,11 +70,13 @@ function App(): JSX.Element {
   
   return (
     <RecoilRoot>
-      <SafeAreaProvider>
-        <RootSiblingParent>
-          <MainStack />
-        </RootSiblingParent>
-      </SafeAreaProvider>
+      <SocketProvider>
+        <SafeAreaProvider>
+          <RootSiblingParent>
+            <MainStack />
+          </RootSiblingParent>
+        </SafeAreaProvider>
+      </SocketProvider>
     </RecoilRoot>
   );  
 }

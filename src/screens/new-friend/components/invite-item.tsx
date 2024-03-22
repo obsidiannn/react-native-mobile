@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Image } from "@/components/image";
 import { FriendInviteApplyItem } from "@/api/types/friend";
+import { FriendApplyStatusEnum } from "@/api/types/enums";
 dayjs.extend(relativeTime)
 export default (props: {
     item: FriendInviteApplyItem,
@@ -12,7 +13,7 @@ export default (props: {
 }) => {
     const { item, isLast } = props;
     return <TouchableOpacity onPress={() => {
-        if (item.status === 1) {
+        if (item.status === FriendApplyStatusEnum.PENDING) {
             navigate('InviteInfo', {
                 id: item.id,
                 obj_uid: item.objUid,
@@ -23,9 +24,11 @@ export default (props: {
                 remark: item.remark,
             });
         } else {
-            const authUid = globalThis.wallet?.address.toLowerCase() || '';
+            const authUid = globalThis.wallet?.address || '';
+            const uid = (authUid === item.uid) ? item.objUid : item.uid
+            
             navigate('UserInfo', {
-                uid: authUid === item.uid ? item.objUid : item.uid,
+                uid
             });
         }
     }} style={styles.container}>
@@ -42,11 +45,11 @@ export default (props: {
             <View style={styles.statusContainer}>
                 <Text style={{
                     ...styles.statusText,
-                    color: item.status === 1 ? '#009B0F' : '#999',
+                    color: item.status === FriendApplyStatusEnum.PENDING ? '#009B0F' : '#999',
                 }}>
-                    {item.status === 2 && '已添加'}
-                    {item.status === 3 && '已拒绝'}
-                    {item.status === 1 && '等待验证'}
+                    {item.status === FriendApplyStatusEnum.PASSED  && '已添加'}
+                    {item.status === FriendApplyStatusEnum.REFUSED && '已拒绝'}
+                    {item.status === FriendApplyStatusEnum.PENDING  && '等待验证'}
                 </Text>
             </View>
         </View>

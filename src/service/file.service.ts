@@ -18,6 +18,9 @@ import * as Sharing from 'expo-sharing';
 import toast from '@/lib/toast';
 import { enc } from 'crypto-js';
 
+// 加解密的分片大小
+const ENCODE_CHUNK = 65536
+const DECODE_CHUNK = ENCODE_CHUNK + 16
 
 export interface ChooseImageOption {
     aspect?: [number, number],
@@ -276,7 +279,7 @@ const fileSpliteEncode = async (fileKey: string,localPath: string,encKey: string
     const newPath = `${FileSystem.cacheDirectory}${fileKeySign}.enc`;
     
     if(!await RNFS.exists(newPath)){
-        const limit = 65536
+        const limit = ENCODE_CHUNK
         const total = fileInfo.size
         for (let start = 0; start < total; start+=limit) {
             const end = Math.min(start+limit-1,total-1)        
@@ -309,7 +312,7 @@ const fileSplitDecode = async (targetPath: string,localPath: string, encKey: str
     }
     const encodeFile = await FileSystem.getInfoAsync(localPath,{size: true,md5: true})
     const total = encodeFile.size    
-    const limit = 65552
+    const limit = DECODE_CHUNK
     for (let start = 0; start < total; start+=limit) {
         const end = Math.min(start+limit-1,total-1)        
         const encData = await chunkFromFile(localPath,start,end)

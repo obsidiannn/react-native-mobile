@@ -6,10 +6,12 @@ export interface FreindInfoReleationItem extends FriendRelationItem{
 	avatar: string;
 	gender: number;
 	pubKey: string
+	chatId?: string
   }
 export interface FriendRelationItem {
 	uid: string;
 	isFriend: FriendReleationEnum;
+	chatId?:string
 };
 
 export interface FriendInviteApplyReq{

@@ -7,10 +7,11 @@ import ConfirmPasswordModal, { ConfirmPasswordModalType } from "../../components
 import { scale, verticalScale } from "react-native-size-matters/extend";
 
 import ToolItem from "./components/tool-item";
-import { clearAccountDataList } from "../../lib/account";
+import { clearAccountDataList, readMN } from "../../lib/account";
 import groupService from "../../service/group.service";
 import messageService from "../../service/message.service";
 import RNRestart from 'react-native-restart';
+import { navigate } from "@/lib/root-navigation";
 const SecurityScreen = () => {
     const insets = useSafeAreaInsets();
     const confirmModalRef = useRef<ConfirmModalType>();
@@ -24,37 +25,16 @@ const SecurityScreen = () => {
             icon: require('../../assets/icons/disk.svg'),
             title: '备份助记词',
             onPress: () => {
-                //groupService.create('测试群聊', 'https://avatars.githubusercontent.com/u/25190530?s=60&v=4');
-                const gid = '05df14c0-2b87-4dea-be20-aff84f7fb631';
-                groupService.applyList().then((res,) => {
-                    console.log('待审核',res);
-                });
-                // groupService.getInfo(gid).then((x) => {
-                //     console.log('x', x);
-                //     groupService.encInfo(gid).then((y) => {
-                //         if (!globalThis.wallet || !x) {
-                //             return;
-                //         }
-                //         const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(x.pub.substring(2), 'hex')).substring(4);
-                //         console.log('sharedSecret', sharedSecret);
-                //         const pri = quickAes.De(y.enc_pri, sharedSecret);
-                //         const key = quickAes.De(y.enc_key, sharedSecret);
-                //         console.log('pri', pri);
-                //         console.log('key', key);
-                //     });
-                // });
-                // confirmPasswordModalRef.current?.open({
-                //     title: '备份助记词',
-                //     desc: '请谨慎操作！',
-                //     onSubmit: (password: string) => {
-
-                //         readMN(password).then((mn) => {
-                //             console.log(mn)
-                //             navigate('BackupMnemonic', { mn })
-                //         }).catch((e) => {
-                //         });
-                //     }
-                // })
+                confirmPasswordModalRef.current?.open({
+                    title: '备份助记词',
+                    desc: '请谨慎操作！',
+                    onSubmit: (password: string) => {
+                        readMN(password).then((mn) => {
+                            navigate('BackupMnemonic', { mnemonic:mn })
+                        }).catch((e) => {
+                        });
+                    }
+                })
             }
         },
         {

@@ -3,7 +3,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import { NowAccount } from "../../stores/app";
+import { NowAccount, atomCurrentUser } from "../../stores/app";
 import SecurityComponent from "./components/security-password";
 import Navbar from "../../components/navbar";
 import { readAccount } from "../../lib/account";
@@ -11,6 +11,8 @@ import { navigate } from '../../lib/root-navigation'
 import { scale } from "react-native-size-matters/extend";
 import { RootStackParamList } from "@/types";
 import { DrawerActions } from "@react-navigation/native";
+import util from '@/lib/utils'
+import authService from "@/service/auth.service";
 type Props = StackScreenProps<RootStackParamList, 'Unlock'>;
 
 const UnlockScreen = ({ navigation,route }: Props) => {
@@ -18,7 +20,8 @@ const UnlockScreen = ({ navigation,route }: Props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [, setNowAccount] = useRecoilState(NowAccount);
     const params:any = route.params??{}
-    
+    const [,setCurrent] = useRecoilState(atomCurrentUser)
+
     useEffect(() => {
         // (async () => {
         //     const oneWallet = await readAccount('147258');
@@ -49,6 +52,7 @@ const UnlockScreen = ({ navigation,route }: Props) => {
                             const oneWallet = await readAccount(password);
                             setNowAccount(oneWallet);
                             globalThis.wallet = oneWallet;
+                            setCurrent(await authService.info())
                             navigation.popToTop();
 
                             if(params.jumpTo &&( params.jumpTo??null !== null)){

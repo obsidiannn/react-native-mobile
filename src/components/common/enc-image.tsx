@@ -21,6 +21,8 @@ export default (props: EncImageProps) => {
             return source;
         }
         console.log('encKey:',props.encKey);
+        console.log('uri:',source);
+        
         
         const base64 = await fileService.getEnFileContent(source, props.encKey);
         const mimeType = mime.getType(source);

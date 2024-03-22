@@ -1,4 +1,5 @@
 import { BasePageReq,BasePageResp,CommonEnum,GroupTypeEnum } from "./common";
+import { ChatTypeEnum } from "./enums";
 
 export interface ChatListItem {
 	id: string;
@@ -13,12 +14,15 @@ export interface ChatListItem {
 
 export interface ChatDetailItem {
 	id: string;
-	creator_id: string;
-	type: number;
+	creatorId: string;
+	type: ChatTypeEnum;
 	status: number;
-	is_enc: number;
-	last_read_sequence: number;
-	last_sequence: number;
-	last_time: number;
-	created_at: number;
+	isEnc: number;
+	lastReadSequence: number;
+	lastSequence: number;
+	lastTime: number;
+	createdAt: number;
+	avatar: string
+	sourceId: string
+	chatAlias: string
 };
