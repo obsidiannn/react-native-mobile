@@ -9,10 +9,11 @@ import Navbar from "@/components/navbar";
 import { scale } from "react-native-size-matters/extend";
 import DropMenu, { DropMenuItem } from "./components/drop-menu";
 import NavbarRight from "./components/navbar-right";
-import ConversationItem, { Conversation } from "./components/conversation-item";
+import ConversationItem, { Conversation, ConversationType } from "./components/conversation-item";
 import dayjs from "dayjs";
 
 import chatApi from '@/api/v2/chat';
+import chatService from '@/service/chat.service'
 import SelectMemberModal, { SelectMemberModalType, SelectMemberOption } from "@/components/select-member-modal";
 import authService from "@/service/auth.service";
 import groupService from "@/service/group.service";
@@ -25,7 +26,7 @@ type Props = StackScreenProps<RootStackParamList, 'Home'>;
 const HomeScreen = ({ navigation }: Props) => {
     const insets = useSafeAreaInsets();
     const elementRef = useRef<RootSiblings>();
-    const [conversations, setConversations] = useState<Conversation[]>([]);
+    const [conversations, setConversations] = useState<ConversationType[]>([]);
     const selectMemberModalRef = useRef<SelectMemberModalType>(null);
     const [menus, setMenus] = useState<DropMenuItem[]>([]);
     const scanQrcodeModalRef = useRef<ScanQrcodeModalType>(null);
@@ -44,13 +45,12 @@ const HomeScreen = ({ navigation }: Props) => {
     }, [menus]);
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            chatApi.mineChatList().then((res) => {
-                console.log('chatApi.getList', res.items);
-                const items = res.items.map((item) => {
+            chatService.mineChatList().then((res) => {
+                const items:ConversationType[] = res.map((item) => {
                     return {
                         ...item,
-                        // timestamp: item.last_time > 0 ? dayjs(item.last_time) : undefined,
-                        // unread: item.last_sequence - item.last_read_sequence,
+                        timestamp: item.lastTime > 0 ? dayjs(item.lastTime) : undefined,
+                        unread: item.lastSequence - item.lastReadSequence,
                     }
                 });
                 setConversations(items);
@@ -58,7 +58,27 @@ const HomeScreen = ({ navigation }: Props) => {
         });
         setMenus([
             {
-                title: '创建群',
+                title: '添加好友',
+                onPress: () => {
+                    if (elementRef.current) {
+                        elementRef.current?.destroy();
+                    }
+                    navigation.navigate('AddFriend');
+                },
+                icon: require('@/assets/icons/useradd-black.svg'),
+            },
+            {
+                title: '扫一扫',
+                onPress: () => {
+                    if (elementRef.current) {
+                        elementRef.current?.destroy();
+                    }
+                    scanQrcodeModalRef.current?.open();
+                },
+                icon: require('@/assets/icons/scan-black.svg'),
+            },
+            {
+                title: '创建群聊',
                 onPress: async () => {
                     const data = await friendService.getList();
                     const options: SelectMemberOption[] = data.items.map((item) => {
@@ -89,26 +109,6 @@ const HomeScreen = ({ navigation }: Props) => {
                     }
                 },
                 icon: require('@/assets/icons/useradd-black.svg'),
-            },
-            {
-                title: '添加好友',
-                onPress: () => {
-                    if (elementRef.current) {
-                        elementRef.current?.destroy();
-                    }
-                    navigation.navigate('AddFriend');
-                },
-                icon: require('@/assets/icons/useradd-black.svg'),
-            },
-            {
-                title: '扫一扫',
-                onPress: () => {
-                    if (elementRef.current) {
-                        elementRef.current?.destroy();
-                    }
-                    scanQrcodeModalRef.current?.open();
-                },
-                icon: require('@/assets/icons/scan-black.svg'),
             },
         ])
         return unsubscribe;

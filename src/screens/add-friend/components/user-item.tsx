@@ -2,7 +2,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { navigate } from "../../../lib/root-navigation"
 import { Image } from "../../../components/image";
 import { scale } from "react-native-size-matters/extend";
-import { FreindInfoReleationItem } from "@/api/types/friend";
+import { FreindInfoReleationItem, FriendReleationEnum } from "@/api/types/friend";
+import toast from "@/lib/toast";
 
 export default (props: {
     item: FreindInfoReleationItem;
@@ -10,9 +11,13 @@ export default (props: {
 }) => {
     const { item, isLast } = props;
     return <TouchableOpacity onPress={() => {
-        navigate('UserInfo', {
-            uid: item.uid
-        })
+        if(item.isFriend === FriendReleationEnum.FRIEND_NONE ||item.isFriend === FriendReleationEnum.FRIEND_HIM ){
+            navigate('UserInfo', {
+                uid: item.uid
+            })
+        }else{
+            toast('对方已是好友')
+        }
     }} style={{
         ...styles.container,
     }}>
@@ -21,7 +26,6 @@ export default (props: {
             ...styles.rightContainer,
             borderBottomColor: isLast ? 'white' : '#F4F4F4',
         }}>
-
             <Text style={styles.name}>{item.name}</Text>
             <Image style={styles.icon} source={require('../../../assets/icons/arrow-right-primary.svg')} />
         </View>

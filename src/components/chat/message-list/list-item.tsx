@@ -3,11 +3,12 @@ import { scale } from "react-native-size-matters/extend";
 import TextItem from "./modules/text-item"
 import FileItem from "./modules/file-item";
 import ImageItem from "./modules/image-item";
+import VideoItem from './modules/video-item'
 import Avatar from "./modules/avatar";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MessageContainer from "./modules/message-container";
 import Info from "./modules/info";
-import { DataType, IMessage, IMessageFile, IMessageImage } from "../input-toolkit/types";
+import { DataType, IMessage, IMessageFile, IMessageImage, IMessageVideo } from "../input-toolkit/types";
 export default (props: {
     isSelf: boolean;
     item: IMessage<DataType>;
@@ -16,6 +17,9 @@ export default (props: {
     onPress?: (message: IMessage<DataType>) => void;
     itemOnPress?: () => void;
 }) => {
+
+    const [reload,setReload] = useState(false)
+    useEffect(()=>{},[reload])
     const { item } = props;
     let message: React.ReactNode;
     switch (item.type) {
@@ -32,6 +36,18 @@ export default (props: {
                 const h = scale(Math.floor(image.h * (w / image.w)));
                 message = <ImageItem
                     image={image}
+                    encKey={props.encKey} />;
+            }
+            break;
+        case "video":
+            const video = item.data as IMessageVideo
+            if (!video || !video.h) {
+                message = <TextItem text="[视频不存在]" isSelf={props.isSelf} />
+            } else {
+                const w = scale(video.w) > scale(180) ? scale(180) : scale(video.w);
+                const h = scale(Math.floor(video.h * (w / video.w)));
+                message = <VideoItem 
+                    video={video}
                     encKey={props.encKey} />;
             }
             break;

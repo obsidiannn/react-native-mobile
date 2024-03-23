@@ -4,6 +4,8 @@ import { scale } from "react-native-size-matters/extend";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Image } from "@/components/image";
+import { ChatDetailItem, ChatListItem } from "@/api/types/chat";
+import { ChatTypeEnum } from "@/api/types/enums";
 dayjs.extend(relativeTime)
 export interface Conversation {
     id: string;
@@ -17,22 +19,28 @@ export interface Conversation {
     last_sequence: number;
     last_time: number;
 }
+
+export interface ConversationType extends ChatDetailItem {
+    timestamp?: dayjs.Dayjs
+    unread: number
+}
+
 export default (props: {
-    item: Conversation,
+    item: ConversationType,
     isLast: boolean,
 }) => {
     const { item, isLast } = props;
     return <TouchableOpacity onPress={() => {
-        if (item.type === 1) {
-            
+        if (item.type === ChatTypeEnum.NORMAL) {
             navigate('UserChat',{
-                uid: item.target_id,
+                uid: item.sourceId,
                 chatId: item.id,
             })
-        }else if(item.type === 2){
+        }else if(item.type === ChatTypeEnum.GROUP){
             console.log('group item', item);
             navigate('GroupChat',{
                 chatId: item.id,
+                groupId: item.sourceId
             })
         }
     }} style={styles.container}>
@@ -49,7 +57,7 @@ export default (props: {
             borderBottomColor: isLast ? 'white' : '#F4F4F4',
         }}>
             <View style={styles.nameContainer}>
-                <Text style={styles.nameText}>{item.name}</Text>
+                <Text style={styles.nameText}>{item.chatAlias}</Text>
             </View>
             <View style={styles.timeContainer}>
                 <Text style={styles.timeText}>{item.timestamp?.fromNow()}</Text>

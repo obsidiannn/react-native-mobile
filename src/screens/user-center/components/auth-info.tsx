@@ -4,18 +4,46 @@ import toast from "../../../lib/toast";
 import * as clipboard from 'expo-clipboard';
 import { navigate } from "../../../lib/root-navigation";
 import { Image } from "expo-image";
-export default () => {
-    const avatar = 'https://img2.woyaogexing.com/2023/11/17/171ab55d7ee543be461803d1fc941f3e.jpg';
+import EncImage  from '@/components/common/enc-image'
+import util from '@/lib/utils'
+import { useEffect, useState } from "react";
+import { UserInfoItem } from "@/api/types/user";
+import fileService from "@/service/file.service";
+import { useRecoilState } from "recoil";
+
+import { atomCurrentUser } from '@/stores/app' 
+
+export default (
+   
+) => {
+    const [currentUser,_] = useRecoilState(atomCurrentUser)
+    // const selfKey = ():string  =>{
+    //     const wallet = globalThis.wallet
+    //     if(wallet){
+    //         // return wallet.signingKey.computeSharedSecret(wallet.signingKey.publicKey)
+    //         return wallet.signingKey.privateKey
+    //     }
+    //     return ''
+    // }
+    const localUser = () =>{
+        if(currentUser){
+            return currentUser
+        }else{
+            return globalThis.currentUser
+        }
+    }
+
     return <View style={styles.container}>
-        <Image source={{ uri: avatar }} style={styles.avatar} />
+
+        <Image source={fileService.getFullUrl(localUser()?.avatar??'')} style={styles.avatar} />
         <View style={styles.infoContainer}>
-            <Text style={styles.name}>xxx</Text>
+            <Text style={styles.name}>{localUser()?.name}</Text>
             <Pressable style={styles.uidContainer} onPress={async () => {
-                if (await clipboard.setStringAsync('0x9999...dada')) {
+                if (await clipboard.setStringAsync(localUser()?.id??'')) {
                     toast('复制成功');
                 }
             }}>
-                <Text style={styles.uid}>BID: 0x9999...dada</Text>
+            <Text style={styles.uid}>{localUser()?.id}</Text>
             </Pressable>
         </View>
         <Pressable onPress={() => {

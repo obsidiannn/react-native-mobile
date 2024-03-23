@@ -6,7 +6,8 @@ import {
   MessageDetailItem,
   MessageDeleteByIdReq,
   MessageSendResp,
-  MessageListReq
+  MessageListReq,
+  MessageDetailReq
  } from '../types/message'
 
  // 发送消息
@@ -20,7 +21,7 @@ const getMessageList = (param:MessageListReq): Promise<BaseArrayResp<MessageList
 }
 
 // 消息列表
-const getMessageDetail = (param: BaseIdsArrayReq): Promise<BaseArrayResp<MessageDetailItem>>=>{
+const getMessageDetail = (param: MessageDetailReq): Promise<BaseArrayResp<MessageDetailItem>>=>{
   return createRequestInstance(true).post('/messages/detail',param);
 }
 

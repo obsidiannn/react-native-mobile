@@ -11,15 +11,29 @@ type Props = StackScreenProps<RootStackParamList, 'NewFriend'>;
 import friendApi from "@/api/v2/friend";
 import { FriendInviteApplyItem } from '@/api/types/friend'
 import { RootStackParamList } from "@/types";
+import userService from "@/service/user.service";
 
 const NewFriendScreen = ({navigation }: Props) => {
     const insets = useSafeAreaInsets();
     const [items, setItems] = useState<FriendInviteApplyItem[]>([]);
     useEffect(()=>{
-        const unsubscribe = navigation.addListener('focus', () => {
-            friendApi.getInviteList().then(res =>{
-                setItems(res.items);
-            })
+        const unsubscribe = navigation.addListener('focus', async () => {
+            const res = await friendApi.getInviteList()
+                
+                if(res.items.length > 0){
+                const uids = res.items.map(i=>i.objUid)
+                const userHash = await userService.getUserHash(uids)
+                let change = false
+                res.items.forEach(ri=>{
+                    const user = userHash.get(ri.objUid)
+                    if(user){
+                        change = true
+                        ri.avatar = user.avatar
+                        ri.name = user.name
+                    }
+                })
+                    setItems(res.items);
+                }
         });
         return unsubscribe;
     },[navigation])

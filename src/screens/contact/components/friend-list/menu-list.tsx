@@ -8,7 +8,7 @@ import { scale, verticalScale } from "react-native-size-matters/extend"
 export default () => {
     return <View>
         <TouchableOpacity onPress={() => {
-            navigate("AddFriend")
+            navigate("NewFriend")
         }} style={styles.item}>
             <Image style={styles.icon} source={require('@/assets/icons/useradd-red.svg')} />
             <View style={{

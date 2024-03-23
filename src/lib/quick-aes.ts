@@ -5,6 +5,7 @@ const getIV = (val: string) => {
         .digest('hex')
         .substring(0, 16);
 }
+
 const En = (val: string, key: string) => {
     const iv = getIV(key);
     const cipher = Crypto.createCipheriv('aes-128-cbc', iv, iv, {
@@ -33,6 +34,7 @@ const EnBuffer = (val: Buffer, key: string) => {
 }
 const DeBuffer = (val: Buffer, key: string) => {
     const iv = getIV(key);
+    
     const decipher = Crypto.createDecipheriv('aes-128-cbc', iv, iv, {
         padding: 'pkcs7',
     });
@@ -40,9 +42,30 @@ const DeBuffer = (val: Buffer, key: string) => {
     data += decipher.final('hex');
     return Buffer.from(data as string, 'hex');
 }
+
+const EnPadding = (val: Buffer, key: string) => {
+    const iv = getIV(key);
+    const cipher = Crypto.createCipheriv('aes-128-cbc', iv, iv);
+    cipher.setAutoPadding(true)
+    let data = cipher.update(val, 'binary', 'hex')
+    data += cipher.final('hex');
+    return Buffer.from(data as string, 'hex');
+}
+const DePadding = (val: Buffer, key: string) => {
+    const iv = getIV(key);
+    const decipher = Crypto.createDecipheriv('aes-128-cbc', iv, iv);
+    decipher.setAutoPadding(true)
+    let data = decipher.update(val, 'binary', 'hex')
+    data += decipher.final('hex');
+    return Buffer.from(data as string, 'hex');
+}
+
+
 export default {
     En,
     De,
     EnBuffer,
-    DeBuffer
+    DeBuffer,
+    EnPadding,
+    DePadding
 };

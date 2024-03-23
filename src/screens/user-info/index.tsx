@@ -86,10 +86,12 @@ const UserInfoScreen = ({ navigation, route }: Props) => {
                                     uid: user.uid
                                 })
                             } else {
-                                navigation.navigate('UserChat', {
-                                    uid: user.uid,
-                                    chatId: ''
-                                })
+                                if(user.chatId){
+                                    navigation.navigate('UserChat', {
+                                        uid: user.uid,
+                                        chatId: user.chatId
+                                    })
+                                }
                             }
                         }} label={user.isFriend != 1 ? '添加好友' : '开始聊天'} />
                     </View>

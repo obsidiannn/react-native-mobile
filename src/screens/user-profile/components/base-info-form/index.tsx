@@ -11,6 +11,9 @@ import colors from "../../../../config/colors";
 import { Button } from "react-native-ui-lib";
 import toast from "../../../../lib/toast";
 import { GenderEnum } from "@/api/types/enums";
+import { useRecoilState } from "recoil";
+import { atomCurrentUser } from '@/stores/app'
+
 export interface FormData {
     avatar: string;
     gender: number;
@@ -28,6 +31,8 @@ export default forwardRef((_, ref) => {
     });
     const [address, setAddress] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const [_unuse,setCurrent] = useRecoilState(atomCurrentUser)
     useImperativeHandle(ref, () => ({
         init: () => {
             authService.info().then(res => {
@@ -148,6 +153,10 @@ export default forwardRef((_, ref) => {
                         await authService.updateGender(formData.gender);
                         await authService.updateSign(formData.sign);
                         toast('更新成功!');
+                        const current = await authService.info()
+                        if(current){
+                            setCurrent(current)
+                        }
                     } catch (error) {
                         console.log(error);
                         toast("更新失败")
