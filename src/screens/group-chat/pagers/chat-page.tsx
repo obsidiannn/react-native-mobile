@@ -4,7 +4,7 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef,
 import tools from '../tools';
 import { UserInfoItem } from "@/api/types/user";
 import userService from "@/service/user.service";
-import MessageService from "@/service/message.service";
+import messageService from "@/service/message.service";
 import ToastException from "@/exception/toast-exception";
 import { verticalScale } from "react-native-size-matters/extend";
 import EncImagePreview, { IEncImagePreviewRef } from "@/components/chat/enc-image-preview-modal";
@@ -18,6 +18,7 @@ import groupService from "@/service/group.service";
 import toast from "@/lib/toast";
 import quickAes from "@/lib/quick-aes";
 import { GroupInfoItem } from "@/api/types/group";
+import colors from "@/config/colors";
 export interface ChatPageRef {
     init: (chatId: string,group: GroupInfoItem,authUser: UserInfoItem) => void;
     close: () => void;
@@ -46,7 +47,7 @@ export default forwardRef((_,ref) => {
             return;
         }
         const seq = direction == 'up' ? firstSeq.current : lastSeq.current;
-        MessageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction).then((res) => {
+        messageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction).then((res) => {
             if (res.length > 0) {
                 if (direction == 'up') {
                     firstSeq.current = res[res.length - 1].sequence ?? 0;
@@ -86,17 +87,20 @@ export default forwardRef((_,ref) => {
             toast('钱包未初始化');
             return;
         }
-        const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(g.pubKey.substring(2), 'hex')).substring(4);
+        // const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(g.pubKey, 'hex')).substring(4);
+        const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(g.pubKey);
         console.log('sharedSecret', sharedSecret);
-        groupService.encInfo(conversationIdRef.current).then((res) => {
-            console.log('群加密信息', res);
-            sharedSecretRef.current = quickAes.De(res.enc_key, sharedSecret);
-            console.log('sharedSecretRef.current', sharedSecretRef.current);
-            loadMessages('up');
-            // intervalRef.current = setInterval(() => {
-            //     loadMessages('down');
-            // }, 2000);
-        })
+        loadMessages('up');
+        loadMessages('down');
+        // groupService.encInfo(conversationIdRef.current).then((res) => {
+        //     console.log('群加密信息', res);
+        //     sharedSecretRef.current = quickAes.De(res.enc_key, sharedSecret);
+        //     console.log('sharedSecretRef.current', sharedSecretRef.current);
+            
+        //     // intervalRef.current = setInterval(() => {
+        //     //     loadMessages('down');
+        //     // }, 2000);
+        // })
         setAuthUser(a);
     }, []);
     const close = useCallback(() => {
@@ -139,7 +143,7 @@ export default forwardRef((_,ref) => {
         <>
             <View style={{
                 flex: 1,
-                backgroundColor: '#F4F4F4',
+                backgroundColor: colors.gray100,
             }}>
                 <TouchableWithoutFeedback accessible={false} onPress={() => {
                     Keyboard.dismiss();
@@ -199,7 +203,7 @@ export default forwardRef((_,ref) => {
                         if (message.type == 'image' || message.type == "file") {
                             loadingModalRef.current?.open('加密处理中...');
                         }
-                        MessageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
+                        messageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
                             if (!res) {
                                 return;
                             }

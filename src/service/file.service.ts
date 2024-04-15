@@ -17,6 +17,8 @@ import * as RNFS from 'react-native-fs';
 import * as Sharing from 'expo-sharing';
 import toast from '@/lib/toast';
 import { enc } from 'crypto-js';
+import dayjs from 'dayjs';
+import { SaveFormat, manipulateAsync } from 'expo-image-manipulator';
 
 // 加解密的分片大小
 const ENCODE_CHUNK = 65536
@@ -88,6 +90,36 @@ export const uploadFile = async (path: string, key: string): Promise<boolean> =>
     })
 
 };
+
+/**
+ * 上传本地图片，不加密
+ * @param localImage 
+ * @returns 
+ */
+export const uploadImage = async (localImage: string) =>{
+
+    if (localImage.startsWith('file:/')) {
+        const uuid = (await crypto.randomUUID()).replace(/-/g, '');
+        const date = dayjs().format('YYYY/MM/DD');
+        const key = `upload/avatar/${date}/${uuid}.webp`;
+        const manipResult = await manipulateAsync(
+            localImage,
+            [
+                { resize: { width: 200 } },
+            ],
+            { compress: 1, format: SaveFormat.JPEG }
+        );
+        const webpOutput = manipResult.uri.replace(/\.jpg$/, '.webp');
+        if (await format(manipResult.uri, webpOutput)) {
+            FileSystem.deleteAsync(localImage);
+            localImage = webpOutput;
+        }
+        await uploadFile(localImage, key);
+        return key;
+    }
+    return null
+}
+
 export const format = async (input: string, output: string): Promise<boolean> => {
     const cmd = `-i ${input} ${output}`;
     const session = await FFmpegKit.execute(cmd);
@@ -442,5 +474,6 @@ export default {
     encryptVideo,
     checkExist,
     fileSplitDecode,
-    fileSpliteEncode
+    fileSpliteEncode,
+    uploadImage
 }

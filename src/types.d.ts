@@ -29,6 +29,7 @@ type RootStackParamList = {
     };
     GroupChat: {
         chatId?: string;
+        groupId: string
     },
     NewFriend: undefined;
     InviteInfo: {
@@ -61,6 +62,9 @@ type RootStackParamList = {
     GroupInfo: {
         gid?: string;
     };
+    GroupCreate: {
+        selected: SelectMemberOption[]
+    }
 };
 
 

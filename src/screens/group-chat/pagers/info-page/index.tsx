@@ -1,6 +1,6 @@
 import { GroupInfoItem } from "@/api/types/group";
 import { UserInfoItem } from "@/api/types/user";
-import { Text } from "react-native"
+import { ScrollView, Text } from "react-native"
 import { scale } from "react-native-size-matters/extend";
 import { Button, View } from "react-native-ui-lib"
 import MemberItem from "./components/member-item";
@@ -44,7 +44,8 @@ export default (props: {
         if (!globalThis.wallet) {
             throw new Error('群公钥不存在')
         }
-        const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(group.pub.substring(2), 'hex')).substring(4);
+        // const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(group.pub.substring(2), 'hex')).substring(4);
+        const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(group.pubKey);
         const groupPri = quickAes.De(encInfo.enc_pri, sharedSecret)
         const groupKey = quickAes.De(encInfo.enc_key, sharedSecret);
         const groupWallet = new ethers.Wallet(groupPri);
@@ -77,7 +78,7 @@ export default (props: {
         // 分别解密enc_key
         // 发送
     }, []);
-    return <View style={{
+    return <ScrollView style={{
         flex: 1,
         backgroundColor: '#fff',
         paddingHorizontal: scale(25),
@@ -98,7 +99,7 @@ export default (props: {
                 flexWrap: 'wrap',
             }}>
                 {props.members?.map((member, i) => {
-                    return <MemberItem avatar={member.avatar} text={member.name} onPress={() => {
+                    return <MemberItem key={member.id} avatar={member.avatar} text={member.name} onPress={() => {
                         console.log('点击用户', member);
                     }} />
                 })}
@@ -260,5 +261,5 @@ export default (props: {
             props.onChangeMemberList?.();
         }} ref={applyInfoModalRef} />
         <SelectMemberModal ref={selectMemberModalRef} />
-    </View>
+    </ScrollView>
 }

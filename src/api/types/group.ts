@@ -11,6 +11,7 @@ export interface GroupCreateReq {
 	searchType: number;
 	encPri: string
 	encKey: string
+	// joinPrice: number
 };
 
 export interface GroupMemberItem {

@@ -35,6 +35,7 @@ export default () => {
         <Stack.Navigator initialRouteName='Tab' screenOptions={{
             headerShown: false,
         }}>
+          
             <Stack.Screen name="Tab" component={TabStack} />
             <Stack.Screen name="AddFriend" component={AddFriendScreen} />
             <Stack.Screen name="UserInfo" component={UserInfoScreen} />

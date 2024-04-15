@@ -25,6 +25,7 @@ import UserChatInfoScreen from './user-chat-info/index';
 import GroupInfoScreen from './group-info/index';
 import GroupListScreen from './contact/components/group-list/index2'
 import NotificationClick from './notification-click';
+import GroupCreateScreen from './group-create/index'
 export {
     EntryScreen,
     RegisterScreen,
@@ -53,4 +54,5 @@ export {
     GroupInfoScreen,
     GroupListScreen,
     NotificationClick,
+    GroupCreateScreen
 }

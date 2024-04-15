@@ -22,7 +22,7 @@ const groupMemberSecret = ()=>{
 
 }
 
-const create = async (name: string, avatar: string) => {
+const create = async (name: string, avatar: string,isEnc: boolean,searchType: string) => {
     if (!globalThis.wallet) {
         throw new Error('请先登录');
     }
@@ -48,10 +48,10 @@ const create = async (name: string, avatar: string) => {
         pubKey: pub,
         avatar: avatar,
         name: name,
-        isEnc: CommonEnum.ON,
+        isEnc: isEnc?CommonEnum.ON:CommonEnum.OFF,
         type: 1,
         banType: 0,
-        searchType: 0,
+        searchType: Number(searchType),
         encPri: enc_pri,
         encKey: enc_key
     }
@@ -121,7 +121,7 @@ const getMembers = async (id: string) => {
     return data.items;
 }
 // 获取群组信息
-const getInfo = async (id: string): Promise<GroupDetailItem | null> => {
+const getInfo = async (id: string): Promise<GroupDetailItem > => {
     const data = await groupApi.groupDetail({
         ids:[id]
     });

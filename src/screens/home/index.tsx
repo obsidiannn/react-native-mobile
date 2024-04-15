@@ -97,11 +97,10 @@ const HomeScreen = ({ navigation }: Props) => {
                         title: '选择好友',
                         options,
                         callback: async (ops: SelectMemberOption[]) => {
-                            const authInfo = await authService.info();
-                            const name = authInfo?.name ?? options.slice(0, 3).map((user) => user.name).join(',');
-                            const avatar = 'https://api.multiavatar.com/' + Buffer.from(crypto.randomBytes(16)).toString('hex') + '.png'
-                            const group = await groupService.create(name, avatar);
-                            await groupService.invite(group.id, ops,group);
+                            // 跳转到群组创建再返回                            
+                            navigation.navigate('GroupCreate',{
+                                selected: ops
+                            });
                         }
                     });
                     if (elementRef.current) {

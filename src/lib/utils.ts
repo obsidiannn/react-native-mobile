@@ -34,10 +34,20 @@ const currentUser = () =>{
 //     }
 // }
 
+const isNotBlank = (val: string) =>{
+    return val !== undefined && val !== null && val !== ''
+}
+
+const isBlank = (val: string|null) =>{
+    return !isNotBlank(val??'')
+}
+
 export default {
     bytesToSize,
     generateId,
     setWallet,
     currentUser,
+    isNotBlank,
+    isBlank
     // refreshCurrentInfo
 }
