@@ -9,6 +9,8 @@ export interface GroupCreateReq {
 	type: number;
 	banType: number;
 	searchType: number;
+	encPri: string
+	encKey: string
 };
 
 export interface GroupMemberItem {

@@ -10,11 +10,16 @@ import { SelectMemberOption } from "@/components/select-member-modal";
 import { CommonEnum } from "@/api/types/common";
 
 import { GroupApplyJoinReq, GroupCreateReq, GroupDetailItem, GroupInfoItem } from "@/api/types/group";
+import utils from "@/lib/utils";
 const quit = async (gid: string) => {
     return true;
 }
 const quitAll = async () => {
     return true;
+}
+
+const groupMemberSecret = ()=>{
+
 }
 
 const create = async (name: string, avatar: string) => {
@@ -36,17 +41,10 @@ const create = async (name: string, avatar: string) => {
     const sharedSecret = wallet.signingKey.computeSharedSecret(Buffer.from(selfPub.substring(2), 'hex')).substring(4);
     const enc_pri = quickAes.En(pri, sharedSecret);
     const enc_key = quickAes.En(key, sharedSecret);
-    // const group = {
-    //     id: Crypto.randomUUID(),
-    //     name,
-    //     avatar,
-    //     enc_pri,
-    //     pub,
-    //     enc_key,
-    // }
+    
     const group:GroupCreateReq = 
     {
-        id: Crypto.randomUUID(),
+        id: utils.generateId(),
         pubKey: pub,
         avatar: avatar,
         name: name,
@@ -54,33 +52,35 @@ const create = async (name: string, avatar: string) => {
         type: 1,
         banType: 0,
         searchType: 0,
+        encPri: enc_pri,
+        encKey: enc_key
     }
-
+    console.log('group create: ',group);
+    
     await groupApi.create(group);
     return group;
 }
 
-const invite = async (gid: string, members: SelectMemberOption[]) => {
-    const enc = await encInfo(gid);
+const invite = async (gid: string, members: SelectMemberOption[],groupInfo: GroupCreateReq) => {
     const group = await getInfo(gid);
     if (!globalThis.wallet || !group) {
         return;
     }
-    const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(group.pub.substring(2), 'hex')).substring(4);
+    const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(group.pubKey.substring(2), 'hex')).substring(4);
     
-    const pri = quickAes.De(enc.enc_pri, sharedSecret);
-    const key = quickAes.De(enc.enc_key, sharedSecret);
+    const pri = quickAes.De(groupInfo.encPri, sharedSecret);
+    const key = quickAes.De(groupInfo.encKey, sharedSecret);
     const groupWallet = new ethers.Wallet(pri);
     const items: {
         uid: string;
-        enc_key: string;
+        encKey: string;
     }[] = [];
     members.forEach(member => {
-        const sk = groupWallet.signingKey.computeSharedSecret(Buffer.from(group.pub.substring(2), 'hex')).substring(4);
+        const sk = groupWallet.signingKey.computeSharedSecret(Buffer.from(group.pubKey.substring(2), 'hex')).substring(4);
         const enkey = quickAes.En(sk, key);
         items.push({
             uid: member.id,
-            enc_key: enkey
+            encKey: enkey,
         })
     })
     if(items.length>0){

@@ -74,6 +74,7 @@ export default forwardRef((props: SelectMemberModalProps, ref) => {
             paddingTop: insets.top,
         }}>
             <Navbar title={title} onLeftPress={() => {
+                setCheckedAll(false)
                 setVisible(false);
             }} />
             <View style={{
@@ -86,9 +87,10 @@ export default forwardRef((props: SelectMemberModalProps, ref) => {
                     flex: 1,
                 }}>
                     <FlashList
-                        style={{
-                            flex: 1,
-                        }}
+                        // style={{
+                        //     flex: 1,
+                        // }}
+                    //    contentContainerStyle={{backgroundColor: 'blue'}}
                         data={options}
                         keyExtractor={(item) => item.id}
                         ref={flashListRef}

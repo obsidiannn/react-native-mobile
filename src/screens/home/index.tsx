@@ -101,7 +101,7 @@ const HomeScreen = ({ navigation }: Props) => {
                             const name = authInfo?.name ?? options.slice(0, 3).map((user) => user.name).join(',');
                             const avatar = 'https://api.multiavatar.com/' + Buffer.from(crypto.randomBytes(16)).toString('hex') + '.png'
                             const group = await groupService.create(name, avatar);
-                            await groupService.invite(group.id, ops);
+                            await groupService.invite(group.id, ops,group);
                         }
                     });
                     if (elementRef.current) {

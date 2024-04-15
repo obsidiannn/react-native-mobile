@@ -13,7 +13,7 @@ import {
 import { createRequestInstance } from "../lib/request";
 import { BaseIdReq,BaseIdArrayReq, BaseIdsArrayReq, BaseArrayResp } from "../types/common";
 
-const create = (param: GroupCreateReq) => {
+const create = (param: GroupCreateReq):Promise<void> => {
   return createRequestInstance(true).post('/groups/create', param);
 }
 
