@@ -68,7 +68,9 @@ type RootStackParamList = {
     WalletRecord:{},
     WalletQrcord:{},
     BillDetail: {id: string},
-    WalletRecordPage:{typeState: string},
+    WalletRecordPage:{
+        typeState: string
+    },
 };
 
 

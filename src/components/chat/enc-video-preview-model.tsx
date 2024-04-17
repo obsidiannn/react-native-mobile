@@ -64,7 +64,7 @@ export default forwardRef((_, ref) => {
         
         const decodePath = await fileService.decodeVideo(path, encKey) ?? null;
         if (decodePath === null) {
-            toast('下载失败');
+            toast('下載失败');
             return;
         }
         console.log('file is',decodePath);

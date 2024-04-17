@@ -53,7 +53,7 @@ export default forwardRef((_, ref) => {
         }
         const base64 = await fileService.getEnFileContent(path, encKey) ?? undefined;
         if (!base64) {
-            toast('下载失败');
+            toast('下載失败');
             return;
         }
         const mimeType = mime.getType(path);

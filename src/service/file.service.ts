@@ -203,7 +203,7 @@ const encryptVideo = async (path: string, key: string): Promise<{
     };
 }
 
-// 判断下载的文件是否存在
+// 判断下載的文件是否存在
 const checkDownloadFileExists = async (url: string) => {
     const key = crypto.Hash('sha256').update(url).digest('hex');
     const path = `${FileSystem.cacheDirectory}/${key}`;
@@ -236,12 +236,12 @@ const downloadFile = async (url: string, path: string = ''): Promise<string> => 
     if (result.status !== 200) {
         // 删除文件
         await RNFS.unlink(path);
-        throw new Error('下载失败5');
+        throw new Error('下載失败5');
     }
     // if (result.md5 !== md5) {
     //     // 删除文件
     //     await RNFS.unlink(path);
-    //     throw new Error('下载失败6');
+    //     throw new Error('下載失败6');
     // }
     return path;
 }

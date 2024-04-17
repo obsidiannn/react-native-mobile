@@ -38,7 +38,7 @@ export default (props: Props) => {
 
     useEffect(() => {
         const page = { limit: 5, page: 1 }
-        walletApi.billRecordPage({ inOut: BillInOutEnum.OUTCOME, ...page }).then(res => {
+        walletApi.billRecordPage({ ...page }).then(res => {
             const list = res.items.map(i => {
                 return {
                     id: i.id,
@@ -52,7 +52,7 @@ export default (props: Props) => {
             setList1({ items: list, total: res.total })
         })
         walletApi.billRecordPage({
-            inOut: BillInOutEnum.INCOME,
+            inOut: BillInOutEnum.OUTCOME,
             types: [BillTypeEnum.DRAW_CASH, BillTypeEnum.GROUP_DRAW_CASH]
             , ...page
         }).then(res => {

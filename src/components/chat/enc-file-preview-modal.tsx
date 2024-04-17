@@ -36,7 +36,7 @@ export default forwardRef((_, ref) => {
     const [downloaded, setDownloaded] = useState(false);
     const downloadFile = useCallback(async (f: IEncFilePreviewFile) => {
         await fileService.downloadFile(fileService.getFullUrl(f.path));
-        toast('下载成功');
+        toast('下載成功');
         setDownloaded(true);
     }, []);
     const saveFile = useCallback(async (f: IEncFilePreviewFile) => {
@@ -50,7 +50,7 @@ export default forwardRef((_, ref) => {
         }
         const data = await fileService.getEnFileContent(f.path, encKey) ?? undefined;
         if (!data) {
-            toast('下载失败3');
+            toast('下載失败3');
             return;
         }
         const path = await fileService.saveFile(data, f.name);
@@ -90,7 +90,7 @@ export default forwardRef((_, ref) => {
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
         }}>
-            <Navbar title="文件详情" onLeftPress={() => setVisible(false)} />
+            <Navbar title="文件詳情" onLeftPress={() => setVisible(false)} />
             <View style={{
                 flex: 1,
                 alignItems: 'center',
@@ -138,7 +138,7 @@ export default forwardRef((_, ref) => {
                     display: 'flex',
                     width: '100%',
                 }} size="large" label={
-                    downloaded ? (loading ? '解密中' : '保存到本地') : (loading ? '下载中' : '保存到本地')
+                    downloaded ? (loading ? '解密中' : '保存到本地') : (loading ? '下載中' : '保存到本地')
                 }>
                     {loading ? <ActivityIndicator color="white" style={{
                         marginRight: scale(5),
