@@ -1,5 +1,8 @@
 import crypto from "react-native-quick-crypto";
 import authService from "@/service/auth.service";
+
+import dayjs from 'dayjs'
+
 const bytesToSize = (bytes: number) => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     if (bytes === 0) return '0 Byte';
@@ -42,12 +45,20 @@ const isBlank = (val: string|null) =>{
     return !isNotBlank(val??'')
 }
 
+const dateFormat = (date: Date|null):string=>{
+    if(date === null || date === undefined){
+        return ''
+    }
+    return dayjs(date).format('YYYY-MM-DD HH:mm:ss')
+}
+
 export default {
     bytesToSize,
     generateId,
     setWallet,
     currentUser,
     isNotBlank,
-    isBlank
+    isBlank,
+    dateFormat
     // refreshCurrentInfo
 }

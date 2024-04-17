@@ -64,7 +64,11 @@ type RootStackParamList = {
     };
     GroupCreate: {
         selected: SelectMemberOption[]
-    }
+    },
+    WalletRecord:{},
+    WalletQrcord:{},
+    BillDetail: {id: string},
+    WalletRecordPage:{typeState: string},
 };
 
 

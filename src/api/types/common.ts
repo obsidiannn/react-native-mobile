@@ -14,6 +14,7 @@ export interface BasePageResp<T>{
   limit: number,
   items: T[],
   status: number,
+  total: number
 }
 
 export interface BaseArrayResp<T>{

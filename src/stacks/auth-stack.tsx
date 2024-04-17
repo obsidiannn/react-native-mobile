@@ -20,6 +20,10 @@ import {
     UserChatInfoScreen,
     GroupInfoScreen,
     GroupListScreen,
+    WalletRecordScreen,
+    WalletQrcordScreen,
+    BillDetailScreen,
+    WalletRecordPageScreen
 } from '../screens/index'
 import { RootStackParamList } from '@/types';
 import { useNavigation } from '@react-navigation/native';
@@ -55,7 +59,10 @@ export default () => {
             <Stack.Screen name="UserChatInfo" component={UserChatInfoScreen} />
             <Stack.Screen name="GroupInfo" component={GroupInfoScreen} />
             <Stack.Screen name="GroupList" component={GroupListScreen} />
-            
+            <Stack.Screen name="WalletRecord" component={WalletRecordScreen} />
+            <Stack.Screen name="WalletQrcord" component={WalletQrcordScreen} />
+            <Stack.Screen name="BillDetail" component={BillDetailScreen} />
+            <Stack.Screen name="WalletRecordPage" component={WalletRecordPageScreen} />
         </Stack.Navigator>
     );
 }

@@ -26,11 +26,15 @@ import GroupInfoScreen from './group-info/index';
 import GroupListScreen from './contact/components/group-list/index2'
 import NotificationClick from './notification-click';
 import GroupCreateScreen from './group-create/index'
+import WalletRecordScreen from './wallet/wallet-record'
+import WalletQrcordScreen from './wallet/components/wallet-qrcode'
+import BillDetailScreen from './wallet/components/bill-detail'
+import WalletRecordPageScreen from './wallet/components/wallet-record-page'
 export {
     EntryScreen,
     RegisterScreen,
     WebScreen,
-    LoginScreen,
+    LoginScreen, 
     UnlockScreen,
     HomeScreen,
     UserCenterScreen,
@@ -54,5 +58,9 @@ export {
     GroupInfoScreen,
     GroupListScreen,
     NotificationClick,
-    GroupCreateScreen
+    GroupCreateScreen,
+    WalletRecordScreen,
+    WalletQrcordScreen,
+    BillDetailScreen,
+    WalletRecordPageScreen,   
 }
