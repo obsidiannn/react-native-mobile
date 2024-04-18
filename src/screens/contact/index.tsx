@@ -32,7 +32,7 @@ const ContactScreen = ({ navigation }: Props) => {
             paddingTop: insets.top,
         }}>
             <View>
-                <Navbar title="通讯录" renderLeft={() => null} />
+                <Navbar title="通訊錄" renderLeft={() => null} />
             </View>
             {/* <View style={{
                 paddingHorizontal: scale(10),

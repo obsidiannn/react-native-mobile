@@ -35,7 +35,7 @@ const UnlockScreen = ({ navigation,route }: Props) => {
     return (
         <SafeAreaView style={styles.container}>
             <View>
-                <Navbar title="解锁" />
+                <Navbar title="解鎖" />
             </View>
             <ScrollView style={styles.inputContainer} keyboardShouldPersistTaps="handled">
                 <SecurityComponent

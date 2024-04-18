@@ -5,7 +5,7 @@ import Navbar from "../../components/navbar";
 type Props = StackScreenProps<RootStackParamList, 'GroupApplyList'>;
 const GroupApplyListScreen = ({navigation }: Props) => {
     const insets = useSafeAreaInsets();
-    // 与新朋友列表一样
+    // 與新朋友列表一樣
     return (
         <View style={{
             ...styles.container,
@@ -13,7 +13,7 @@ const GroupApplyListScreen = ({navigation }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="群申请" />
+                <Navbar title="羣申請" />
             </View>
             <View style={styles.listContainer}>
             </View>

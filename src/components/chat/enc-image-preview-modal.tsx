@@ -53,7 +53,7 @@ export default forwardRef((_, ref) => {
         }
         const base64 = await fileService.getEnFileContent(path, encKey) ?? undefined;
         if (!base64) {
-            toast('下載失败');
+            toast('下載失敗');
             return;
         }
         const mimeType = mime.getType(path);
@@ -96,7 +96,7 @@ export default forwardRef((_, ref) => {
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
         }}>
-            <Navbar theme="dark" title="图片预览" onLeftPress={() => setVisible(false)} />
+            <Navbar theme="dark" title="圖片預覽" onLeftPress={() => setVisible(false)} />
             <PagerView style={{
                 flex: 1,
             }} onPageSelected={(e) => {
@@ -172,12 +172,12 @@ export default forwardRef((_, ref) => {
                             <Text style={{
                                 color: 'white',
                                 textAlign: 'center',
-                            }}>查看原图</Text>
+                            }}>查看原圖</Text>
                         </TouchableOpacity> : null}
                     </View>
                     <View>
                         <TouchableOpacity onPress={async () => {
-                            // 将图片保存到相册
+                            // 將圖片保存到相冊
                             if (data) {
                                 await fileService.saveToAlbum(data);
                                 toast('保存成功')

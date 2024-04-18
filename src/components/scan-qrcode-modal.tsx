@@ -82,7 +82,7 @@ export default forwardRef((props: {
                             display: 'flex',
                             alignItems: 'center',
                         }}>
-                            <Text style={{ fontWeight: '500', color: 'white', fontSize: 16, textAlign: 'center' }}>扫一扫</Text>
+                            <Text style={{ fontWeight: '500', color: 'white', fontSize: 16, textAlign: 'center' }}>掃一掃</Text>
                         </View>
                     </View>
                     <View style={{

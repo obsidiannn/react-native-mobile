@@ -11,7 +11,7 @@ export default () => {
     }[] = [
             {
                 icon: require('../../../assets/icons/user-tool.svg'),
-                name: '个人资料',
+                name: '個人資料',
                 route: 'UserProfile',
             },
             {
@@ -21,7 +21,7 @@ export default () => {
             },
             {
                 icon: require('../../../assets/icons/setting.svg'),
-                name: '设置',
+                name: '設置',
                 route: 'Setting',
             },
         ]

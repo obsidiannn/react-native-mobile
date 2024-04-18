@@ -58,7 +58,7 @@ const UserCardScreen = ({ }: Props) => {
                     /> : null}
                     <Text style={styles.address}>{address}</Text>
                     <View style={styles.line}></View>
-                    <Text style={styles.tips}>「 扫一扫，加我为好友 」</Text>
+                    <Text style={styles.tips}>「 掃一掃，加我爲好友 」</Text>
                 </View>
             </ViewShot>
             <View style={styles.buttonContainer}>
@@ -69,7 +69,7 @@ const UserCardScreen = ({ }: Props) => {
                     try {
                         const permission = await getCheckPermissionPromise();
                         if (!permission) {
-                            toast('请先允许访问相册');
+                            toast('請先允許訪問相冊');
                             return;
                         }
                         const uri = await captureRef(viewRef.current, {
@@ -78,12 +78,12 @@ const UserCardScreen = ({ }: Props) => {
                             handleGLSurfaceViewOnAndroid: true,
                         });
                         await CameraRoll.save(uri);
-                        toast('保存到相册成功');
+                        toast('保存到相冊成功');
                     } catch (error) {
                         console.log(error);
                     }
 
-                }} labelStyle={styles.buttonLabel} label="保存为图片" />
+                }} labelStyle={styles.buttonLabel} label="保存爲圖片" />
             </View>
         </View>
     );

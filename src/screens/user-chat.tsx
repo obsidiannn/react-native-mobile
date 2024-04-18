@@ -161,7 +161,7 @@ const InputTool = (props: {
         });
         if (!result.canceled) {
             const input = result.assets[0].uri;
-            // 将文件的后缀名改为mp4
+            // 將文件的後綴名改爲mp4
             const output = input.replace(/(.*)(\..*$)/, '$1_output.mp4');
         
             const cmd = `-i ${input} -c:v mpeg4 ${output}`;
@@ -307,11 +307,11 @@ const UserChatScreen = ({ navigation }: Props) => {
 
     const insets = useSafeAreaInsets();
     const [messages, setMessages] = useState<IMessage[]>([])
-    // 获取设备屏幕高度
+    // 獲取設備屏幕高度
     const screenHeight = Dimensions.get('window').height;
     const authUser: User = {
         id: '1',
-        name: '测试',
+        name: '測試',
         avatar: 'https://avatars.githubusercontent.com/u/17189275?v=4'
     }
 
@@ -323,7 +323,7 @@ const UserChatScreen = ({ navigation }: Props) => {
         for (let i = 1; i < 10; i++) {
             users.current.push({
                 id: `${i}`,
-                name: `测试${i}`,
+                name: `測試${i}`,
                 avatar: `https://avatars.githubusercontent.com/u/${i}?v=4`
             })
         }
@@ -361,12 +361,12 @@ const UserChatScreen = ({ navigation }: Props) => {
             key: 'camera'
         },
         {
-            title: '录像',
+            title: '錄像',
             icon: 'videocamera',
             key: 'video'
         },
         {
-            title: '相册',
+            title: '相冊',
             icon: 'picture',
             key: 'albums'
         },
@@ -376,12 +376,12 @@ const UserChatScreen = ({ navigation }: Props) => {
             key: 'file'
         },
         {
-            title: '转账',
+            title: '轉賬',
             icon: 'swap',
             key: 'swap'
         },
         {
-            title: '红包',
+            title: '紅包',
             icon: 'redenvelopes',
             key: 'red-envelope',
         }
@@ -400,7 +400,7 @@ const UserChatScreen = ({ navigation }: Props) => {
                 width: '100%',
                 backgroundColor: 'white',
             }}>
-                <Navbar title="昵称1" />
+                <Navbar title="暱稱1" />
             </View>
             <View style={{
                 flex: 1,

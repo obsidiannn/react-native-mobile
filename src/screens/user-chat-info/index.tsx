@@ -46,7 +46,7 @@ const UserChatInfoScreen = ({ navigation, route }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="聊天详情" />
+                <Navbar title="聊天詳情" />
             </View>
             <View style={{
                 paddingHorizontal: scale(25),
@@ -56,7 +56,7 @@ const UserChatInfoScreen = ({ navigation, route }: Props) => {
                 <View style={{
                     marginTop: scale(15),
                 }}>
-                    <ActionItem title="消息免打扰" rightComponent={<Switch height={scale(24)} onColor={colors.primary} value={params?.disturb} onValueChange={(v) => {
+                    <ActionItem title="消息免打擾" rightComponent={<Switch height={scale(24)} onColor={colors.primary} value={params?.disturb} onValueChange={(v) => {
                         setParams({
                             ...params,
                             disturb: v,
@@ -66,7 +66,7 @@ const UserChatInfoScreen = ({ navigation, route }: Props) => {
                 <View style={{
                     marginTop: scale(15),
                 }}>
-                    <ActionItem title="置顶聊天" rightComponent={<Switch height={scale(24)} onColor={colors.primary} value={params?.top} onValueChange={(v) => {
+                    <ActionItem title="置頂聊天" rightComponent={<Switch height={scale(24)} onColor={colors.primary} value={params?.top} onValueChange={(v) => {
                         setParams({
                             ...params,
                             top: v,
@@ -78,14 +78,14 @@ const UserChatInfoScreen = ({ navigation, route }: Props) => {
                 }}>
                     <ActionItem onPress={() => {
                         confirmModalRef.current?.open({
-                            title: '清空聊天记录',
-                            desc: '将清空与该好友的聊天记录，且无法恢复',
+                            title: '清空聊天記錄',
+                            desc: '將清空與該好友的聊天記錄，且無法恢復',
                             onSubmit: () => {
                                 messageService.clearAll([params?.chatId ?? '']);
                                 toast('清空成功');
                             }
                         })
-                    }} title="清空聊天记录" textColor="#FB3737" rightComponent={<Image source={require('@/assets/icons/arrow-right-gray.svg')} style={{
+                    }} title="清空聊天記錄" textColor="#FB3737" rightComponent={<Image source={require('@/assets/icons/arrow-right-gray.svg')} style={{
                         width: scale(20),
                         height: scale(20),
                     }} />} />

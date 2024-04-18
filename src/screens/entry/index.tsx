@@ -24,11 +24,11 @@ export default ({ navigation }: StackScreenProps<RootStackParamList, 'Entry'>) =
     useEffect(() => {
         setProtocols([
             {
-                name: '《隐私协议》',
+                name: '《隱私協議》',
                 url: 'https://www.baidu.com'
             },
             {
-                name: '《可接受条款》',
+                name: '《可接受條款》',
                 url: 'https://sina.com'
             },
         ]);
@@ -47,7 +47,7 @@ export default ({ navigation }: StackScreenProps<RootStackParamList, 'Entry'>) =
                     <Image style={styles.logo} source={require('../../assets/logo.svg')} />
                 </View>
                 <View style={styles.sloganContainer}>
-                    <Text style={styles.sloganPrimaryText}>欢迎使用  BOBO</Text>
+                    <Text style={styles.sloganPrimaryText}>歡迎使用  BOBO</Text>
                     <Text style={styles.sloganNormalText}>享受自由的世界</Text>
                 </View>
             </View>
@@ -55,25 +55,25 @@ export default ({ navigation }: StackScreenProps<RootStackParamList, 'Entry'>) =
                 <View style={styles.buttonContainer}>
                     <Button size="large" style={styles.loginButton} backgroundColor={colors.primary} onPress={() => {
                         if (!protocolStatus) {
-                            toast('请先阅读并同意相关协议！');
+                            toast('請先閱讀並同意相關協議！');
                             return;
                         }
                         onLogin();
-                    }} label="登陆" labelStyle={styles.loginButtonLabel} />
+                    }} label="登陸" labelStyle={styles.loginButtonLabel} />
                     <Button size="large" style={styles.registerButton} backgroundColor="white" onPress={() => {
                         if (!protocolStatus) {
-                            toast('请先阅读并同意相关协议！');
+                            toast('請先閱讀並同意相關協議！');
                             return
                         }
                         onRegister();
-                    }} label="注册TDchat账号" labelStyle={styles.registerButtonLabel} />
+                    }} label="註冊TDchat賬號" labelStyle={styles.registerButtonLabel} />
                 </View>
                 <View style={styles.protocolContainer}>
                     <View style={styles.protocolContentContainer}>
                         <Checkbox borderRadius={scale(9)} color={colors.primary} iconColor="white" size={scale(18)} value={protocolStatus} onValueChange={(value) => setProtocolStatus(value)} />
                         <View style={styles.protocolTextContainer}>
                             <TouchableOpacity onPress={() => setProtocolStatus(!protocolStatus)}>
-                                <Text style={styles.protocolText}>我已阅读并同意</Text>
+                                <Text style={styles.protocolText}>我已閱讀並同意</Text>
                             </TouchableOpacity>
                             {protocols.map((protocol, index) => {
                                 return (

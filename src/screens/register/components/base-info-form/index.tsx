@@ -52,7 +52,7 @@ export default (props: {
                     color: '#000',
                     marginLeft: scale(15),
                     marginBottom: verticalScale(10),
-                }}>昵称</Text>
+                }}>暱稱</Text>
                 <UsernameInput value={formData.name} onChange={(v) => {
                     v !== '' ? setReady(true) : setReady(false);
                     setFormData({
@@ -73,7 +73,7 @@ export default (props: {
                     color: '#000',
                     marginLeft: scale(15),
                     marginBottom: verticalScale(10),
-                }}>性别</Text>
+                }}>性別</Text>
                 <GenderOption onChange={(v) => {
                     setFormData({
                         ...formData,

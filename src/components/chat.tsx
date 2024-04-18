@@ -107,7 +107,7 @@ const Chat = (props: ChatProps) => {
                             paddingVertical: 5,
                             paddingHorizontal: 5,
                         }}
-                        placeholder="输入消息"
+                        placeholder="輸入消息"
                         placeholderTextColor="#52525b"
                         //multiline={true}
                         returnKeyType="send"

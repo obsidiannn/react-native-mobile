@@ -32,30 +32,30 @@ const GroupChatScreen = ({ navigation, route }: Props) => {
     const pagerViewRef = useRef<PagerView>(null);
     const [members, setMembers] = useState<UserInfoItem[]>([]);
     const loadMembers = useCallback(async () => {
-        console.log(conversationIdRef.current,'群成员###')
+        console.log(conversationIdRef.current,'羣成員###')
         groupService.getMembers(groupIdRef.current).then(async (res) => {
-            console.log(res,'群成员列表')
+            console.log(res,'羣成員列表')
             const uids = res.map((item) => item.uid);
             const users = await userService.getBatchInfo(uids);
-            console.log('用户信息',users);
+            console.log('用戶信息',users);
             setMembers(users);
         });
     }, []);
     const init = useCallback(async () => {
         conversationIdRef.current = route.params.chatId ?? '';
         groupIdRef.current = route.params.groupId??''
-        console.log('会话id conversationIdRef', conversationIdRef.current)
-        console.log('群id', groupIdRef.current)
+        console.log('會話id conversationIdRef', conversationIdRef.current)
+        console.log('羣id', groupIdRef.current)
         const res = await groupService.getInfo(groupIdRef.current)
-        console.log('群信息', res);
+        console.log('羣信息', res);
         if(res === null){
-            toast('群组异常')
+            toast('羣組異常')
             return 
         }
         setGroup(res);
         setTitle(res?.name ?? '');
         if (!globalThis.wallet || !res?.pubKey) {
-            toast('钱包未初始化');
+            toast('錢包未初始化');
             return;
         }
         const a = await authService.info()
@@ -64,7 +64,7 @@ const GroupChatScreen = ({ navigation, route }: Props) => {
         loadMembers();
     }, [])
     useEffect(() => {
-        // 监听页面获取焦点
+        // 監聽頁面獲取焦點
         const focusEvent = navigation.addListener('focus', () => {
             init();
         });

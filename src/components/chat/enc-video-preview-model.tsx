@@ -45,7 +45,7 @@ export default forwardRef((_, ref) => {
     const loadVideo = async (video: IMessageVideo) => {
         const path = video.path ?? (video.trans?? video.original)
         if(!path ||path === '')        {
-            toast('数据异常')
+            toast('數據異常')
             return
         }
         setDuration(video.duration)
@@ -56,15 +56,15 @@ export default forwardRef((_, ref) => {
                 setData(path)
                 return 
             } else {
-                toast('数据异常')
+                toast('數據異常')
                 return
             }
         }
-        console.log('视频预览',path);
+        console.log('視頻預覽',path);
         
         const decodePath = await fileService.decodeVideo(path, encKey) ?? null;
         if (decodePath === null) {
-            toast('下載失败');
+            toast('下載失敗');
             return;
         }
         console.log('file is',decodePath);
@@ -81,7 +81,7 @@ export default forwardRef((_, ref) => {
         // setData(decodePath??'')
     }
 
-     //自定义进度条
+     //自定義進度條
      const onProgress = (data:any)=>{
         if(paused){
             return 
@@ -102,7 +102,7 @@ export default forwardRef((_, ref) => {
         })
     }
 
-    //视频结束显示重新播放按钮
+    //視頻結束顯示重新播放按鈕
     const onEnd=()=> {
         setVideoProgress({
             progress: 1,
@@ -110,7 +110,7 @@ export default forwardRef((_, ref) => {
         })
         setPaused(true)
     }
-    //点击按钮重新播放
+    //點擊按鈕重新播放
     const _replay = ()=>{
         if(videoProgress.progress==1)
         {
@@ -151,7 +151,7 @@ export default forwardRef((_, ref) => {
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
         }}>
-            <Navbar theme="dark" title="视频预览" onLeftPress={() => setVisible(false)} />
+            <Navbar theme="dark" title="視頻預覽" onLeftPress={() => setVisible(false)} />
             <TouchableWithoutFeedback
                     onPress={()=>{
                         setPaused(!paused)
@@ -167,7 +167,7 @@ export default forwardRef((_, ref) => {
                     onError={onError}
                 />
             </TouchableWithoutFeedback>
-             {/* 进度条 */}
+             {/* 進度條 */}
              <View style={styles.progressBox}>
                 <View style={[styles.progress,{width:Dimensions.get('window').width*videoProgress.progress}]}></View>
             </View>

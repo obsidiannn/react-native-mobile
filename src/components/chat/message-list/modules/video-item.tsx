@@ -10,7 +10,7 @@ export default (
         encKey: string;
     }
 ) => {
-    // 计算图片的宽高 宽不超过180 高等比缩放
+    // 計算圖片的寬高 寬不超過180 高等比縮放
     const [size, setSize] = useState([0,0]);
     const [thumbnail,setThumbnail] = useState('')
     const getWH = (w: number, h: number) => {
@@ -23,7 +23,7 @@ export default (
         const { w, h } = getWH(props.video.w, props.video.h);
         setSize([w, h]);
         setThumbnail(props.video.thumbnail)
-        console.log('加载视频',props.video.path);
+        console.log('加載視頻',props.video.path);
     }, [props.video.w, props.video.h,props.video.thumbnail]); 
 
     return <View style={[

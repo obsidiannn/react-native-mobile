@@ -33,7 +33,7 @@ export default forwardRef((_, ref) => {
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
         }}>
-            <Navbar onLeftPress={() => setVisible(false)} title="设置备注" />
+            <Navbar onLeftPress={() => setVisible(false)} title="設置備註" />
             <ScrollView keyboardDismissMode="interactive" style={{
                 paddingHorizontal: scale(25),
                 paddingTop: scale(20),
@@ -49,7 +49,7 @@ export default forwardRef((_, ref) => {
                     alignItems: 'center',
                     paddingHorizontal: scale(15),
                 }}>
-                    <TextInput placeholder="设置备注" style={{
+                    <TextInput placeholder="設置備註" style={{
                         flex: 1,
                         fontSize: scale(14),
                         fontWeight:'400'
@@ -69,7 +69,7 @@ export default forwardRef((_, ref) => {
                     try {
                         toast('更新成功!');
                     } catch (error) {
-                        toast('更新失败!');
+                        toast('更新失敗!');
                     }finally{
                         setLoading(false);
                         setTimeout(() => {

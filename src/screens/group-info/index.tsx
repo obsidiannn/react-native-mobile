@@ -23,7 +23,7 @@ const GroupInfoScreen = ({ navigation, route }: Props) => {
         const unsubscribe = navigation.addListener('focus', () => {
             const gid = route.params?.gid;
             if (!gid) {
-                toast('群聊不存在');
+                toast('羣聊不存在');
                 setTimeout(() => {
                     navigation.goBack();
                 }, 1000)
@@ -48,7 +48,7 @@ const GroupInfoScreen = ({ navigation, route }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar backgroundColor="#F4F4F4" title="群聊详情" />
+                <Navbar backgroundColor="#F4F4F4" title="羣聊詳情" />
             </View>
             <View style={{
                 paddingHorizontal: scale(15),
@@ -57,7 +57,7 @@ const GroupInfoScreen = ({ navigation, route }: Props) => {
                 <View style={{
                     padding: scale(15),
                     backgroundColor: '#ffffff',
-                    // 生成阴影
+                    // 生成陰影
                     shadowColor: "#000",
                     shadowOffset: {
                         width: 0,
@@ -115,7 +115,7 @@ const GroupInfoScreen = ({ navigation, route }: Props) => {
                         marginTop: scale(40),
                         height: scale(50),
                         borderRadius: scale(15),
-                    }} backgroundColor={colors.primary} label={inJoin ? "进入群聊" : "申请加入"} />
+                    }} backgroundColor={colors.primary} label={inJoin ? "進入羣聊" : "申請加入"} />
                 </View>
             </View>
             <ApplyJoinModal ref={applyJoinModalRef} />

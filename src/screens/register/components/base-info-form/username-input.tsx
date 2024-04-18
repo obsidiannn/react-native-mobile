@@ -9,7 +9,7 @@ export default (props: {
     const inputRef = useRef<TextInput>();
     return <View style={styles.inputContainer}>
         <TextInput
-            placeholder="设置昵称"
+            placeholder="設置暱稱"
             maxLength={16}
             ref={(ref) => {
                 inputRef.current = ref as TextInput;

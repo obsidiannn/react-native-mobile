@@ -40,7 +40,7 @@ const GroupCreateScreen = (props: Props) => {
    
     const doGroupCreate = async () => {
         if (!utils.isNotBlank(createState.name)) {
-            toast('请填写群组名称')
+            toast('請填寫羣組名稱')
             return 
         }
         let imgUrl = createState.avatar
@@ -50,7 +50,7 @@ const GroupCreateScreen = (props: Props) => {
         if (utils.isNotBlank(imgUrl)) {
             const url = await fileService.uploadImage(imgUrl)
             if (utils.isBlank(url)) {
-                toast('图片上传失败')
+                toast('圖片上傳失敗')
                 return
             }
             imgUrl = url??''
@@ -73,7 +73,7 @@ const GroupCreateScreen = (props: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar backgroundColor="#F4F4F4" title="创建群聊" />
+                <Navbar backgroundColor="#F4F4F4" title="創建羣聊" />
             </View>
             <View style={{
                 paddingHorizontal: scale(15),
@@ -108,7 +108,7 @@ const GroupCreateScreen = (props: Props) => {
                                 })
                             }} />
                     </View>
-                    <Text style={{ padding: scale(4), fontSize: scale(12) }}>上传封面</Text>
+                    <Text style={{ padding: scale(4), fontSize: scale(12) }}>上傳封面</Text>
                 </View>
 
                 <View style={{
@@ -120,7 +120,7 @@ const GroupCreateScreen = (props: Props) => {
                     <View>
 
                         <TextInput
-                            placeholder="群聊名称"
+                            placeholder="羣聊名稱"
                             placeholderTextColor={colors.gray600}
                             maxLength={128}
                             style={{
@@ -143,7 +143,7 @@ const GroupCreateScreen = (props: Props) => {
                             })
                         }}>
                             <View row style={{ padding: scale(14) }} >
-                                <RadioButton color={colors.gray600} value='0' label="公开"
+                                <RadioButton color={colors.gray600} value='0' label="公開"
                                     labelStyle={{ marginRight: scale(28) }} />
                                 <RadioButton color={colors.gray600} value='1' label="私密" />
                             </View>
@@ -155,7 +155,7 @@ const GroupCreateScreen = (props: Props) => {
                     }}>
                         <View>
                             <Text style={{ fontSize: scale(14), color: colors.gray600 }}>加密（不可更改）</Text>
-                            <Text style={{ color: colors.gray400, fontSize: scale(12) }}>不加密，用户将直接可以加入群聊</Text>
+                            <Text style={{ color: colors.gray400, fontSize: scale(12) }}>不加密，用戶將直接可以加入羣聊</Text>
                         </View>
                         <View style={{ marginLeft: scale(8) }}>
                             <Switch value={createState.isEnc}
@@ -174,7 +174,7 @@ const GroupCreateScreen = (props: Props) => {
                     marginTop: scale(40),
                     height: scale(50),
                     borderRadius: scale(15),
-                }} backgroundColor={colors.primary} label="创建群聊" />
+                }} backgroundColor={colors.primary} label="創建羣聊" />
                 <LoadingModal ref={loadingModalRef} />
             </View>
         </View>
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     sub_area: {
         padding: scale(15),
         backgroundColor: '#ffffff',
-        // 生成阴影
+        // 生成陰影
         shadowColor: "#000",
         shadowOffset: {
             width: 0,

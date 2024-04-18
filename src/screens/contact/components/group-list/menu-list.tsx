@@ -15,7 +15,7 @@ export default () => {
         }}>
             <Image style={styles.icon} source={require('@/assets/icons/userchecked-blue.svg')} />
             <View style={styles.rightContainer}>
-                <Text style={styles.text}>申请记录</Text>
+                <Text style={styles.text}>申請記錄</Text>
             </View>
         </TouchableOpacity>
     </View>

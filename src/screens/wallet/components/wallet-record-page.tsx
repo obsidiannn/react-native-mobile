@@ -71,7 +71,7 @@ const WalletRecordPage = (props: Props) => {
         console.log();
     }, [])
     return <View style={{ flex: 1 }}>
-        <Navbar title="BOBO钱包" />
+        <Navbar title="BOBO錢包" />
         <View style={{ padding: scale(14), backgroundColor: colors.gray200, flex: 1 }}>
             <View style={styles.main_container}>
                 <View style={styles.button_area}>
@@ -90,8 +90,8 @@ const WalletRecordPage = (props: Props) => {
                 </View>
                 <View style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                     <View style={styles.stat_area}>
-                        <Text>收入总额：${list.length}</Text>
-                        <Text>收入总额：${ }</Text>
+                        <Text>收入總額：${list.length}</Text>
+                        <Text>收入總額：${ }</Text>
                     </View>
                     <View style={{
                         flex: 1,

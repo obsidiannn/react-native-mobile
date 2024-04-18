@@ -68,7 +68,7 @@ export default forwardRef((_, ref) => {
                         color: '#D90000',
                         fontSize: scale(16),
                         fontWeight: '500',
-                    }}>确认</Text>
+                    }}>確認</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                     setVisible(false)

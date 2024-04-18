@@ -21,7 +21,7 @@ export default (props: {
     }, [props.pageIndex]);
     return <View style={styles.container}>
         <View style={styles.placeholderContainer}>
-            <Text style={styles.placeholderText}>输入安全密码</Text>
+            <Text style={styles.placeholderText}>輸入安全密碼</Text>
         </View>
         <View style={styles.wordContainer}>
             {words.map((word, i) => {
@@ -105,10 +105,10 @@ export default (props: {
             })}
         </View>
         <View style={styles.tipsContainer}>
-            <Text style={styles.tipsText}>请设置安全密码，安全密码将用于保护你的助词</Text>
+            <Text style={styles.tipsText}>請設置安全密碼，安全密碼將用於保護你的助詞</Text>
         </View>
         <View style={styles.buttonContainer}>
-            <Button disabled={!ready}  size="large" style={styles.loginButton} backgroundColor={colors.primary} onPress={() => props.onNext()} label="登陆" labelStyle={styles.loginButtonLabel} />
+            <Button disabled={!ready}  size="large" style={styles.loginButton} backgroundColor={colors.primary} onPress={() => props.onNext()} label="登陸" labelStyle={styles.loginButtonLabel} />
             <Button size="large" style={styles.prevButton} backgroundColor="white" onPress={() => {
                 props.onChange('');
                 setWords(new Array(6).fill(''));

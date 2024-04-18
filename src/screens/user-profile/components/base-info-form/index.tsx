@@ -70,7 +70,7 @@ export default forwardRef((_, ref) => {
                     color: '#000',
                     marginLeft: scale(15),
                     marginBottom: verticalScale(10),
-                }}>昵称</Text>
+                }}>暱稱</Text>
                 <UsernameInput value={formData.name} onChange={(v) => {
                     // v !== '' ? setReady(true) : setReady(false);
                     setFormData({
@@ -91,7 +91,7 @@ export default forwardRef((_, ref) => {
                     color: '#000',
                     marginLeft: scale(15),
                     marginBottom: verticalScale(10),
-                }}>性别</Text>
+                }}>性別</Text>
                 <GenderOption onChange={(v) => {
                     setFormData({
                         ...formData,
@@ -111,7 +111,7 @@ export default forwardRef((_, ref) => {
                     color: '#000',
                     marginLeft: scale(15),
                     marginBottom: verticalScale(10),
-                }}>个性签名</Text>
+                }}>個性簽名</Text>
                 <SignInput value={formData.sign} onChange={(v) => {
                     setFormData({
                         ...formData,
@@ -146,7 +146,7 @@ export default forwardRef((_, ref) => {
                     }
                     setLoading(true);
                     try { 
-                        // TODO: 服务端待集成s3
+                        // TODO: 服務端待集成s3
                         await authService.updateAvatar(formData.avatar);
                 
                         await authService.updateName(formData.name);
@@ -159,7 +159,7 @@ export default forwardRef((_, ref) => {
                         }
                     } catch (error) {
                         console.log(error);
-                        toast("更新失败")
+                        toast("更新失敗")
                     }finally{
                         setLoading(false);
                     }

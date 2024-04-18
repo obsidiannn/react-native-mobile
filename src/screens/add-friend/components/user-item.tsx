@@ -16,7 +16,7 @@ export default (props: {
                 uid: item.uid
             })
         }else{
-            toast('对方已是好友')
+            toast('對方已是好友')
         }
     }} style={{
         ...styles.container,

@@ -43,7 +43,7 @@ const GroupListScreen = ({ navigation, route }: Props) => {
     //     e.subtitle ="sub",
     //     e.isPinned = false
     // }).then(r=>{
-    // console.log("插入数据库");
+    // console.log("插入數據庫");
     // console.log(r)
     // })
    
@@ -56,7 +56,7 @@ const GroupListScreen = ({ navigation, route }: Props) => {
         <View style={{
             flex: 1,
         }}>
-          <Navbar title="群聊" backgroundColor="white" />
+          <Navbar title="羣聊" backgroundColor="white" />
             <View style={{
                 flex: 1,
                 flexDirection: 'row',

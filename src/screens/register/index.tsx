@@ -41,7 +41,7 @@ const RegisterScreen = ({ navigation }: Props) => {
     return (
         <SafeAreaView style={styles.container}>
             <View>
-                <Navbar title="创建账号" />
+                <Navbar title="創建賬號" />
             </View>
             <PagerView onPageSelected={(e) => {
                 setPageIndex(e.nativeEvent.position);
@@ -63,7 +63,7 @@ const RegisterScreen = ({ navigation }: Props) => {
                             setLoading(true);
                             const result = await authService.register(password);
                             if (!result) {
-                                toast('注册失败，请重试');
+                                toast('註冊失敗，請重試');
                                 setNowAccount(null);
                                 setLoading(false);
                                 return;
@@ -78,7 +78,7 @@ const RegisterScreen = ({ navigation }: Props) => {
                                 console.log(error);
                             }finally{
                                 navigation.replace('AuthStackNav');
-                                toast('注册成功');
+                                toast('註冊成功');
                                 setLoading(false);
                             }
                         }}

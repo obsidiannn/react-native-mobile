@@ -16,7 +16,7 @@ export default (props: {
     return (
         <View style={styles.container}>
             <View style={styles.tipsContainer}>
-                <Text style={styles.tipsText}>注意：TD chat不会保存您的助记词，请您妥善保管好助记词，以免造成财产损失。</Text>
+                <Text style={styles.tipsText}>注意：TD chat不會保存您的助記詞，請您妥善保管好助記詞，以免造成財產損失。</Text>
             </View>
             <View style={styles.wordContainer}>
                 {words.map((word, i) => {
@@ -51,14 +51,14 @@ export default (props: {
                 <TouchableOpacity onPress={async () => {
                     const v = await Clipboard.getStringAsync()
                     if (!bip39.validateMnemonic(v, wordlist)) {
-                        toast('助记词不合法，请检查！');
+                        toast('助記詞不合法，請檢查！');
                         return;
                     }
                     setWords(v.split(' '));
                     props.onChange(v);
                     setReady(true);
                 }} style={styles.pasteButton}>
-                    <Text style={styles.pasteButtonText}>粘贴助记词</Text>
+                    <Text style={styles.pasteButtonText}>粘貼助記詞</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.nextContainer}>

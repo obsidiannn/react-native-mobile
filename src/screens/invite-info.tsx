@@ -59,7 +59,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="验证信息" />
+                <Navbar title="驗證信息" />
             </View>
             <View>
                 <View style={{ paddingHorizontal: scale(15), paddingTop: verticalScale(21) }}>
@@ -87,7 +87,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                             <Text style={{ fontSize: 16, fontWeight: '500', color: '#000' }}>xxx</Text>
                             <TouchableOpacity onPress={async () => {
                                 await clipboard.setStringAsync(info.uid);
-                                toast('复制成功');
+                                toast('複製成功');
                             }} style={{
                                 display: 'flex',
                                 flexDirection: 'row',
@@ -115,7 +115,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                         <Text style={{
                             fontSize: 16,
                             color: '#333'
-                        }}>备注</Text>
+                        }}>備註</Text>
                     </View>
                 </View>
                 <View style={{
@@ -140,7 +140,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                         }} labelStyle={{
                             fontSize: 16,
                             fontWeight: '700',
-                        }} label="通过" />
+                        }} label="通過" />
                         <Button size="large" style={{
                             width: '100%',
                             height: verticalScale(50),
@@ -160,14 +160,14 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                             fontSize: 16,
                             fontWeight: '700',
                             color: colors.primary,
-                         }} label="拒绝" />
+                         }} label="拒絕" />
                     </> : null}
                     {info.status === 1 && info.isSelf ? <Button disabled={true} size="large" style={{
                          width: '100%',
                          height: verticalScale(50),
                          borderRadius: verticalScale(16),
                          marginTop: verticalScale(30),
-                     }} backgroundColor={colors.primary} label="等待验证" /> : null}
+                     }} backgroundColor={colors.primary} label="等待驗證" /> : null}
                 </View>
             </View>
         </View>

@@ -41,7 +41,7 @@ export default forwardRef((props: {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="验证信息" onLeftPress={() => setVisible(false)} />
+                <Navbar title="驗證信息" onLeftPress={() => setVisible(false)} />
             </View>
             <View>
                 <View style={{ paddingHorizontal: scale(15), paddingTop: verticalScale(21) }}>
@@ -69,7 +69,7 @@ export default forwardRef((props: {
                             <Text style={{ fontSize: 16, fontWeight: '500', color: '#000' }}>{item?.name}</Text>
                             <TouchableOpacity onPress={async () => {
                                 await clipboard.setStringAsync(item?.uid ?? '');
-                                toast('复制成功');
+                                toast('複製成功');
                             }} style={{
                                 display: 'flex',
                                 flexDirection: 'row',
@@ -97,7 +97,7 @@ export default forwardRef((props: {
                         <Text style={{
                             fontSize: 16,
                             color: '#333'
-                        }}>备注</Text>
+                        }}>備註</Text>
                     </View>
                 </View>
                 <View style={{
@@ -118,10 +118,10 @@ export default forwardRef((props: {
                                 const encInfo = await groupService.encInfo(item.gid);
                                 const group = await groupService.getInfo(item.gid);
                                 if (!group) {
-                                    throw new Error('群不存在')
+                                    throw new Error('羣不存在')
                                 }
                                 if (!globalThis.wallet) {
-                                    throw new Error('群公钥不存在')
+                                    throw new Error('羣公鑰不存在')
                                 }
                                 const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(group.pub.substring(2), 'hex')).substring(4);
                                 const groupPri = quickAes.De(encInfo.enc_pri, sharedSecret)
@@ -130,7 +130,7 @@ export default forwardRef((props: {
                                 console.log('groupKey', groupKey)
                                 const user = await userService.getInfo(item.uid);
                                 if (!user) {
-                                    throw new Error('用户不存在')
+                                    throw new Error('用戶不存在')
                                 }
                                 const userSharedSecret = groupWallet.signingKey.computeSharedSecret(Buffer.from(user.pub_key.substring(2), 'hex')).substring(4);
                                 const userGroupEncKey = quickAes.En(groupKey, userSharedSecret)
@@ -145,7 +145,7 @@ export default forwardRef((props: {
                                     uid: item.uid,
                                     enc_key: userGroupEncKey,
                                 })
-                                toast('成功通过')
+                                toast('成功通過')
                             } catch (e) {
                                 console.log(e);
                             } finally {
@@ -155,7 +155,7 @@ export default forwardRef((props: {
                         }} labelStyle={{
                             fontSize: 16,
                             fontWeight: '700',
-                        }} label="通过" />
+                        }} label="通過" />
                         <Button size="large" style={{
                             width: '100%',
                             height: verticalScale(50),
@@ -167,19 +167,19 @@ export default forwardRef((props: {
                             };
                             setLoading(true);
                             groupService.rejectJoin(item?.gid ?? '', [item?.uid ?? '']).then(res => {
-                                toast('已拒绝');
+                                toast('已拒絕');
                                 setTimeout(() => {
                                     setVisible(false);
                                 }, 500)
                             }).finally(() => {
                                 setLoading(false);
                             })
-                            console.log('拒绝');
+                            console.log('拒絕');
                         }} labelStyle={{
                             fontSize: 16,
                             fontWeight: '700',
                             color: colors.primary,
-                        }} label="拒绝" />
+                        }} label="拒絕" />
                     </> : null}
                 </View>
             </View>

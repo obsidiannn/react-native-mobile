@@ -15,7 +15,7 @@ export default (props: {
             <Text style={styles.nameText}>{props.name}</Text>
             <TouchableOpacity onPress={async () => {
                 await clipboard.setStringAsync(props.address);
-                toast('复制成功');
+                toast('複製成功');
             }} style={styles.addressContainer}>
                 <Text style={styles.addressText}>{handleAddress(props.address)}</Text>
                 <Image style={styles.icon} source={require('@/assets/icons/copy.svg')} />

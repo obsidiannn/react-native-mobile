@@ -62,7 +62,7 @@ export default forwardRef((_,ref) => {
             setMessages((items) => {
                 return res.concat(items);
             });
-            // 存储图片
+            // 存儲圖片
             const tmps: IMessageImage[] = [];
             res.forEach((item) => {
                 if (item.type == 'image') {
@@ -70,7 +70,7 @@ export default forwardRef((_,ref) => {
                 }
             });
             imagesRef.current = tmps.concat(imagesRef.current);
-            console.log('图片列表', imagesRef.current);
+            console.log('圖片列表', imagesRef.current);
         }).catch((err) => {
             console.log('err', err);
         }).finally(() => {
@@ -81,10 +81,10 @@ export default forwardRef((_,ref) => {
         setMessages([]);
         imagesRef.current = [];
         conversationIdRef.current = chatId;
-        console.log('会话id conversationIdRef', conversationIdRef.current)
+        console.log('會話id conversationIdRef', conversationIdRef.current)
         setGroup(g);
         if (!globalThis.wallet || !g?.pubKey) {
-            toast('钱包未初始化');
+            toast('錢包未初始化');
             return;
         }
         // const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(g.pubKey, 'hex')).substring(4);
@@ -93,7 +93,7 @@ export default forwardRef((_,ref) => {
         loadMessages('up');
         loadMessages('down');
         // groupService.encInfo(conversationIdRef.current).then((res) => {
-        //     console.log('群加密信息', res);
+        //     console.log('羣加密信息', res);
         //     sharedSecretRef.current = quickAes.De(res.enc_key, sharedSecret);
         //     console.log('sharedSecretRef.current', sharedSecretRef.current);
             
@@ -155,11 +155,11 @@ export default forwardRef((_,ref) => {
                         paddingBottom: keyboardState ? verticalScale(60) : (verticalScale(60) + insets.bottom),
                     }}>
                         <MessageList authUid={authUser?.id ?? ''} encKey={sharedSecretRef.current} messages={messages} onLongPress={(m) => {
-                            console.log('长按', m);
+                            console.log('長按', m);
                         }} onPress={(m) => {
                             const data = m.data as IMessageTypeMap[DataType];
                             if (m.type == 'image') {
-                                console.log('点击图片', m);
+                                console.log('點擊圖片', m);
                                 const data = m.data as IMessageImage;
                                 const initialIndex = imagesRef.current.findIndex((image) => image.original == data.original)
                                 if (m.state == 1) {
@@ -192,22 +192,22 @@ export default forwardRef((_,ref) => {
                     })
                 }}>
                 <InputToolkit ref={inputToolkitRef} onSend={async (message) => {
-                    console.log('发送消息@@@@@@@', message);
+                    console.log('發送消息@@@@@@@', message);
                     if (!group) {
-                        throw new ToastException('信息错误！');
+                        throw new ToastException('信息錯誤！');
                     }
                     setMessages((items) => {
                         return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
                     });
                     setTimeout(() => {
                         if (message.type == 'image' || message.type == "file") {
-                            loadingModalRef.current?.open('加密处理中...');
+                            loadingModalRef.current?.open('加密處理中...');
                         }
                         messageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
                             if (!res) {
                                 return;
                             }
-                            // 将消息状态改为已发送
+                            // 將消息狀態改爲已發送
                             const { sequence = 0 } = res;
                             if (sequence > lastSeq.current) {
                                 lastSeq.current = sequence;
@@ -237,8 +237,8 @@ export default forwardRef((_,ref) => {
                                 return items;
                             });
                         }).catch((err) => {
-                            // 将消息状态改为发送失败
-                            console.log('发送失败', err);
+                            // 將消息狀態改爲發送失敗
+                            console.log('發送失敗', err);
                             setMessages((items) => {
                                 const index = items.findIndex((item) => item.mid == message.mid);
                                 if (index > -1) {

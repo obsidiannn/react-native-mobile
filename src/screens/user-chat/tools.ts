@@ -5,12 +5,12 @@ export default [
         key: 'camera'
     },
     {
-        title: '录像',
+        title: '錄像',
         icon: require('./icons/video.svg'),
         key: 'video'
     },
     {
-        title: '相册',
+        title: '相冊',
         icon: require('./icons/albums.svg'),
         key: 'albums'
     },
@@ -20,12 +20,12 @@ export default [
         key: 'file'
     },
     {
-        title: '转账',
+        title: '轉賬',
         icon: require('./icons/transfer.svg'),
         key: 'swap'
     },
     {
-        title: '红包',
+        title: '紅包',
         icon: require('./icons/redpack.svg'),
         key: 'red-envelope',
     }

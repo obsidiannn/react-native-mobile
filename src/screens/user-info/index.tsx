@@ -40,7 +40,7 @@ const UserInfoScreen = ({ navigation, route }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="用户信息" renderRight={() => {
+                <Navbar title="用戶信息" renderRight={() => {
                     return <View style={{
                         height: '100%',
                         justifyContent: 'center',
@@ -93,7 +93,7 @@ const UserInfoScreen = ({ navigation, route }: Props) => {
                                     })
                                 }
                             }
-                        }} label={user.isFriend != 1 ? '添加好友' : '开始聊天'} />
+                        }} label={user.isFriend != 1 ? '添加好友' : '開始聊天'} />
                     </View>
                 </View> : null}
 

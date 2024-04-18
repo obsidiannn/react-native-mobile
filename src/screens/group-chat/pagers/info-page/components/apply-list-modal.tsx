@@ -37,7 +37,7 @@ export default forwardRef((props: {
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
         }}>
-            <Navbar backgroundColor='white' title="申请列表" onLeftPress={() => setVisible(false)} />
+            <Navbar backgroundColor='white' title="申請列表" onLeftPress={() => setVisible(false)} />
             <View>
                 {items.map(item => {
                     const isLast = items.indexOf(item) === items.length - 1;

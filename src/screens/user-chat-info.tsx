@@ -28,7 +28,7 @@ const UserChatInfoScreen = ({ navigation, route }: Props) => {
             gender: 0,
         })
         const unsubscribe = navigation.addListener('focus', () => {
-            // 拉取用户信息
+            // 拉取用戶信息
         });
         return unsubscribe;
     }, [navigation])
@@ -39,7 +39,7 @@ const UserChatInfoScreen = ({ navigation, route }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="聊天详情" />
+                <Navbar title="聊天詳情" />
             </View>
             <View style={{
                 paddingHorizontal: scale(25),
@@ -63,7 +63,7 @@ const UserChatInfoScreen = ({ navigation, route }: Props) => {
                         fontSize: scale(15),
                         color: '#000',
                         fontWeight: '400',
-                    }}>加入黑名单</Text>
+                    }}>加入黑名單</Text>
                     <Switch height={scale(24)} onColor={colors.primary} value={blacklisted} onValueChange={(v) => setBlacklisted(v)}/>
                 </View>
                 <View style={{
@@ -71,10 +71,10 @@ const UserChatInfoScreen = ({ navigation, route }: Props) => {
                 }}>
                     <Button outlineColor="#FB3737" borderRadius={scale(12)} backgroundColor="white" labelStyle={{
                         color: "#FB3737"
-                    }} label="删除好友" onPress={() => {
+                    }} label="刪除好友" onPress={() => {
                         confirmModalRef.current?.open({
-                            title: '删除好友',
-                            desc: '删除好友后，将清空与该好友的聊天记录，且无法恢复',
+                            title: '刪除好友',
+                            desc: '刪除好友後，將清空與該好友的聊天記錄，且無法恢復',
                             onSubmit: () => {
                             }
                         })

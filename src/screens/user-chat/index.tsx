@@ -69,7 +69,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                 
                 return result
             });
-            // 存储图片
+            // 存儲圖片
             const tmps: IMessageImage[] = [];
             res.forEach((item) => {
                 if (item.type == 'image') {
@@ -77,7 +77,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                 }
             });
             imagesRef.current = tmps.concat(imagesRef.current);
-            console.log('图片列表', imagesRef.current);
+            console.log('圖片列表', imagesRef.current);
         }).catch((err) => {
             console.log('err', err);
         }).finally(() => {
@@ -85,7 +85,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
         })
     }, [])
     useEffect(() => {
-        // 监听页面获取焦点
+        // 監聽頁面獲取焦點
         const focusEvent = navigation.addListener('focus', () => {
             console.log('focus');
             
@@ -93,7 +93,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             imagesRef.current = [];
             conversationIdRef.current = route.params.chatId ?? '';
             //conversationIdRef.current = 's_e36812780132627e';
-            console.log('会话id conversationIdRef', conversationIdRef.current)
+            console.log('會話id conversationIdRef', conversationIdRef.current)
             const uid = route.params.uid;//'0xb929da34c0791dff8541fc129c5b61323a996a7a';//
             if (!uid) {
                 navigation.goBack();
@@ -108,7 +108,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     setTitle((res?.remark ) || res.name);
                     loadMessages('up');
                     loadMessages('down');
-                    // TODO: 这里临时是定时调用的
+                    // TODO: 這裏臨時是定時調用的
                     // intervalRef.current = setInterval(() => {
                     //     loadMessages('down');
                     // }, 2000);
@@ -172,7 +172,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                         alignItems: 'center',
                     }}>
                         <TouchableOpacity onPress={() => {
-                            console.log('点击', imagesRef.current);
+                            console.log('點擊', imagesRef.current);
                             // navigation.navigate('UserChatInfo', {
                             //     uid: user?.uid ?? '',
                             //     chatId: conversationIdRef.current,
@@ -205,11 +205,11 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     paddingBottom: keyboardState ? verticalScale(60) : (verticalScale(60) + insets.bottom),
                 }}>
                     <MessageList authUid={authUser?.id ?? ''} encKey={sharedSecretRef.current} messages={messages} onLongPress={(m)=>{
-                        console.log('长按',m);
+                        console.log('長按',m);
                     }} onPress={(m) => {
                         // const data = m.data as IMessageTypeMap[DataType];
                         if (m.type == 'image') {
-                            console.log('点击图片', m);
+                            console.log('點擊圖片', m);
                             const data = m.data as IMessageImage;
                             const initialIndex = imagesRef.current.findIndex((image) => image.original == data.original)
                             if (m.state == 1) {
@@ -249,22 +249,22 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     bottom: keyboardState ? (Platform.OS == 'ios' ? keyboardHeight : 0) : 0,
                 }}>
                 <InputToolkit ref={inputToolkitRef} onSend={async (message) => {
-                    console.log('发送消息@@@@@@@', message);
+                    console.log('發送消息@@@@@@@', message);
                     if (!user) {
-                        throw new ToastException('信息错误！');
+                        throw new ToastException('信息錯誤！');
                     }
                     setMessages((items) => {
                         return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
                     });
                     setTimeout(() => {
                         if(message.type == 'image' || message.type =="file" || message.type == 'video'){
-                            loadingModalRef.current?.open('加密处理中...');
+                            loadingModalRef.current?.open('加密處理中...');
                         }
                         messageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
                             if (!res) {
                                 return;
                             }
-                            // 将消息状态改为已发送
+                            // 將消息狀態改爲已發送
                             const { sequence = 0 } = res;
                             if (sequence > lastSeq.current) {
                                 lastSeq.current = sequence;
@@ -306,8 +306,8 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                                 return items;
                             });
                         }).catch((err) => {
-                            // 将消息状态改为发送失败
-                            console.log('发送失败', err);
+                            // 將消息狀態改爲發送失敗
+                            console.log('發送失敗', err);
                             setMessages((items) => {
                                 const index = items.findIndex((item) => item.mid == message.mid);
                                 if (index > -1) {

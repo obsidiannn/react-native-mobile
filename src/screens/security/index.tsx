@@ -23,11 +23,11 @@ const SecurityScreen = () => {
     const options = [
         {
             icon: require('../../assets/icons/disk.svg'),
-            title: '备份助记词',
+            title: '備份助記詞',
             onPress: () => {
                 confirmPasswordModalRef.current?.open({
-                    title: '备份助记词',
-                    desc: '请谨慎操作！',
+                    title: '備份助記詞',
+                    desc: '請謹慎操作！',
                     onSubmit: (password: string) => {
                         readMN(password).then((mn) => {
                             navigate('BackupMnemonic', { mnemonic:mn })
@@ -39,11 +39,11 @@ const SecurityScreen = () => {
         },
         {
             icon: require('../../assets/icons/logout.svg'),
-            title: '退出所有群聊',
+            title: '退出所有羣聊',
             onPress: () => {
                 confirmModalRef.current?.open({
                     title: '清空所有消息',
-                    desc: '清空所有消息后，将无法恢复',
+                    desc: '清空所有消息後，將無法恢復',
                     onSubmit: () => {
                         groupService.quitAll();
                     }
@@ -56,7 +56,7 @@ const SecurityScreen = () => {
             onPress: () => {
                 confirmModalRef.current?.open({
                     title: '清空所有消息',
-                    desc: '清空所有消息后，将无法恢复',
+                    desc: '清空所有消息後，將無法恢復',
                     onSubmit: () => {
                         messageService.clearAll();
                     }
@@ -65,21 +65,21 @@ const SecurityScreen = () => {
         },
         {
             icon: require('../../assets/icons/userdel.svg'),
-            title: '删除所有好友',
+            title: '刪除所有好友',
             onPress: () => {
                 confirmModalRef.current?.open({
-                    title: '删除所有好友',
-                    desc: '删除所有好友后，将无法恢复'
+                    title: '刪除所有好友',
+                    desc: '刪除所有好友後，將無法恢復'
                 })
             }
         },
         {
             icon: require('../../assets/icons/reset.svg'),
-            title: '重置应用',
+            title: '重置應用',
             onPress: () => {
                 confirmModalRef.current?.open({
-                    title: '重置应用',
-                    desc: '将清除应用所有数据',
+                    title: '重置應用',
+                    desc: '將清除應用所有數據',
                     onSubmit: () => {
                         handleReset();
                     }

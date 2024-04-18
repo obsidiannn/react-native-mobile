@@ -17,13 +17,13 @@ interface HandleResult {
     params: any
 }
 export default ({ navigation,route }: StackScreenProps<RootStackParamList, 'NotificationClick'>) => {
-    console.log('跳转到消息的页面：',route.params);
+    console.log('跳轉到消息的頁面：',route.params);
     
     const init = useCallback(async () => {
         const target = handleNofitication()
-        // 是否存在账号
+        // 是否存在賬號
         if (await isEmptyAccountDataList()) {
-            // 账号是否活跃
+            // 賬號是否活躍
             if(globalThis.wallet){
                 navigation.navigate('AuthStackNav',{ screen: target.jumpTo,params: target.params })
             }else{
@@ -35,7 +35,7 @@ export default ({ navigation,route }: StackScreenProps<RootStackParamList, 'Noti
     }, []);
 
     /**
-     * 处理路由的跳转
+     * 處理路由的跳轉
      */
     const handleNofitication = ():HandleResult => {
         const result: HandleResult = {

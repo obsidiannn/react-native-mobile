@@ -58,7 +58,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="验证信息" />
+                <Navbar title="驗證信息" />
             </View>
             <ScrollView keyboardDismissMode="interactive">
                 <View style={styles.infoContainer}>
@@ -75,7 +75,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                         paddingHorizontal: scale(15),
                         marginTop: verticalScale(20),
                     }}>
-                        <TextInput value={remark} onChangeText={(v) => setRemark(v)} placeholder="输入备注" style={{
+                        <TextInput value={remark} onChangeText={(v) => setRemark(v)} placeholder="輸入備註" style={{
                             flex: 1
                         }}/>
                         <Image source={require('@/assets/icons/edit.svg')} style={{
@@ -98,7 +98,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                             }).finally(() => {
                                 setLoading(false);
                             });
-                        }} labelStyle={styles.label} label="通过" />
+                        }} labelStyle={styles.label} label="通過" />
                         <Button size="large" style={styles.rejectButton} outlineColor={colors.primary} backgroundColor="white" onPress={async () => {
                             if (loading) {
                                 return
@@ -116,9 +116,9 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                         }} labelStyle={{
                             ...styles.label,
                             color: colors.primary,
-                        }} label="拒绝" />
+                        }} label="拒絕" />
                     </> : null}
-                    {info.status === 1 && info.isSelf ? <Button disabled={true} size="large" style={styles.waitButton} backgroundColor={colors.primary} label="等待验证" /> : null}
+                    {info.status === 1 && info.isSelf ? <Button disabled={true} size="large" style={styles.waitButton} backgroundColor={colors.primary} label="等待驗證" /> : null}
                 </View>
             </ScrollView>
         </View>

@@ -16,7 +16,7 @@ export default ({ navigation, route }: Props) => {
     const [remark, setRemark] = useState('');
     const [state, setState] = useState(false)
     useEffect(() => {
-        // 监听页面获取焦点
+        // 監聽頁面獲取焦點
         const unsubscribe = navigation.addListener('focus', () => {
             setUid(route.params.uid);
         });
@@ -28,13 +28,13 @@ export default ({ navigation, route }: Props) => {
         paddingTop: insets.top,
     }}>
         <View>
-            <Navbar title="邀请信息" />
+            <Navbar title="邀請信息" />
         </View>
         <ScrollView style={styles.contentContainer} keyboardDismissMode="interactive">
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
-                    placeholder="请输入备注"
+                    placeholder="請輸入備註"
                     onChangeText={text => setRemark(text)}
                     defaultValue={remark}
                     multiline={true}
@@ -51,7 +51,7 @@ export default ({ navigation, route }: Props) => {
                             uid,
                             remark: remark,
                         }).then(res => {
-                            toast('发送邀请成功');
+                            toast('發送邀請成功');
                             setTimeout(() => {
                                 navigation.goBack();
                             }, 1000);
@@ -59,7 +59,7 @@ export default ({ navigation, route }: Props) => {
                             setState(false)
 
                         })
-                    }} label='发送邀请' />
+                    }} label='發送邀請' />
             </View>
         </ScrollView>
     </View>

@@ -30,9 +30,9 @@ export default (props: Props) => {
     const [list2, setList2] = useState<RecordItem>({ items: [], total: 0 })
     const [list3, setList3] = useState<RecordItem>({ items: [], total: 0 })
     const tabs = [
-        { label: '账单列表' },
-        { label: '提现记录' },
-        { label: '充值记录' },
+        { label: '賬單列表' },
+        { label: '提現記錄' },
+        { label: '充值記錄' },
     ]
 
 
@@ -87,7 +87,7 @@ export default (props: Props) => {
 
     }, [])
     return <View style={styles.record_container}>
-        <Navbar title="个人资料" />
+        <Navbar title="個人資料" />
         <WalletCard bottomRadius={false} />
         <View style={{ display: 'flex', flex: 1, flexDirection: 'column', padding: scale(8) }}>
             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>

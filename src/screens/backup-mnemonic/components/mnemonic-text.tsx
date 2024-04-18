@@ -30,8 +30,8 @@ export default (props: {
             <View style={styles.buttonContainer}>
                 <Button size="large" style={styles.button} backgroundColor={colors.primary} onPress={async () => {
                     await clipboard.setStringAsync(mnemonic);
-                    toast('复制成功');
-                }} label="复制助记词" labelStyle={styles.buttonLabel} />
+                    toast('複製成功');
+                }} label="複製助記詞" labelStyle={styles.buttonLabel} />
             </View>
         </View>
     )

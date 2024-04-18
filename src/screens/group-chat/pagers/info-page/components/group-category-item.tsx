@@ -23,8 +23,8 @@ const CategoryItemContainer = (
           {paddingBottom: insets.bottom},
       ]}>
           <View style={styles.textArea}>
-            <Text style={styles.textA}>设置分类，精准定位</Text>
-            <Text style={styles.textB}>已选 {props.choose}/{props.maxChoose}</Text>
+            <Text style={styles.textA}>設置分類，精準定位</Text>
+            <Text style={styles.textB}>已選 {props.choose}/{props.maxChoose}</Text>
           </View>
           <View style={styles.listContainer}>
             <View style={styles.itemContainer}>
@@ -45,7 +45,7 @@ const CategoryItemContainer = (
             <View style={styles.bottomArea}>
               <Button style={[styles.button,{backgroundColor: "#EFF0F2"}]} label='重置' labelStyle={[styles.buttonFont,{color: "#333333"}]} size='small' >
               </Button>
-              <Button style={[styles.button,{backgroundColor: "#5B6979"}]} label='确定' labelStyle={[styles.buttonFont]} size='small' >
+              <Button style={[styles.button,{backgroundColor: "#5B6979"}]} label='確定' labelStyle={[styles.buttonFont]} size='small' >
               </Button>
             </View>
           </View> 

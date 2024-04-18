@@ -9,7 +9,7 @@ export default (
         encKey: string;
     }
 ) => {
-    // 计算图片的宽高 宽不超过180 高等比缩放
+    // 計算圖片的寬高 寬不超過180 高等比縮放
     const [size, setSize] = useState([0,0]);
     const getWH = (w: number, h: number) => {
         w = scale(props.image.w) > scale(180) ? scale(180) : scale(props.image.w);

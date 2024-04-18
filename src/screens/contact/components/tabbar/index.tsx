@@ -17,7 +17,7 @@ export default (props: {
             styles.textContainer,
             index === 1 ? styles.activeTextContainer : {}
         ]}>
-            <Text style={index == 1 ? styles.activeText : styles.text}>群组</Text>
+            <Text style={index == 1 ? styles.activeText : styles.text}>羣組</Text>
         </Pressable>
     </View>
 }

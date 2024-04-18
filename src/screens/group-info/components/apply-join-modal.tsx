@@ -31,13 +31,13 @@ export default forwardRef<ApplyJoinModalRef>((_, ref) => {
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
         }}>
-            <Navbar backgroundColor='white' title="申请加入" onLeftPress={() => setVisible(false)} />
+            <Navbar backgroundColor='white' title="申請加入" onLeftPress={() => setVisible(false)} />
 
             <ScrollView style={styles.contentContainer} keyboardDismissMode="interactive">
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
-                        placeholder="请输入备注"
+                        placeholder="請輸入備註"
                         onChangeText={text => setRemark(text)}
                         defaultValue={remark}
                         multiline={true}
@@ -55,7 +55,7 @@ export default forwardRef<ApplyJoinModalRef>((_, ref) => {
                             setState(true);
                             try {
                                 await groupService.join(gid);
-                                toast('发送申请成功');
+                                toast('發送申請成功');
                                 setTimeout(() => {
                                     setVisible(false);
                                 }, 500)
@@ -64,7 +64,7 @@ export default forwardRef<ApplyJoinModalRef>((_, ref) => {
                             } finally {
                                 setState(false);
                             }
-                        }} label='发送申请' />
+                        }} label='發送申請' />
                 </View>
             </ScrollView>
         </View>

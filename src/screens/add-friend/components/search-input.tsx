@@ -13,7 +13,7 @@ export default (props: {
         <TextInput style={styles.input} placeholderTextColor='#33333366'
             onEndEditing={() => {
                 props.onSearch(address);
-            }} ref={inputRef} returnKeyType="done" placeholder="请输入好友地址" value={address}
+            }} ref={inputRef} returnKeyType="done" placeholder="請輸入好友地址" value={address}
             onChangeText={(v) => setAddress(v)} />
     </View>
 }

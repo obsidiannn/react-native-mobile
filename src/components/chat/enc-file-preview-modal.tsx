@@ -50,12 +50,12 @@ export default forwardRef((_, ref) => {
         }
         const data = await fileService.getEnFileContent(f.path, encKey) ?? undefined;
         if (!data) {
-            toast('下載失败3');
+            toast('下載失敗3');
             return;
         }
         const path = await fileService.saveFile(data, f.name);
         if (!path) {
-            toast('保存失败1');
+            toast('保存失敗1');
             return;
         }
         if (Platform.OS == 'ios') {

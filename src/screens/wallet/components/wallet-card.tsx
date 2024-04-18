@@ -43,7 +43,7 @@ export default (props: {
                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }}>
                     <Image style={{ width: scale(28), height: scale(28) }}
                         source={require('../icons/dollar.svg')} />
-                    <Text style={styles.wallet_title}>账户余额</Text>
+                    <Text style={styles.wallet_title}>賬戶餘額</Text>
                 </View>
                 <View >
 

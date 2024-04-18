@@ -38,8 +38,8 @@ export default (props: {
                     color: item.status === 1 ? '#009B0F' : '#999',
                 }}>
                     {item.status === 2 && '已添加'}
-                    {item.status === 3 && '已拒绝'}
-                    {item.status === 1 && '等待验证'}
+                    {item.status === 3 && '已拒絕'}
+                    {item.status === 1 && '等待驗證'}
                 </Text>
             </View>
         </View>

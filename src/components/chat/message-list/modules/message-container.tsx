@@ -17,7 +17,7 @@ export default (props: {
     //     alignItems: 'center',
     //     justifyContent: 'center',
     // }}>
-    //     <Text>状态</Text>
+    //     <Text>狀態</Text>
     // </View>;
     const statusComponent = null;
     return <View style={[

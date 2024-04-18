@@ -40,7 +40,7 @@ export default (
             <Text style={styles.name}>{localUser()?.name}</Text>
             <Pressable style={styles.uidContainer} onPress={async () => {
                 if (await clipboard.setStringAsync(localUser()?.id??'')) {
-                    toast('复制成功');
+                    toast('複製成功');
                 }
             }}>
             <Text style={styles.uid}>{localUser()?.id}</Text>

@@ -56,7 +56,7 @@ export default forwardRef((_, ref) => {
                         fontWeight: '500',
                         marginBottom: verticalScale(15),
                         marginTop: verticalScale(25),
-                    }}>输入安全密码</Text>
+                    }}>輸入安全密碼</Text>
                     <PasswordInput onChange={(v) => setPassword(v)} />
                     <Text style={{
                         color: '#FF4018',
@@ -88,7 +88,7 @@ export default forwardRef((_, ref) => {
                             color: password.length < 6 ? '#999999' : 'black',
                             fontSize: scale(16),
                             fontWeight: '500',
-                        }}>确认</Text>
+                        }}>確認</Text>
                     </TouchableOpacity>
                     <View style={{
                         width: scale(1),

@@ -39,10 +39,10 @@ export default (props: {
         const encInfo = await groupService.encInfo(gid);
         const group = await groupService.getInfo(gid);
         if (!group) {
-            throw new Error('群不存在')
+            throw new Error('羣不存在')
         }
         if (!globalThis.wallet) {
-            throw new Error('群公钥不存在')
+            throw new Error('羣公鑰不存在')
         }
         // const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(group.pub.substring(2), 'hex')).substring(4);
         const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(group.pubKey);
@@ -68,15 +68,15 @@ export default (props: {
                 id: group.id,
                 items,
             })
-            toast('发起邀请成功');
+            toast('發起邀請成功');
         }
         console.log(items);
-        // 获取加密信息
+        // 獲取加密信息
         // 解密key
-        // 构建群钱包对象
-        // 获取 uids
-        // 分别解密enc_key
-        // 发送
+        // 構建羣錢包對象
+        // 獲取 uids
+        // 分別解密enc_key
+        // 發送
     }, []);
     return <ScrollView style={{
         flex: 1,
@@ -100,7 +100,7 @@ export default (props: {
             }}>
                 {props.members?.map((member, i) => {
                     return <MemberItem key={member.id} avatar={member.avatar} text={member.name} onPress={() => {
-                        console.log('点击用户', member);
+                        console.log('點擊用戶', member);
                     }} />
                 })}
                 <MemberItem avatar={require('@/assets/icons/circle-plus-big-white.svg')} onPress={async () => {
@@ -122,7 +122,7 @@ export default (props: {
                     if (options.length > 0) {
                         console.log('options',options);
                         selectMemberModalRef.current?.open({
-                            title: '添加成员',
+                            title: '添加成員',
                             options,
                             callback: async (ops: SelectMemberOption[]) => {
                                 const uids = ops.filter((item) => item.status).map(item => item.id);
@@ -135,7 +135,7 @@ export default (props: {
 
                 }} />
                 <MemberItem avatar={require('@/assets/icons/circle-sub-big-white.svg')} onPress={() => {
-                    console.log('踢出用户');
+                    console.log('踢出用戶');
                     if (props.members) {
                         const authId = globalThis.wallet?.address.toLowerCase();
                         const options: SelectMemberOption[] = props.members.map((item) => {
@@ -151,7 +151,7 @@ export default (props: {
                         })
 
                         selectMemberModalRef.current?.open({
-                            title: '踢出成员',
+                            title: '踢出成員',
                             options,
                             callback: (ops: SelectMemberOption[]) => {
                                 console.log(ops);
@@ -161,10 +161,10 @@ export default (props: {
                                         id: props.group?.id ?? '',
                                         uids,
                                     }).then(() => {
-                                        toast('删除成功')
+                                        toast('刪除成功')
                                     }).catch((e) => {
                                         console.log(e);
-                                        toast('删除失败')
+                                        toast('刪除失敗')
                                     })
                                 }
                             },
@@ -180,8 +180,8 @@ export default (props: {
             qrcodeModalRef.current?.open({
                 group: props.group,
             })
-        }} icon={require('@/assets/icons/qrcode.svg')} label="群二维码" />
-        <MenuItem label="群容量" rightComponent={<Text style={{
+        }} icon={require('@/assets/icons/qrcode.svg')} label="羣二維碼" />
+        <MenuItem label="羣容量" rightComponent={<Text style={{
             fontSize: scale(14),
             fontWeight: '400',
             color: '#ABABB2',
@@ -192,35 +192,35 @@ export default (props: {
                 return;
             }
             groupCategoryModalRef.current?.open(props.group?.id);
-        }} icon={require('@/assets/icons/arrow-right-gray.svg')} label="群分类" />
+        }} icon={require('@/assets/icons/arrow-right-gray.svg')} label="羣分類" />
 
        <MenuItem onPress={() => {
             if (!props.group) {
                 return;
             }
-            console.log("管理进入" );
+            console.log("管理進入" );
             groupManagerModalRef.current?.open(props.group?.id);
-        }} icon={require('@/assets/icons/arrow-right-gray.svg')} label="管理员" />
+        }} icon={require('@/assets/icons/arrow-right-gray.svg')} label="管理員" />
 
         <MenuItem onPress={() => {
             if (!props.group) {
                 return;
             }
             applyListModalRef.current?.open(props.group?.id);
-        }} icon={require('@/assets/icons/arrow-right-gray.svg')} label="申请列表" />
+        }} icon={require('@/assets/icons/arrow-right-gray.svg')} label="申請列表" />
         <MenuItem onPress={() => {
             confirmModalRef.current?.open({
-                title: '清空群消息',
-                desc: '清空后，将无法恢复',
+                title: '清空羣消息',
+                desc: '清空後，將無法恢復',
                 onSubmit: () => {
-                    console.log('清空群消息');
+                    console.log('清空羣消息');
                 }
             });
-        }} icon={require('@/assets/icons/arrow-right-gray.svg')} label="清空群消息" />
+        }} icon={require('@/assets/icons/arrow-right-gray.svg')} label="清空羣消息" />
         <MenuItem onPress={() => {
             confirmModalRef.current?.open({
                 title: '清空我的消息',
-                desc: '清空后，将无法恢复',
+                desc: '清空後，將無法恢復',
                 onSubmit: () => {
                     console.log('清空我的消息');
                 }
@@ -228,36 +228,36 @@ export default (props: {
         }} labelColor="#FB3737" icon={require('@/assets/icons/arrow-right-gray.svg')} label="清空我的消息" />
         <Button onPress={() => {
             confirmModalRef.current?.open({
-                title: '解散群聊',
-                desc: '解散后，将无法恢复',
+                title: '解散羣聊',
+                desc: '解散後，將無法恢復',
                 onSubmit: () => {
-                    console.log('解散群聊');
+                    console.log('解散羣聊');
                 }
             });
         }} style={{
             height: scale(50),
             marginTop: scale(40),
-        }} borderRadius={scale(12)} color="#FB3737" backgroundColor="white" outlineColor="#FB3737" label="解散群聊" />
+        }} borderRadius={scale(12)} color="#FB3737" backgroundColor="white" outlineColor="#FB3737" label="解散羣聊" />
         <QRcodeModal ref={qrcodeModalRef} />
         <ApplyListModal onCheck={(item) => {
-            console.log('查看用户', item);
+            console.log('查看用戶', item);
             applyInfoModalRef.current?.open(item);
         }} ref={applyListModalRef} />
         <ConfirmModal ref={confirmModalRef} />
         <GoodCategory ref={groupCategoryModalRef} onCheck={()=>{
-          console.log("打开群分类");
+          console.log("打開羣分類");
           
         }} />
 
         <GoodManager ref={groupManagerModalRef} onCheck={()=>{
-          console.log("打开群管理");
+          console.log("打開羣管理");
         }} />
 
         <ApplyInfoModal onCheck={() => {
-            console.log('查看用户');
+            console.log('查看用戶');
             props.onChangeMemberList?.();
         }} onReject={() => {
-            console.log('拒绝');
+            console.log('拒絕');
             props.onChangeMemberList?.();
         }} ref={applyInfoModalRef} />
         <SelectMemberModal ref={selectMemberModalRef} />

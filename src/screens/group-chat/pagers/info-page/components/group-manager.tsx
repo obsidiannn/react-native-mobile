@@ -8,7 +8,7 @@ import { scale } from 'react-native-size-matters/extend';
 import { Image } from "@/components/image";
 import RemixIcon from "@/components/common/remix-icon"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-//  群分类
+//  羣分類
 export interface GroupManagerModalRef {
   open: (id: string) => void;
 }
@@ -21,7 +21,7 @@ export default forwardRef((props: {
   const [groupId, setGroupId] = useState<string>('');
   const maxManager = 5;
   const [managerDescribe,setManagerDescribe] = useState([
-    "1.修改群聊名称","2.发表群公告","3.设置退群方式，并可确认退群申请","4.移除成员"
+    "1.修改羣聊名稱","2.發表羣公告","3.設置退羣方式，並可確認退羣申請","4.移除成員"
   ]);
   const [managers,setManagers] = useState<GroupMemberItem[]>([
     {
@@ -100,10 +100,10 @@ export default forwardRef((props: {
             paddingTop: insets.top,
             paddingBottom: insets.bottom,}
         }>
-          <Navbar title="管理员" backgroundColor="white" onLeftPress={() => setVisible(false)}/>
+          <Navbar title="管理員" backgroundColor="white" onLeftPress={() => setVisible(false)}/>
           <ScrollView style={styles.mainContainer}>
             <View style={{marginTop:"5%"}}>
-              <Text style={styles.titleStyle}>群管理员可以拥有以下权利</Text>
+              <Text style={styles.titleStyle}>羣管理員可以擁有以下權利</Text>
               <View style={styles.groupDescribe}>
                 {
                   managerDescribe.map(
@@ -116,7 +116,7 @@ export default forwardRef((props: {
             </View>
 
             <View>
-              <Text style={styles.titleStyle}>现群管理员</Text>
+              <Text style={styles.titleStyle}>現羣管理員</Text>
               <View style={styles.managerList}>
                 {
                   managers.map((e,i)=>{
@@ -135,7 +135,7 @@ export default forwardRef((props: {
               </View>
               
             </View>
-            <Button style={[styles.button,{backgroundColor: "#5B6979"}]} label='确定' labelStyle={[styles.buttonFont]} size='small' >
+            <Button style={[styles.button,{backgroundColor: "#5B6979"}]} label='確定' labelStyle={[styles.buttonFont]} size='small' >
             </Button>
             
           </ScrollView>

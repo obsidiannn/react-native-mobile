@@ -10,7 +10,7 @@ export default (props: {
 }) => {
     return <TouchableOpacity style={styles.container} onPress={async () => {
         await Clipboard.setStringAsync(props.value);
-        toast('复制成功!');
+        toast('複製成功!');
     }}>
         <Text style={styles.text}>{handleAddress(props.value)}</Text>
         <Image source={require('../../../../assets/icons/copy.svg')} style={{

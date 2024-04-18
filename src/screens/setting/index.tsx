@@ -20,37 +20,37 @@ const SettingScreen = () => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="设置" />
+                <Navbar title="設置" />
             </View>
             <View style={styles.contentContainer}>
                 <View style={styles.toolContainer}>
 
-                    <ToolItem title="关于我们" icon={require('../../assets/icons/info.svg')} onPress={() => {
+                    <ToolItem title="關於我們" icon={require('../../assets/icons/info.svg')} onPress={() => {
                         navigate('Web', {
                             url: 'https://baidu.com',
                         })
                     }} />
-                    <ToolItem title="注销账号" icon={require('../../assets/icons/power.svg')} onPress={() => {
+                    <ToolItem title="註銷賬號" icon={require('../../assets/icons/power.svg')} onPress={() => {
                         actionSheetRef.current?.open({
-                            title: '注销账号',
-                            desc: '注销账号后，将无法恢复,并且将删除所有信息',
+                            title: '註銷賬號',
+                            desc: '註銷賬號後，將無法恢復,並且將刪除所有信息',
                             onSubmit: async () => {
                                 navigate('Unlock');
-                                // 输入密码后，删除账号
+                                // 輸入密碼後，刪除賬號
                             }
                         });
                     }} />
-                    <ToolItem title="当前版本" icon={require('../../assets/icons/bookmark.svg')} rightComponent={() => {
+                    <ToolItem title="當前版本" icon={require('../../assets/icons/bookmark.svg')} rightComponent={() => {
                         return <View style={styles.versionContainer}>
                             <Text style={styles.version}>{version}</Text>
                         </View>
                     }} />
                 </View>
                 <View style={styles.buttonContainer}>
-                    <Button label="退出登录" size="large" style={styles.button} avoidMinWidth={true} outlineColor="#D90000" backgroundColor="white" onPress={async () => {
+                    <Button label="退出登錄" size="large" style={styles.button} avoidMinWidth={true} outlineColor="#D90000" backgroundColor="white" onPress={async () => {
                         actionSheetRef.current?.open({
-                            title: '退出登录',
-                            desc: '退出登录后，将无法收到消息,但数据将保留',
+                            title: '退出登錄',
+                            desc: '退出登錄後，將無法收到消息,但數據將保留',
                             onSubmit: async () => {
                                 navigate('Unlock');
                             }

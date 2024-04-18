@@ -21,7 +21,7 @@ const UpdateUsernameScreen = () => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="更新昵称" />
+                <Navbar title="更新暱稱" />
             </View>
             <ScrollView style={{
                 flex: 1
@@ -31,7 +31,7 @@ const UpdateUsernameScreen = () => {
                         <TextInput
                             placeholderTextColor="#ABABB2"
                             ref={(ref) => inputRef.current = ref as TextInput}
-                            placeholder="昵称(5-16位)"
+                            placeholder="暱稱(5-16位)"
                             style={styles.input}
                         />
                     </View>

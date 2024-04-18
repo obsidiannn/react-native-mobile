@@ -22,7 +22,7 @@ const AddFriendScreen = () => {
     const search = useCallback((v: string, l: boolean) => {
         
         if (!v.match(/^0x[a-fA-F0-9]{40}$/)) {
-            toast('请输入正确的以太坊地址！');
+            toast('請輸入正確的以太坊地址！');
             return;
         }
         if (l) {

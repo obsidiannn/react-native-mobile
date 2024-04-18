@@ -23,7 +23,7 @@ const UserSettingScreen = ({ navigation, route }: Props) => {
     const updateRemarkModalRef = useRef<UpdateRemarkModalType>(null);
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            // 拉取用户信息
+            // 拉取用戶信息
         });
         return unsubscribe;
     }, [navigation])
@@ -34,7 +34,7 @@ const UserSettingScreen = ({ navigation, route }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="资料设置" />
+                <Navbar title="資料設置" />
             </View>
             <View style={{
                 paddingHorizontal: scale(25),
@@ -58,7 +58,7 @@ const UserSettingScreen = ({ navigation, route }: Props) => {
                         fontSize: scale(15),
                         color: '#000',
                         fontWeight: '400',
-                    }}>设置备注</Text>
+                    }}>設置備註</Text>
                     <Image source={require('@/assets/icons/edit.svg')} style={{
                         width: scale(24),
                         height: scale(24),
@@ -81,7 +81,7 @@ const UserSettingScreen = ({ navigation, route }: Props) => {
                         fontSize: scale(15),
                         color: '#000',
                         fontWeight: '400',
-                    }}>加入黑名单</Text>
+                    }}>加入黑名單</Text>
                     <Switch height={scale(24)} onColor={colors.primary} value={blacklisted} onValueChange={(v) => setBlacklisted(v)}/>
                 </View>
                 <View style={{
@@ -89,10 +89,10 @@ const UserSettingScreen = ({ navigation, route }: Props) => {
                 }}>
                     <Button outlineColor="#FB3737" borderRadius={scale(12)} backgroundColor="white" labelStyle={{
                         color: "#FB3737"
-                    }} label="删除好友" onPress={() => {
+                    }} label="刪除好友" onPress={() => {
                         confirmModalRef.current?.open({
-                            title: '删除好友',
-                            desc: '删除好友后，将清空与该好友的聊天记录，且无法恢复',
+                            title: '刪除好友',
+                            desc: '刪除好友後，將清空與該好友的聊天記錄，且無法恢復',
                             onSubmit: () => {
                             }
                         })

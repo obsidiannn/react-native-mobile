@@ -33,7 +33,7 @@ const BackupMnemonicScreen = ({navigation,route}: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="备份助记词" />
+                <Navbar title="備份助記詞" />
             </View>
             <View style={{
                 paddingHorizontal: scale(15),
@@ -53,7 +53,7 @@ const BackupMnemonicScreen = ({navigation,route}: Props) => {
                     fontWeight: '400',
                     color: '#FF4018',
                     textAlign: 'center',
-                }}>注意： TD chat不会保存您的助记词，请您妥 善保管好助记词，以免造成财产损失。</Text>
+                }}>注意： TD chat不會保存您的助記詞，請您妥 善保管好助記詞，以免造成財產損失。</Text>
             </View>
             <PagerView ref={pagerViewRef} onPageSelected={(e) => {
                 setPageIndex(e.nativeEvent.position);

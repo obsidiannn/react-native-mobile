@@ -22,7 +22,7 @@ export default (props: {
             </View>
             <View ref={(ref) => viewRef.current = ref as View} style={styles.qrTipsContainer}>
 
-                <Text style={styles.qrTipsText}>助记词二维码</Text>
+                <Text style={styles.qrTipsText}>助記詞二維碼</Text>
             </View>
             <View style={styles.buttonContainer}>
                 <Button size="large" style={styles.button} backgroundColor={colors.primary} onPress={async () => {
@@ -34,8 +34,8 @@ export default (props: {
                         quality: 0.8
                     });
                     await CameraRoll.save(uri);
-                    toast('保存到相册成功');
-                }} label="保存到相册" labelStyle={styles.buttonLabel} />
+                    toast('保存到相冊成功');
+                }} label="保存到相冊" labelStyle={styles.buttonLabel} />
             </View>
         </View>
     )

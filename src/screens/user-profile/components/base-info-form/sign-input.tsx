@@ -10,7 +10,7 @@ export default (props: {
     return <View style={styles.inputContainer}>
         <TextInput
             multiline={true}
-            placeholder="设置签名"
+            placeholder="設置簽名"
             ref={(ref) => {
                 inputRef.current = ref as TextInput;
             }}

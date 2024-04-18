@@ -5,7 +5,7 @@ export default (props: {
     remark: string;
 }) => {
     return <View style={styles.container}>
-        <Text style={styles.text}>备注：{props.remark}</Text>
+        <Text style={styles.text}>備註：{props.remark}</Text>
     </View>
 }
 const styles = StyleSheet.create({

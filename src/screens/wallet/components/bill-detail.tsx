@@ -32,7 +32,7 @@ const BillDetail = (props: Props) => {
         })
     }, [])
     return <View style={{ flex: 1, backgroundColor: colors.gray200 }}>
-        <Navbar title="账单详情" />
+        <Navbar title="賬單詳情" />
         <View style={styles.detail_container}>
             <View style={styles.detail_window}>
                 <View style={styles.detail_title}>
@@ -45,12 +45,12 @@ const BillDetail = (props: Props) => {
                     </View>
                 </View>
                 <View style={{ ...styles.detail_block, ...styles.bottom_line }}>
-                    <Text style={{ ...styles.detail_line, marginBottom: scale(8), }}>当前状态：{walletConstant.billStatusTransfer(detail?.type ?? 0, detail?.status ?? 0, detail?.inOut).title}</Text>
-                    <Text style={styles.detail_line}>备注：{detail?.remark}</Text>
+                    <Text style={{ ...styles.detail_line, marginBottom: scale(8), }}>當前狀態：{walletConstant.billStatusTransfer(detail?.type ?? 0, detail?.status ?? 0, detail?.inOut).title}</Text>
+                    <Text style={styles.detail_line}>備註：{detail?.remark}</Text>
                 </View>
                 <View style={{ ...styles.detail_block, ...styles.bottom_line }}>
-                    <Text style={{ ...styles.detail_line, marginBottom: scale(8), }}>支付类型：{walletConstant.billTypeTransfer(detail?.type ?? 0)}</Text>
-                    <Text style={styles.detail_line}>支付时间： {utils.dateFormat(detail?.createdAt ?? null)}</Text>
+                    <Text style={{ ...styles.detail_line, marginBottom: scale(8), }}>支付類型：{walletConstant.billTypeTransfer(detail?.type ?? 0)}</Text>
+                    <Text style={styles.detail_line}>支付時間： {utils.dateFormat(detail?.createdAt ?? null)}</Text>
                 </View>
                 <View style={{ ...styles.detail_block }}>
                     <TouchableOpacity style={{
@@ -61,14 +61,14 @@ const BillDetail = (props: Props) => {
                         marginBottom: scale(8)
                     }} onPress={async () => {
                         await clipboard.setStringAsync(detail?.transactionNo ?? '');
-                        toast('复制成功');
+                        toast('複製成功');
                     }}
                     >
-                        <Text style={{ ...styles.detail_line }}>交易单号：<Text style={{ fontSize: scale(12), }}>{detail?.transactionNo}</Text></Text>
+                        <Text style={{ ...styles.detail_line }}>交易單號：<Text style={{ fontSize: scale(12), }}>{detail?.transactionNo}</Text></Text>
 
                         <AntIcon name="copy1" size={12} />
                     </TouchableOpacity>
-                    <Text style={styles.detail_line}>商户单号： {detail?.sellerNo}</Text>
+                    <Text style={styles.detail_line}>商戶單號： {detail?.sellerNo}</Text>
                 </View>
             </View>
         </View>

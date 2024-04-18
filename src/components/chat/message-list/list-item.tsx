@@ -30,7 +30,7 @@ export default (props: {
         case "image":
             const image = item.data as IMessageImage
             if (!image || !image.h) {
-                message = <TextItem text="[图片不存在]" isSelf={props.isSelf} />
+                message = <TextItem text="[圖片不存在]" isSelf={props.isSelf} />
             } else {
                 const w = scale(image.w) > scale(180) ? scale(180) : scale(image.w);
                 const h = scale(Math.floor(image.h * (w / image.w)));
@@ -42,7 +42,7 @@ export default (props: {
         case "video":
             const video = item.data as IMessageVideo
             if (!video || !video.h) {
-                message = <TextItem text="[视频不存在]" isSelf={props.isSelf} />
+                message = <TextItem text="[視頻不存在]" isSelf={props.isSelf} />
             } else {
                 const w = scale(video.w) > scale(180) ? scale(180) : scale(video.w);
                 const h = scale(Math.floor(video.h * (w / video.w)));

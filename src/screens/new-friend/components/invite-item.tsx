@@ -48,8 +48,8 @@ export default (props: {
                     color: item.status === FriendApplyStatusEnum.PENDING ? '#009B0F' : '#999',
                 }}>
                     {item.status === FriendApplyStatusEnum.PASSED  && '已添加'}
-                    {item.status === FriendApplyStatusEnum.REFUSED && '已拒绝'}
-                    {item.status === FriendApplyStatusEnum.PENDING  && '等待验证'}
+                    {item.status === FriendApplyStatusEnum.REFUSED && '已拒絕'}
+                    {item.status === FriendApplyStatusEnum.PENDING  && '等待驗證'}
                 </Text>
             </View>
         </View>

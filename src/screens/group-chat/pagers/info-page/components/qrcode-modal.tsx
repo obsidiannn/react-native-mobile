@@ -39,7 +39,7 @@ export default forwardRef((_, ref) => {
             paddingTop: insets.top,
             paddingBottom: insets.bottom,
         }}>
-            <Navbar backgroundColor='#F3F4F6' title="群二维码" onLeftPress={() => setVisible(false)} />
+            <Navbar backgroundColor='#F3F4F6' title="羣二維碼" onLeftPress={() => setVisible(false)} />
             <View style={{
                 flex: 1,
                 paddingHorizontal: scale(15),
@@ -112,9 +112,9 @@ export default forwardRef((_, ref) => {
                                 handleGLSurfaceViewOnAndroid: true,
                             }).then(uri => {
                                 console.log(uri);
-                                toast('保存到相册成功');
+                                toast('保存到相冊成功');
                             });
-                        }} borderRadius={scale(21)} backgroundColor="#EFF0F2" label="保存为图片" style={{
+                        }} borderRadius={scale(21)} backgroundColor="#EFF0F2" label="保存爲圖片" style={{
                             height: scale(42),
                             marginTop: scale(40),
                         }} labelStyle={{

@@ -90,7 +90,7 @@ export default forwardRef((props: InputToolKitProps,ref) => {
                         const video = await captureVideo();
                         if(video !== undefined){
                             const mid = util.generateId()
-                            // 这里在未经解码的时候，使用最初的视频文件生成缩略图，可能会存在转码问题，留意
+                            // 這裏在未經解碼的時候，使用最初的視頻文件生成縮略圖，可能會存在轉碼問題，留意
                             const originalThumbnailPath = await fileService.generateVideoThumbnail(video.uri,mid)
                             const message: IMessage<'video'> = {
                                 mid: mid,

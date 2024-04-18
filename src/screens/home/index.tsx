@@ -68,7 +68,7 @@ const HomeScreen = ({ navigation }: Props) => {
                 icon: require('@/assets/icons/useradd-black.svg'),
             },
             {
-                title: '扫一扫',
+                title: '掃一掃',
                 onPress: () => {
                     if (elementRef.current) {
                         elementRef.current?.destroy();
@@ -78,7 +78,7 @@ const HomeScreen = ({ navigation }: Props) => {
                 icon: require('@/assets/icons/scan-black.svg'),
             },
             {
-                title: '创建群聊',
+                title: '創建羣聊',
                 onPress: async () => {
                     const data = await friendService.getList();
                     const options: SelectMemberOption[] = data.items.map((item) => {
@@ -94,10 +94,10 @@ const HomeScreen = ({ navigation }: Props) => {
                     });
 
                     selectMemberModalRef.current?.open({
-                        title: '选择好友',
+                        title: '選擇好友',
                         options,
                         callback: async (ops: SelectMemberOption[]) => {
-                            // 跳转到群组创建再返回                            
+                            // 跳轉到羣組創建再返回                            
                             navigation.navigate('GroupCreate',{
                                 selected: ops
                             });
@@ -118,7 +118,7 @@ const HomeScreen = ({ navigation }: Props) => {
             paddingTop: insets.top,
         }}>
             <View>
-                <Navbar title="会话" renderLeft={() => null} renderRight={() => <NavbarRight onPress={open} />} />
+                <Navbar title="會話" renderLeft={() => null} renderRight={() => <NavbarRight onPress={open} />} />
             </View>
             <View style={styles.listContainer}>
                 <FlashList

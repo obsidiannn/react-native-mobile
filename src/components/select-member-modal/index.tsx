@@ -34,7 +34,7 @@ export default forwardRef((props: SelectMemberModalProps, ref) => {
     const [contactAlphabetIndex, setContactAlphabetIndex] = useState<{ [key: string]: number }>({});
     const [aplphabet, setAplphabet] = useState<string[]>([]);
     const insets = useSafeAreaInsets();
-    // users 为列表数据 可以为 string 或者 Item
+    // users 爲列表數據 可以爲 string 或者 Item
     const [options, setOptions] = useState<SelectMemberOption[]>([]);
     const flashListRef = useRef<FlashList<(SelectMemberOption)>>(null);
     const callbackRef = useRef<(options: SelectMemberOption[]) => void>();

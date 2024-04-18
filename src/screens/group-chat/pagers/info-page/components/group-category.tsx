@@ -9,7 +9,7 @@ import {GroupCategoryListParams,GroupCategoryListItem} from '@/api/types/group'
 import { Modal } from "react-native-ui-lib"
 import { scale } from "react-native-size-matters/extend";
 
-//  群分类
+//  羣分類
 export interface GroupCategoryModalRef {
   open: (id: string) => void;
 }
@@ -33,14 +33,14 @@ export default forwardRef((props: {
   const max = 3;
   const [choose,setChoose] = useState(0)
   const [categoryList,setCategoryList] = useState<GroupCategoryListItem[]>([
-    {id: "1",name: "分类1",checked: false},
-    {id: "2",name: "分类2",checked: false},
-    {id: "3",name: "分类3",checked: false},
-    {id: "4",name: "分类4",checked: false},
-    {id: "5",name: "分类4",checked: false},
-    {id: "6",name: "分类4",checked: false},
-    {id: "7",name: "分类4",checked: false},
-    {id: "8",name: "分类4",checked: false},
+    {id: "1",name: "分類1",checked: false},
+    {id: "2",name: "分類2",checked: false},
+    {id: "3",name: "分類3",checked: false},
+    {id: "4",name: "分類4",checked: false},
+    {id: "5",name: "分類4",checked: false},
+    {id: "6",name: "分類4",checked: false},
+    {id: "7",name: "分類4",checked: false},
+    {id: "8",name: "分類4",checked: false},
   ])
 
   useImperativeHandle(ref, () => ({
@@ -59,7 +59,7 @@ export default forwardRef((props: {
             paddingTop: insets.top,
             paddingBottom: insets.bottom,}
         }>
-          <Navbar title="群分类" backgroundColor="gray-100" onLeftPress={() => setVisible(false)}/>
+          <Navbar title="羣分類" backgroundColor="gray-100" onLeftPress={() => setVisible(false)}/>
           <View style={{flex:1,backgroundColor: "#f3f4f6",padding:scale(15)}}>
               <CategoryItemContainer  
                   groupId={groupId} 

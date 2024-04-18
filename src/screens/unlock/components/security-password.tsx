@@ -17,7 +17,7 @@ export default (props: {
     }, [])
     return <View style={styles.container}>
         <View style={styles.placeholderContainer}>
-            <Text style={styles.placeholderText}>输入安全密码</Text>
+            <Text style={styles.placeholderText}>輸入安全密碼</Text>
         </View>
         <View style={styles.wordContainer}>
             <PasswordInput ref={passwordInputRef} onReady={(v) => setReady(v)} onChange={(v) => {
@@ -25,7 +25,7 @@ export default (props: {
             }} />
         </View>
         <View style={styles.buttonContainer}>
-            <Button disabled={!ready} size="large" style={styles.unlockButton} backgroundColor={colors.primary} onPress={() => props.onNext()} label="确认解锁" labelStyle={styles.unlockButtonLabel} />
+            <Button disabled={!ready} size="large" style={styles.unlockButton} backgroundColor={colors.primary} onPress={() => props.onNext()} label="確認解鎖" labelStyle={styles.unlockButtonLabel} />
         </View>
     </View>;
 }

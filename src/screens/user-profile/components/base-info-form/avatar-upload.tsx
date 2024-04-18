@@ -27,7 +27,7 @@ export default (props: {
             }
         },
         {
-            title: '从相册选择',
+            title: '從相冊選擇',
             onPress: () => {
                 chooseImage(false, {
                     aspect: [1, 1],

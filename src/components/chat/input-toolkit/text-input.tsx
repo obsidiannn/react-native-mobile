@@ -73,7 +73,7 @@ export default (props: InputToolKitProps) => {
                         setContent('');
                         return;
                     }
-                }} backgroundColor={colors.primary} style={styles.sendButton} size="small" label="发送" />
+                }} backgroundColor={colors.primary} style={styles.sendButton} size="small" label="發送" />
             }
         </View>
     </View>

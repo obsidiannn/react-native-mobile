@@ -41,7 +41,7 @@ const LoginScreen = ({ navigation }: Props) => {
     return (
         <SafeAreaView style={styles.container}>
             <View>
-                <Navbar title="登陆" />
+                <Navbar title="登陸" />
             </View>
             <View style={styles.contentContainer}>
                 <PagerView onPageSelected={(e) => {
@@ -52,7 +52,7 @@ const LoginScreen = ({ navigation }: Props) => {
                             setMnemonicWord(v)
                         }} onNext={() => {
                             if (!bip39.validateMnemonic(mnemonicWord, wordlist)) {
-                                throw new ToastException('助记词不合法，请检查！');
+                                throw new ToastException('助記詞不合法，請檢查！');
                             }
                             pagerViewRef.current?.setPage(1)
                         }} />
@@ -72,14 +72,14 @@ const LoginScreen = ({ navigation }: Props) => {
                                 const res = await authApi.isRegister();
                                 if (!res.isRegister) {
                                     await authApi.register()
-                                    await authApi.changeName({name: '新用户'});
+                                    await authApi.changeName({name: '新用戶'});
                                 }
                                 navigation.navigate('AuthStackNav');
                             } catch (e: any) {
                                 if (e?.name === 'ToastException') {
                                     console.log('ToastException',e);
                                 } else {
-                                    toast('登陆失败，请重试');
+                                    toast('登陸失敗，請重試');
                                 }
                                 if(nowAccount){
                                     setNowAccount(null);

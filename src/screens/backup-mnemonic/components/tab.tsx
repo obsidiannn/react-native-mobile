@@ -11,13 +11,13 @@ export default (props: {
             styles.textContainer,
             index === 0 ? styles.activeTextContainer : {}
         ]}>
-            <Text style={index == 0 ? styles.activeText : styles.text}>二维码</Text>
+            <Text style={index == 0 ? styles.activeText : styles.text}>二維碼</Text>
         </Pressable>
         <Pressable onPress={() => props.onChange(1)} style={[
             styles.textContainer,
             index === 1 ? styles.activeTextContainer : {}
         ]}>
-            <Text style={index == 1 ? styles.activeText : styles.text}>助记词文本</Text>
+            <Text style={index == 1 ? styles.activeText : styles.text}>助記詞文本</Text>
         </Pressable>
     </View>
 }

@@ -27,7 +27,7 @@ export default () => {
         }}>
             <Image style={styles.icon} source={require('@/assets/icons/userchecked-green.svg')} />
             <View style={styles.rightContainer}>
-                <Text style={styles.text}>等待验证</Text>
+                <Text style={styles.text}>等待驗證</Text>
             </View>
         </TouchableOpacity> */}
         <TouchableOpacity onPress={() => {
@@ -38,7 +38,7 @@ export default () => {
         }}>
             <Image style={styles.icon} source={require('@/assets/icons/userchecked-green.svg')} />
             <View style={styles.rightContainer}>
-                <Text style={styles.text}>群聊</Text>
+                <Text style={styles.text}>羣聊</Text>
             </View>
         </TouchableOpacity>
     </View>

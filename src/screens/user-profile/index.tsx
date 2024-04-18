@@ -34,7 +34,7 @@ const UserProfileScreen = ({ navigation }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="个人资料" />
+                <Navbar title="個人資料" />
             </View>
             <ScrollView style={{
                 width: '100%',

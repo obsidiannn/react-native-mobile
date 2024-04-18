@@ -23,7 +23,7 @@ export default (props: {
                     <Text style={styles.signText}>{handleAddress(user.uid)}</Text>
                     <TouchableOpacity onPress={async () => {
                         await clipboard.setStringAsync(user.uid);
-                        toast('复制成功');
+                        toast('複製成功');
                     }}>
                         <Image source={require('@/assets/icons/copy.svg')} style={styles.copyIcon} />
                     </TouchableOpacity>
