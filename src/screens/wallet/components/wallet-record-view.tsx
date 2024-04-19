@@ -24,7 +24,12 @@ const WalletRecordView = (props: {
                 justifyContent: 'center',
                 margin: scale(12)
             }} onPress={()=>{
-                navigate('WalletRecordPage',{ typeState: props.type_state })
+                if(props.type_state === '2'){
+                    navigate('WalletTopupRecord')
+                }else{
+
+                    navigate('WalletRecordPage',{ typeState: props.type_state })
+                }
             }}
             >
                 <Text>查看更多</Text>

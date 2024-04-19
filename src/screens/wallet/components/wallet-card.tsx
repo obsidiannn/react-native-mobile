@@ -32,7 +32,7 @@ export default (props: {
         <View style={styles.wallet_card} >
             <Pressable onPress={() => {
                 getWalletInfo()
-                if(props.navigateToRecord){
+                if (props.navigateToRecord) {
                     navigate('WalletRecord')
                 }
             }} style={{
@@ -57,9 +57,16 @@ export default (props: {
             </Pressable>
             <View style={styles.bottom_button_area}>
                 <View>
-                    <Button style={styles.buttom_button} label="收款" /></View>
-                <View><Button style={styles.buttom_button} label="存入" /></View>
-                <View><Button style={{ ...styles.buttom_button, marginRight: 0 }} label="取款" /></View>
+                    <Button style={styles.buttom_button} label="收款" onPress={() => {
+                        navigate('WalletQrcode')
+                    }} />
+                </View>
+                {/* <View><Button style={styles.buttom_button} label="存入" /></View> */}
+                <View>
+                    <Button style={{ ...styles.buttom_button, marginRight: 0 }} label="取款" onPress={()=>{
+                        navigate('WalletWithdraw')
+                    }} />
+                </View>
             </View>
         </View>
 
@@ -81,7 +88,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: scale(14),
         borderRadius: scale(18),
-        
+
 
         // marginLeft: scale(14),
         // marginRight: scale(14),

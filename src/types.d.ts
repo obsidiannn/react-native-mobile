@@ -66,11 +66,13 @@ type RootStackParamList = {
         selected: SelectMemberOption[]
     },
     WalletRecord:{},
-    WalletQrcord:{},
+    WalletQrcode:{},
     BillDetail: {id: string},
     WalletRecordPage:{
         typeState: string
     },
+    WalletTopupRecord:{},
+    WalletWithdraw: {},
 };
 
 

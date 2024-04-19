@@ -1,5 +1,10 @@
 import { BillInOutEnum, BillTypeEnum } from "./enums"
-import { BasePageReq  } from '../types/common'
+import { BasePageReq,BasePageResp  } from '../types/common'
+
+export interface WalletRecordPageResp<T> extends BasePageResp<T> {
+    incomeTotal: number
+    outcomeTotal: number
+  }
 
 export interface WalletDetailResp {
     balance: number

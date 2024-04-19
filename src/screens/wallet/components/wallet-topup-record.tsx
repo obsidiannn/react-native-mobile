@@ -13,49 +13,34 @@ import { BillInOutEnum, BillTypeEnum } from "@/api/types/enums";
 import walletApi from '@/api/v2/wallet'
 import walletConstant from '@/constants/wallet'
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { RefreshControl } from "react-native";
 import { navigate } from "@/lib/root-navigation";
-type Props = StackScreenProps<RootStackParamList, 'WalletRecordPage'>;
+import CardItem from "@/components/wallet/card-item";
+type Props = StackScreenProps<RootStackParamList, 'WalletTopupRecord'>;
 
 
 interface WalletPageState {
-    income_amount: string
-    outcome_amount: string
     page: number
     total: number
     size: number
-    button_idx: number
 
 }
 
-const WalletRecordPage = (props: Props) => {
-    const [state, setState] = useState<WalletPageState>({ income_amount: '0', outcome_amount: '0', total: 0, page: 0, button_idx: 0, size: 10 })
+const WalletTopupRecord = (props: Props) => {
+    const [state, setState] = useState<WalletPageState>({ page: 0, total: 0, size: 10 })
     const [loading, setLoading] = useState(false)
     const [list, setList] = useState<WalletItem[]>([])
     const flashListRef = useRef<FlashList<(WalletItem)>>(null);
     const insets = useSafeAreaInsets();
     const listGenerate = async () => {
-        console.log('出发刷新');
-
         reload(state)
     }
 
     const reload = async (_state: any, drop?: boolean) => {
-
-        const typeState = props.route.params.typeState
         setLoading(true)
 
-        let inOut = undefined
-        if (_state.button_idx !== 0) {
-            inOut = _state.button_idx === 1 ? BillInOutEnum.INCOME : BillInOutEnum.OUTCOME
-        }
-        const types: number[] = []
-        if (typeState === "1") {
-            types.concat([BillTypeEnum.DRAW_CASH, BillTypeEnum.GROUP_DRAW_CASH])
-        }
-
-        const page = { limit: 3, page: _state.page + 1 }
-        walletApi.billRecordPage({ inOut: inOut, types: types, ...page }).then(res => {
+        const page = { limit: _state.size, page: _state.page + 1 }
+         // walletApi.billRecordPage({ ...page }).then(res => {
+            walletApi.billRecordPage({ inOut: BillInOutEnum.INCOME, types: [BillTypeEnum.FILL_IN], ...page }).then(res => {
             const resList = res.items.map(i => {
                 return {
                     id: i.id,
@@ -63,7 +48,7 @@ const WalletRecordPage = (props: Props) => {
                     amount: i.amount,
                     time: utils.dateFormat(i.createdAt),
                     status: i.status,
-                    showType: '0',
+                    showType: '1',
                     type: i.type
                 }
             })
@@ -83,67 +68,29 @@ const WalletRecordPage = (props: Props) => {
             setLoading(false)
         })
     }
-
-    const pressBtn = (idx: number) => {
-        reload({
-            ...state,
-            page: 0,
-            button_idx: idx
-        }, true)
-    }
-
     return <View style={{ flex: 1 }}>
-        <Navbar title="BOBO錢包" />
+        <Navbar title="充值記錄" />
         <View style={{
             padding: scale(14), backgroundColor: colors.gray200, flex: 1,
             paddingBottom: insets.bottom,
             paddingTop: insets.top,
         }}>
             <View style={styles.main_container}>
-                <View style={styles.button_area}>
-                    {['全部', '收入', '支出'].map((s, i) => {
-                        return <Button key={i}
-                            onPress={() => { pressBtn(i) }}
-                            style={{
-                                ...styles.button_item,
-                                ...(state?.button_idx ?? -1) === i ? { ...styles.button_select } : {}
-                            }} label={s}
-                            labelStyle={{
-                                ...(state?.button_idx ?? -1) === i ? styles.button_label_select : styles.button_label_default
-                            }}
-                        />
-                    })}
-                </View>
                 <View style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <View style={styles.stat_area}>
-                        <Text>收入總額：${state.income_amount}</Text>
-                        <Text>支出總額：${state.outcome_amount}</Text>
-                    </View>
                     <View style={{
                         flex: 1,
                     }}>
                         <FlashList data={list}
-                            estimatedListSize={{height: 10,width: 10}}
+                            estimatedListSize={{ height: 10, width: 10 }}
                             refreshing={loading}
                             ref={flashListRef}
                             keyExtractor={(item) => item.id}
                             onEndReached={listGenerate}
                             estimatedItemSize={scale(0.1)}
-                            ListFooterComponent={<View style={{alignItems:'center'}}>
-                                {loading?<ActivityIndicator size={14}/> :null }
-                            </View>}
                             renderItem={({ item }) => {
-                                return <Pressable style={styles.card_item} key={item.id} onPress={()=>{
-                                    navigate('BillDetail',{id: item.id})
-                                }}>
-                                    <View style={styles.card_title}>
-                                        <Text style={{ color: colors.gray800, fontSize: scale(18) }}>{item.title}</Text>
-                                        <Text style={{ color: colors.gray800, fontSize: scale(24), fontWeight: '700' }}>${Number((item.amount / 100)).toFixed(2)}</Text>
-                                    </View>
-                                    <View style={{}}>
-                                        <Text style={{ fontSize: scale(12), color: colors.gray400 }}>{item.time}</Text>
-                                    </View>
-                                </Pressable>
+                                return <CardItem data={item} key={item.id} bgColor={colors.gray200} onClick={() => {
+                                        navigate('BillDetail', { id: item.id })
+                                    }} />
                             }} />
                     </View>
                 </View>
@@ -155,9 +102,7 @@ const WalletRecordPage = (props: Props) => {
 
 const styles = StyleSheet.create({
     main_container: {
-        backgroundColor: 'white',
         borderRadius: scale(14),
-        padding: scale(24),
         flex: 1
     },
     button_area: {
@@ -214,5 +159,5 @@ const styles = StyleSheet.create({
     },
 })
 
-export default WalletRecordPage
+export default WalletTopupRecord
 

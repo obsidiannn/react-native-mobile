@@ -1,4 +1,4 @@
-import { PermissionsAndroid, Platform, StyleSheet, Text, View } from "react-native";
+import { PermissionsAndroid, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useEffect, useRef, useState } from "react";
@@ -11,8 +11,12 @@ import Navbar from "@/components/navbar";
 import { scale, verticalScale } from "react-native-size-matters/extend";
 import colors from "@/config/colors";
 import { RootStackParamList } from "@/types";
-type Props = StackScreenProps<RootStackParamList, 'WalletQrcord'>;
+import { TouchableOpacity } from "react-native-gesture-handler";
+import AntIcon from 'react-native-vector-icons/AntDesign'
+import * as clipboard from 'expo-clipboard'
 
+type Props = StackScreenProps<RootStackParamList, 'WalletQrcode'>;
+// 收款
 const UserCardScreen = ({ }: Props) => {
     const insets = useSafeAreaInsets();
     const viewRef = useRef<ViewShot>(null);
@@ -26,21 +30,21 @@ const UserCardScreen = ({ }: Props) => {
         })();
     }, []);
     const getCheckPermissionPromise = async () => {
-        if(Platform.OS === 'android') {
+        if (Platform.OS === 'android') {
             if (Platform.Version >= 33) {
                 return Promise.all([
-                  PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES),
-                  PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO),
+                    PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES),
+                    PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO),
                 ]).then(
-                  ([hasReadMediaImagesPermission, hasReadMediaVideoPermission]) =>
-                    hasReadMediaImagesPermission && hasReadMediaVideoPermission,
+                    ([hasReadMediaImagesPermission, hasReadMediaVideoPermission]) =>
+                        hasReadMediaImagesPermission && hasReadMediaVideoPermission,
                 );
-              } else {
+            } else {
                 return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
-              }
+            }
         }
         return true;
-      };
+    };
     return (
         <View style={{
             ...styles.container,
@@ -48,17 +52,17 @@ const UserCardScreen = ({ }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar title="我的名片" />
+                <Navbar title="freeChat收款" />
             </View>
+
             <ViewShot ref={viewRef} style={styles.viewContainer}>
                 <View style={styles.contentContainer}>
                     {data ? <QRCode
                         size={280}
                         value={data}
                     /> : null}
-                    <Text style={styles.address}>{address}</Text>
                     <View style={styles.line}></View>
-                    <Text style={styles.tips}>「 掃一掃，加我爲好友 」</Text>
+                    <Text style={styles.tips}>「 掃描二維碼向我付款 」</Text>
                 </View>
             </ViewShot>
             <View style={styles.buttonContainer}>
@@ -84,6 +88,24 @@ const UserCardScreen = ({ }: Props) => {
                     }
 
                 }} labelStyle={styles.buttonLabel} label="保存爲圖片" />
+                <TouchableOpacity style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: scale(8)
+                    }} onPress={async () => {
+                        await clipboard.setStringAsync(address?? '');
+                        toast('複製成功');
+                    }}
+                    >
+                        <Text style={{ ...styles.detail_line }}>
+                        {address}
+                        <AntIcon name="copy1" size={12} />
+                        </Text>
+
+                        
+                    </TouchableOpacity>
             </View>
         </View>
     );
@@ -94,7 +116,7 @@ export default UserCardScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: colors.gray200,
     },
     buttonContainer: {
         paddingHorizontal: scale(24),
@@ -110,6 +132,8 @@ const styles = StyleSheet.create({
         borderRadius: scale(19),
         borderWidth: scale(1),
         borderColor: '#EDEDED',
+        backgroundColor: 'white',
+
         marginTop: verticalScale(22),
         paddingBottom: verticalScale(21),
         paddingTop: verticalScale(36),
@@ -140,5 +164,13 @@ const styles = StyleSheet.create({
     },
     buttonLabel: {
         color: 'white'
+    },
+    detail_line: {
+        backgroundColor: 'white',
+        padding: scale(12),
+        fontSize: scale(12),
+        borderRadius: scale(14),
+        marginTop: scale(12),
+        color: colors.gray700,
     }
 })

@@ -11,7 +11,7 @@ import toast from '@/lib/toast';
 import { Platform } from 'react-native';
 
 export const createRequestInstance = (en = true) => {
-  const API_BASE_URL = 'http://192.168.31.90:4000'
+  const API_BASE_URL = 'http://192.168.1.5:4000'
   const instance: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,//API_BASE_URL,
     withCredentials: false,

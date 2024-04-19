@@ -11,7 +11,7 @@ import PagerView from "react-native-pager-view";
 import { useEffect, useRef, useState } from "react";
 import WalletRecordView from "./components/wallet-record-view";
 import walletApi from '@/api/v2/wallet'
-import { BillRecordItem, WalletItem } from "@/api/types/wallet";
+import { WalletItem } from "@/api/types/wallet";
 import { BillInOutEnum, BillTypeEnum } from "@/api/types/enums";
 import walletConstant from '@/constants/wallet'
 import dayjs from 'dayjs'
@@ -70,7 +70,8 @@ export default (props: Props) => {
         })
         walletApi.billRecordPage({
             inOut: BillInOutEnum.OUTCOME,
-            types: [BillTypeEnum.FILL_IN], ...page
+            types: [BillTypeEnum.FILL_IN],
+             ...page
         }).then(res => {
             const list = res.items.map(i => {
                 return {
