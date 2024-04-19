@@ -10,8 +10,8 @@ import {
     UnlockScreen,
     RegisterScreen,
     NotificationClick,
-    WalletRecordPageScreen,
-    WalletWithdrawScreen
+    MoneyTransferScreen,
+    PayConfirmScreen
 
 } from '../screens/index'
 import AuthStackNav from './auth-stack';
@@ -22,9 +22,9 @@ const MainStack = () => {
         headerShown: false,
     }}
         initialRouteName={globalThis.wallet ? 'AuthStackNav' : 'Entry'}
-        //  initialRouteName={'WalletWithdraw'}
+        //  initialRouteName={'MoneyTransfer'}
     >
-        {/* <Stack.Screen name="WalletWithdraw" component={WalletWithdrawScreen} /> */}
+        <Stack.Screen name="MoneyTransfer" component={MoneyTransferScreen} />
         <Stack.Screen name="Entry" component={EntryScreen} />
         <Stack.Screen name="Web" component={WebScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />

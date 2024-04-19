@@ -25,7 +25,9 @@ import {
     BillDetailScreen,
     WalletRecordPageScreen,
     WalletTopupRecordScreen,
-    WalletWithdrawScreen
+    WalletWithdrawScreen,
+    MoneyTransferScreen,
+    PayConfirmScreen
 } from '../screens/index'
 import { RootStackParamList } from '@/types';
 import { useNavigation } from '@react-navigation/native';
@@ -67,6 +69,7 @@ export default () => {
             <Stack.Screen name="WalletRecordPage" component={WalletRecordPageScreen} />
             <Stack.Screen name="WalletTopupRecord" component={WalletTopupRecordScreen} />
             <Stack.Screen name="WalletWithdraw" component={WalletWithdrawScreen} />
+            <Stack.Screen name="MoneyTransfer" component={MoneyTransferScreen} />
         </Stack.Navigator>
     );
 }

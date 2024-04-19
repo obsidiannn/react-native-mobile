@@ -32,6 +32,7 @@ import BillDetailScreen from './wallet/components/bill-detail'
 import WalletRecordPageScreen from './wallet/components/wallet-record-page'
 import WalletTopupRecordScreen from './wallet/components/wallet-topup-record'
 import WalletWithdrawScreen from './wallet/components/wallet-withdraw'
+import MoneyTransferScreen from './wallet/components/money-transfer';
 export {
     EntryScreen,
     RegisterScreen,
@@ -66,5 +67,6 @@ export {
     BillDetailScreen,
     WalletRecordPageScreen,   
     WalletTopupRecordScreen,
-    WalletWithdrawScreen
+    WalletWithdrawScreen,
+    MoneyTransferScreen,
 }

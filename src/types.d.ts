@@ -73,6 +73,7 @@ type RootStackParamList = {
     },
     WalletTopupRecord:{},
     WalletWithdraw: {},
+    MoneyTransfer: {uid: string},
 };
 
 
