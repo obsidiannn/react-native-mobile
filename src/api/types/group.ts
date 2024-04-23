@@ -20,10 +20,30 @@ export interface GroupMemberItem {
 	gid: string;
 	role: number;
 	myAlias: string;
-	admin_at: number;
+	aliasIdx: string
+	adminAt: number;
 	createdAt: number;
 };
  
+
+export interface GroupMemberItemVO {
+    id: string
+    gid: string
+    uid: string
+    role: number
+    alias: string
+    aliasIdx: string
+
+	a: string
+	ai: string
+
+    avatar: string
+	name: string;
+  	nameIndex: string
+  	gender: number
+  	pubKey: string;
+  	sign: string;
+}
 
 export interface GroupMemberResp extends BasePageResp<GroupMemberItem>{
   

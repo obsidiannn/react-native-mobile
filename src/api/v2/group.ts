@@ -8,7 +8,8 @@ import {
   GroupKickOutReq,GroupChangeNameReq ,
   GroupDetailResp,MineGroupInfoItem,
   GroupInfoItem,GroupTransferReq,
-  GroupIdsReq,GroupListIdResp, GroupApplyItem, GroupApplyJoinReq, GroupRequireJoinReq, GroupInfoDto
+  GroupIdsReq,GroupListIdResp, GroupApplyItem, GroupApplyJoinReq, GroupRequireJoinReq, GroupInfoDto,
+  GroupMemberItem
 } from "../types/group"; 
 import { createRequestInstance } from "../lib/request";
 import { BaseIdReq,BaseIdArrayReq, BaseIdsArrayReq, BaseArrayResp } from "../types/common";
@@ -16,6 +17,12 @@ import { BaseIdReq,BaseIdArrayReq, BaseIdsArrayReq, BaseArrayResp } from "../typ
 const create = (param: GroupCreateReq):Promise<void> => {
   return createRequestInstance(true).post('/groups/create', param);
 }
+
+
+const getGroupMembersById = (param: BaseIdReq):Promise<BaseArrayResp<GroupMemberItem>> => {
+  return createRequestInstance(true).post('/groups/members-list', param);
+}
+
 
 const getGroupMembers = (param: BaseIdReq):Promise<GroupMemberResp> => {
   return createRequestInstance(true).post('/groups/members', param);
@@ -118,6 +125,7 @@ const groupDetail = (param:BaseIdsArrayReq):Promise<GroupDetailResp> => {
 export default {
   create,
   getGroupMembers,
+  getGroupMembersById,
   rejectJoin,
   agreeJoin,
   inviteJoin,

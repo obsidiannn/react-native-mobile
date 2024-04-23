@@ -8,7 +8,8 @@ import Avatar from "./modules/avatar";
 import React, { useEffect, useState } from "react";
 import MessageContainer from "./modules/message-container";
 import Info from "./modules/info";
-import { DataType, IMessage, IMessageFile, IMessageImage, IMessageVideo } from "../input-toolkit/types";
+import { DataType, IMessage, IMessageFile, IMessageImage, IMessageSwap, IMessageVideo } from "../input-toolkit/types";
+import SwapItem from "./modules/swap-item";
 export default (props: {
     isSelf: boolean;
     item: IMessage<DataType>;
@@ -18,8 +19,8 @@ export default (props: {
     itemOnPress?: () => void;
 }) => {
 
-    const [reload,setReload] = useState(false)
-    useEffect(()=>{},[reload])
+    const [reload, setReload] = useState(false)
+    useEffect(() => { }, [reload])
     const { item } = props;
     let message: React.ReactNode;
     switch (item.type) {
@@ -46,7 +47,7 @@ export default (props: {
             } else {
                 const w = scale(video.w) > scale(180) ? scale(180) : scale(video.w);
                 const h = scale(Math.floor(video.h * (w / video.w)));
-                message = <VideoItem 
+                message = <VideoItem
                     video={video}
                     encKey={props.encKey} />;
             }
@@ -55,9 +56,17 @@ export default (props: {
             const file = item.data as IMessageFile;
             if (!file) {
                 message = <TextItem text="[文件不存在]" isSelf={props.isSelf} />
-            }else{
-                message = <FileItem name={file.name}  isSelf={props.isSelf} />
+            } else {
+                message = <FileItem name={file.name} isSelf={props.isSelf} />
             }
+            break;
+        case "swap":
+            const swap = item.data as IMessageSwap;
+            message = <SwapItem data={swap} isSelf={props.isSelf} uid={item.user?.id??''}/>;
+            break;
+        case "gswap":
+            const gswap = item.data as IMessageSwap;
+            message = <SwapItem data={gswap} isSelf={props.isSelf} uid={item.user?.id??''}/>;
             break;
         default:
             message = <TextItem text="[未知消息]" isSelf={props.isSelf} />

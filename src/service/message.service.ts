@@ -4,11 +4,13 @@ import quickAes from "../lib/quick-aes";
 import dayjs from 'dayjs';
 import userService from "./user.service";
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import fileService, { format,formatVideo, uploadFile } from "./file.service";
-import { DataType, IMessage, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
+import fileService, { format, formatVideo, uploadFile } from "./file.service";
+import { DataType, IMessage, IMessageSwap, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
 import { MessageTypeEnum } from "@/api/types/enums";
 import { MessageDetailItem, MessageExtra, MessageListItem } from "@/api/types/message";
-
+import { WalletRemitReq, WalletRemitResp } from "@/api/types/wallet";
+import utils from "@/lib/utils";
+import walletApi from '@/api/v2/wallet'
 const _send = async (chatId: string, key: string, mid: string, type: MessageTypeEnum, data: {
     t: string;
     d: any;
@@ -27,12 +29,26 @@ const _send = async (chatId: string, key: string, mid: string, type: MessageType
         content: quickAes.En(JSON.stringify(data), key),
     });
 }
+
+const doRemit = async (req: WalletRemitReq,key: string,swapType: 'swap'|'gswap'): Promise<WalletRemitResp> => {
+    const data: IMessageSwap = {
+        remark:req.remark??'',
+        amount: req.amount,
+        uid: req.objUId
+    }
+    const remitReq: WalletRemitReq = {
+        ...req,
+        content: quickAes.En(JSON.stringify({t: swapType,d: data}), key),
+    }
+    return await walletApi.doRemit(remitReq)
+}
+
 const sendText = async (chatId: string, key: string, message: IMessage<'text'>) => {
     const data = {
         t: 'text',
         d: message.data,
     }
-    const res = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, data);
+    const res = await _send(chatId, key, message.mid, MessageTypeEnum.NORMAL, data);
     message.sequence = res.sequence;
     return {
         ...res,
@@ -67,7 +83,7 @@ const sendImage = async (chatId: string, key: string, message: IMessage<'image'>
     const originalKey = `upload/chat/original/${date}/${message.mid}.webp`;
     await uploadFile(thumbnailEnc.path, thumbnailKey);
     await uploadFile(originalEnc.path, originalKey);
-    const result = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, {
+    const result = await _send(chatId, key, message.mid, MessageTypeEnum.NORMAL, {
         t: 'image',
         d: {
             t_md5: thumbnailEnc.md5,
@@ -107,7 +123,7 @@ const sendFile = async (chatId: string, key: string, message: IMessage<'file'>) 
         const fileInfo = await fileService.getFileInfo(file.path);
         fileInfo?.exists && (file.md5 = fileInfo.md5 ?? '');
         console.log('处理完成准备发送', file);
-        const result = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, {
+        const result = await _send(chatId, key, message.mid, MessageTypeEnum.NORMAL, {
             t: 'file',
             d: {
                 ...file,
@@ -139,11 +155,11 @@ const sendVideo = async (chatId: string, key: string, message: IMessage<'video'>
         const thumbnailKey = `upload/chat/video/${date}/thumbnail_${message.mid}.webp`;
 
         const transFilePath = fileService.cachePath() + message.mid + '_trans.mp4'
-        await formatVideo(file.original,transFilePath)
-        
-        const fileEnc = await fileService.fileSpliteEncode(fileKey,transFilePath, key);
+        await formatVideo(file.original, transFilePath)
+
+        const fileEnc = await fileService.fileSpliteEncode(fileKey, transFilePath, key);
         await uploadFile(fileEnc.path, fileKey);
-        if((file.thumbnail ?? null) !== null){
+        if ((file.thumbnail ?? null) !== null) {
             const thumbEnc = await fileService.encryptFile(file.thumbnail, key);
             await uploadFile(thumbEnc.path, thumbnailKey);
             file.thumbnail = thumbnailKey
@@ -151,8 +167,8 @@ const sendVideo = async (chatId: string, key: string, message: IMessage<'video'>
         file.t_md5 = fileEnc.enc_md5;
         file.o_md5 = fileEnc.md5;
         file.trans = transFilePath
-   
-        const result = await _send(chatId, key, message.mid,MessageTypeEnum.NORMAL, {
+
+        const result = await _send(chatId, key, message.mid, MessageTypeEnum.NORMAL, {
             t: 'video',
             d: {
                 ...file,
@@ -217,26 +233,26 @@ const getList = async (chatId: string, key: string, sequence: number, direction:
         sequence,
         direction,
     });
-    if(data.items.length <= 0){
+    if (data.items.length <= 0) {
         return []
     }
     // const users = await userService.getBatchInfo(data.items.map((item) => item.fromUid));
-    const mids = data.items.map(i=>i.msgId)
-    const details = await messageApi.getMessageDetail({chatId,ids: mids})
-    const messageHash = new Map<string,MessageDetailItem>();
-    const userIds:string[] = []
-    details.items.forEach(d=>{
-        messageHash.set(d.id,d)
+    const mids = data.items.map(i => i.msgId)
+    const details = await messageApi.getMessageDetail({ chatId, ids: mids })
+    const messageHash = new Map<string, MessageDetailItem>();
+    const userIds: string[] = []
+    details.items.forEach(d => {
+        messageHash.set(d.id, d)
         userIds.push(d.fromUid)
     })
     const userHash = await userService.getUserHash(userIds)
     return data.items.map((item) => {
         const detail = messageHash.get(item.msgId)
-        const data = decrypt(key, detail?.content??'');
+        const data = decrypt(key, detail?.content ?? '');
         const t = data.t as DataType;
 
         const time = dayjs(item.createdAt)
-        const user = userHash.get(detail?.fromUid??'')
+        const user = userHash.get(detail?.fromUid ?? '')
         return {
             mid: item.id,
             type: t,
@@ -260,5 +276,6 @@ export default {
     getList,
     removeBatch,
     clearAll,
-    send
+    send,
+    doRemit
 }

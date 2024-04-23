@@ -14,7 +14,7 @@ import { globalStorage } from "@/lib/storage";
 import groupService from "@/service/group.service";
 import toast from "@/lib/toast";
 import authService from "@/service/auth.service";
-import { GroupDetailItem, GroupInfoItem } from "@/api/types/group";
+import { GroupDetailItem, GroupInfoItem, GroupMemberItemVO } from "@/api/types/group";
 import PagerView from "react-native-pager-view";
 import ChatPage, { ChatPageRef } from './pagers/chat-page';
 import InfoPage from "./pagers/info-page/index";
@@ -23,34 +23,30 @@ const GroupChatScreen = ({ navigation, route }: Props) => {
     const [keyboardHeight, setKeyboardHeight] = useState<number>(300);
     const [keyboardState, setKeyboardState] = useState(false);
     const conversationIdRef = useRef<string>('');
-    const groupIdRef = useRef<string> ('')
+    const groupIdRef = useRef<string>('')
     const [title, setTitle] = useState<string>('');
     const [authUser, setAuthUser] = useState<UserInfoItem>();
     const [group, setGroup] = useState<GroupDetailItem>();
     const [pageIndex, setPageIndex] = useState(0);
     const chatPageRef = useRef<ChatPageRef>(null);
     const pagerViewRef = useRef<PagerView>(null);
-    const [members, setMembers] = useState<UserInfoItem[]>([]);
+    const [members, setMembers] = useState<GroupMemberItemVO[]>([]);
+
     const loadMembers = useCallback(async () => {
-        console.log(conversationIdRef.current,'羣成員###')
-        groupService.getMembers(groupIdRef.current).then(async (res) => {
-            console.log(res,'羣成員列表')
-            const uids = res.map((item) => item.uid);
-            const users = await userService.getBatchInfo(uids);
-            console.log('用戶信息',users);
-            setMembers(users);
+        groupService.getMemberList(groupIdRef.current).then((res) => {
+            setMembers(res)
         });
     }, []);
     const init = useCallback(async () => {
         conversationIdRef.current = route.params.chatId ?? '';
-        groupIdRef.current = route.params.groupId??''
+        groupIdRef.current = route.params.groupId ?? ''
         console.log('會話id conversationIdRef', conversationIdRef.current)
         console.log('羣id', groupIdRef.current)
         const res = await groupService.getInfo(groupIdRef.current)
         console.log('羣信息', res);
-        if(res === null){
+        if (res === null) {
             toast('羣組異常')
-            return 
+            return
         }
         setGroup(res);
         setTitle(res?.name ?? '');
@@ -142,13 +138,13 @@ const GroupChatScreen = ({ navigation, route }: Props) => {
                 }} />
             </View>
             <PagerView ref={pagerViewRef}
-            scrollEnabled={false}
-             style={{
-                flex: 1,
-                backgroundColor: '#F4F4F4',
-            }} onPageSelected={(v) => {
-                setPageIndex(v.nativeEvent.position);
-            }} initialPage={pageIndex}>
+                scrollEnabled={false}
+                style={{
+                    flex: 1,
+                    backgroundColor: '#F4F4F4',
+                }} onPageSelected={(v) => {
+                    setPageIndex(v.nativeEvent.position);
+                }} initialPage={pageIndex}>
                 <ChatPage ref={chatPageRef} />
                 <InfoPage onChangeMemberList={() => {
                     loadMembers();

@@ -39,19 +39,7 @@ export default forwardRef((props: SelectMemberModalProps, ref) => {
     const flashListRef = useRef<FlashList<(SelectMemberOption)>>(null);
     const callbackRef = useRef<(options: SelectMemberOption[]) => void>();
     const [title,setTitle] = useState('')
-    // const init = useCallback(async () => {
-    //     const list =await friendService.getList();
-    //     setContactAlphabetIndex(list.alphabetIndex);
-    //     setAplphabet(list.alphabet);
-    //     setUsers(list.items.map((item) => {
-    //         const disabled = props.disabledUids?.includes((item.uid).toString()) ?? false;
-    //         return {
-    //             ...item,
-    //             status: false,
-    //             disabled,
-    //         };
-    //     }));
-    // },[]);
+   
     useImperativeHandle(ref, () => ({
         open: (parmas:{
             title: string;

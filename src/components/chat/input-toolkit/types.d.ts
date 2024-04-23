@@ -38,13 +38,28 @@ export interface IMessageFile {
     enc_md5: string;
     md5: string;
 }
-export type IMessageType = 'text' | 'image' | 'video' | 'audio' | 'file';
+export interface IMessageSwap {
+    remark: string
+    amount: number
+    uid: string // 接收人
+}
+
+export interface IMessageRedPackage {
+    remark: string
+    enable: boolean
+    sender: string
+}
+
+
+export type IMessageType = 'text' | 'image' | 'video' | 'audio' | 'file' | 'swap'|'gswap' ;
 export interface IMessageTypeMap {
     text: string;
     image: IMessageImage;
     video: IMessageVideo;
     audio: IMessageAudio;
     file: IMessageFile;
+    swap: IMessageSwap;
+    gswap: IMessageSwap
 }
 type DataType = keyof IMessageTypeMap;
 export interface IMessage<T extends DataType> {

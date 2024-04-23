@@ -66,6 +66,8 @@ export const readMN = async (password: string) => {
     return quickAes.De(mnList[passwordHashIndex], password + salt);
 }
 export const readAccount = async (password: string) => {
+    console.log('read:' + password);
+    
     const mn = await readMN(password);
     try {
         const priKey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(mn)).privateKey;

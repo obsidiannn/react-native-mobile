@@ -11,30 +11,32 @@ export interface PayConfirmModalType {
     open: (params: {
         title: string;
         amount: number;
-        onNext: () => Promise<void>;
+        onNext: (val: string) => Promise<void>;
         onChange: (val: string) => void;
     }) => void;
 }
 
 export default forwardRef((_, ref) => {
-    const [ready, setReady] = useState<boolean>(true);
+    const [ready, setReady] = useState<boolean>(false);
+    const [pwd,setPwd] = useState('')
     const passwordInputRef = useRef<PasswordInputType>(null);
     const [title, setTitle] = useState('')
     const [amount, setAmount] = useState<number>(0)
     const [visible, setVisible] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false)
-    const onNextRef = useRef<() => Promise<void>>();
+    const onNextRef = useRef<(val: string) => Promise<void>>();
     const onChangeRef = useRef<(val: string) => void>();
 
     useImperativeHandle(ref, () => ({
         open: (params: {
             title: string
             amount: number
-            onNext: () => Promise<void>
+            onNext: (val: string) => Promise<void>
             onChange: (val: string) => void
         }) => {
             setTitle(params.title);
             setAmount(params.amount)
+            setPwd('')
             onNextRef.current = params.onNext
             onChangeRef.current = params.onChange
             setVisible(true);
@@ -68,6 +70,7 @@ export default forwardRef((_, ref) => {
                 <View style={styles.wordContainer}>
                     <PasswordInput ref={passwordInputRef} onReady={(v) => setReady(v)} onChange={(v) => {
                         onChangeRef.current?.(v)
+                        setPwd(v)
                     }} />
                 </View>
                 <View style={styles.buttonContainer}>
@@ -75,7 +78,7 @@ export default forwardRef((_, ref) => {
                         backgroundColor={colors.primary}
                         onPress={async () => {
                             setLoading(true)
-                            await onNextRef.current?.()
+                            await onNextRef.current?.(pwd)
                             setLoading(false)
                             setVisible(false);
                         }} label="確認支付" labelStyle={styles.unlockButtonLabel} >

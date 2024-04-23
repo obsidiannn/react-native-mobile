@@ -1,5 +1,5 @@
 import { Keyboard, View } from "react-native";
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import crypto from "react-native-quick-crypto";
 import { InputAccessoryItemType } from "./accessory";
 import dayjs from "dayjs";
@@ -11,19 +11,31 @@ import Accessory from "./accessory";
 import { globalStorage } from "@/lib/storage";
 import util from '@/lib/utils'
 import fileService from "@/service/file.service";
+import { navigate } from "@/lib/root-navigation";
+import MoneyTransfer, { MoneyTransferModalType } from "@/screens/wallet/components/money-transfer";
+import { WalletRemitReq, WalletRemitResp } from "@/api/types/wallet";
+import SelectMemberModal, { SelectMemberModalType, SelectMemberOption } from "@/components/select-member-modal";
+import { GroupMemberItemVO } from "@/api/types/group";
+import GroupMemberList, { GroupMemberListType } from "@/screens/contact/components/group-list/group-member-list";
 export interface InputToolKitRef {
     down: () => void;
 }
 export interface InputToolKitProps {
     tools: InputAccessoryItemType[];
     onSend: (message: IMessage<DataType>) => Promise<void>;
+    onSwap: (req: WalletRemitReq) => Promise<void>;
+    sourceId?: string
+    members?: GroupMemberItemVO[]
 }
-export default forwardRef((props: InputToolKitProps,ref) => {
+export default forwardRef((props: InputToolKitProps, ref) => {
     const { tools } = props;
     const insets = useSafeAreaInsets();
     const [mode, setMode] = useState<'text' | 'emoji' | 'tool' | 'normal'>('text');
     const [accessoryHeight, setAccessoryHeight] = useState<number>(0);
     const [keyboardState, setKeyboardState] = useState(false);
+    const moneyTransferRef = useRef<MoneyTransferModalType>(null)
+    // 选人弹窗
+    const groupMemberModalRef = useRef<GroupMemberListType>(null);
     useEffect(() => {
         const showSubscription = Keyboard.addListener("keyboardDidShow", (e) => {
             setAccessoryHeight(0);
@@ -51,13 +63,13 @@ export default forwardRef((props: InputToolKitProps,ref) => {
         <TextInput mode={mode} onChangeMode={(v) => {
             if (v == 'text') {
                 setAccessoryHeight(0);
-            }else if(v == 'tool'){
+            } else if (v == 'tool') {
                 const height = globalStorage.getNumber('keyboardHeight') ?? 150;
                 setAccessoryHeight(height);
             }
             setMode(v)
             console.log(v);
-        }} tools={tools} onSend={props.onSend}/>
+        }} tools={tools} onSend={props.onSend} />
         <View style={{
             height: accessoryHeight,
             width: '100%',
@@ -66,7 +78,7 @@ export default forwardRef((props: InputToolKitProps,ref) => {
                 switch (tool.key) {
                     case 'camera':
                         const photo = await captureImage();
-                        if(photo !== undefined){
+                        if (photo !== undefined) {
                             const message: IMessage<'image'> = {
                                 mid: util.generateId(),
                                 type: 'image',
@@ -88,10 +100,10 @@ export default forwardRef((props: InputToolKitProps,ref) => {
                         break;
                     case 'video':
                         const video = await captureVideo();
-                        if(video !== undefined){
+                        if (video !== undefined) {
                             const mid = util.generateId()
                             // 這裏在未經解碼的時候，使用最初的視頻文件生成縮略圖，可能會存在轉碼問題，留意
-                            const originalThumbnailPath = await fileService.generateVideoThumbnail(video.uri,mid)
+                            const originalThumbnailPath = await fileService.generateVideoThumbnail(video.uri, mid)
                             const message: IMessage<'video'> = {
                                 mid: mid,
                                 type: 'video',
@@ -100,18 +112,18 @@ export default forwardRef((props: InputToolKitProps,ref) => {
                                 data: {
                                     w: video.width,
                                     h: video.height,
-                                    thumbnail: originalThumbnailPath??'',
+                                    thumbnail: originalThumbnailPath ?? '',
                                     original: video.uri,
                                     t_md5: '',
                                     o_md5: '',
                                     t_enc_md5: '',
                                     o_enc_md5: '',
-                                    duration: video.duration??0
+                                    duration: video.duration ?? 0
                                 },
                             }
                             await props.onSend(message)
                         }
-                           
+
                         break;
                     case 'albums':
                         const images = await pickerImage();
@@ -137,7 +149,7 @@ export default forwardRef((props: InputToolKitProps,ref) => {
                         }
                         break;
                     case 'file':
-                        const assets =await pickerDocument();
+                        const assets = await pickerDocument();
                         for (let i = 0; i < assets.length; i++) {
                             const uri = assets[i].uri;
                             const message: IMessage<'file'> = {
@@ -157,10 +169,39 @@ export default forwardRef((props: InputToolKitProps,ref) => {
                             await props.onSend(message)
                         }
                         break;
+                    case 'swap':
+                        moneyTransferRef.current?.open({
+                            uid: props.sourceId ?? '',
+                            onFinish: async (obj: WalletRemitReq | null) => {
+                                if (obj !== null) {
+                                    props.onSwap(obj)
+                                }
+                            }
+                        })
+                        break
+                    case 'gswap':
+                        // 群组转账，先弹选人，再弹转账
+                        groupMemberModalRef.current?.open({
+                            gid: props.sourceId,
+                            onPress: (uid: string)=>{
+                                moneyTransferRef.current?.open({
+                                    uid: uid,
+                                    onFinish: async (obj: WalletRemitReq | null) => {
+                                        if (obj !== null) {
+                                            props.onSwap(obj)
+                                        }
+                                    }
+                                })
+                            }
+                        })
+                        
+                        break
                     default:
                         break;
                 }
             }} height={accessoryHeight} /> : null}
         </View>
+        <MoneyTransfer ref={moneyTransferRef} />
+        <GroupMemberList ref={groupMemberModalRef} />
     </View>
 });

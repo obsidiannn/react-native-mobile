@@ -24,6 +24,8 @@ import InputToolkit, { InputToolKitRef } from "@/components/chat/input-toolkit";
 import { DataType, IMessage, IMessageFile, IMessageImage, IMessageTypeMap, IMessageVideo } from "@/components/chat/input-toolkit/types";
 import MessageList from "@/components/chat/message-list";
 import { globalStorage } from "@/lib/storage";
+import { WalletRemitReq } from "@/api/types/wallet";
+import dayjs from 'dayjs'
 const UserChatScreen = ({ navigation, route }: Props) => {
     const insets = useSafeAreaInsets();
     const [messages, setMessages] = useState<IMessage<DataType>[]>([])
@@ -152,6 +154,42 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             hideSubscription.remove();
         };
     }, [])
+
+
+    const onSwap = async (req: WalletRemitReq)=>{
+            console.log('发起转账', req);
+            if (!user) {
+                throw new ToastException('信息錯誤！');
+            }
+            loadingModalRef.current?.open('处理中...');
+            setTimeout(()=>{
+                messageService.doRemit({...req,chatId: conversationIdRef.current},
+                    sharedSecretRef.current,'swap').then(res=>{
+                    const { sequence = 0 } = res;
+                    if (sequence > lastSeq.current) {
+                        lastSeq.current = sequence;
+                    }
+                    const message: IMessage<'swap'> = {
+                        mid: req.id,
+                        type: 'swap',
+                        state: 1,
+                        time: dayjs(res.time),
+                        sequence: res.sequence,
+                        data: {
+                            amount: req.amount,
+                            remark: req.remark??'',
+                            uid: req.objUId
+                        }
+                    }
+                    setMessages((items) => {
+                        return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
+                    });
+                }).finally(()=>{
+                    loadingModalRef.current?.close();
+                })
+            },1000)
+    }
+
     return (
         <View
             style={{
@@ -248,7 +286,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     position: 'absolute',
                     bottom: keyboardState ? (Platform.OS == 'ios' ? keyboardHeight : 0) : 0,
                 }}>
-                <InputToolkit ref={inputToolkitRef} onSend={async (message) => {
+                <InputToolkit sourceId={user?.uid} ref={inputToolkitRef} onSend={async (message) => {
                     console.log('發送消息@@@@@@@', message);
                     if (!user) {
                         throw new ToastException('信息錯誤！');
@@ -257,70 +295,73 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                         return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
                     });
                     setTimeout(() => {
-                        if(message.type == 'image' || message.type =="file" || message.type == 'video'){
-                            loadingModalRef.current?.open('加密處理中...');
-                        }
-                        messageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
-                            if (!res) {
-                                return;
+                        if(message.type !== 'swap'){
+                            if(message.type == 'image' || message.type =="file" || message.type == 'video'){
+                                loadingModalRef.current?.open('加密處理中...');
                             }
-                            // 將消息狀態改爲已發送
-                            const { sequence = 0 } = res;
-                            if (sequence > lastSeq.current) {
-                                lastSeq.current = sequence;
-                            }
-                            setMessages((items) => {
-                                const index = items.findIndex((item) => item.mid == message.mid);
-                                if (index > -1) {
-                                    items[index].state = 1;
-                                    items[index].sequence = sequence;
-                                    if (message.type == 'image') {
-                                        items[index].data = res.data as IMessageImage;
-                                        imagesRef.current.push(res.data as IMessageImage);
-                                    } else if (message.type == 'file') {
-                                        const data = res.data as IMessageFile;
-                                        message.data = {
-                                            ...data,
-                                            path: data.path,
-                                        };
-                                        const file = message.data;
-                                        if (file) {
-                                            file.path = data.path;
-                                            items[index].data = file;
+                            messageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
+                                if (!res) {
+                                    return;
+                                }
+                                // 將消息狀態改爲已發送
+                                const { sequence = 0 } = res;
+                                if (sequence > lastSeq.current) {
+                                    lastSeq.current = sequence;
+                                }
+                                setMessages((items) => {
+                                    const index = items.findIndex((item) => item.mid == message.mid);
+                                    if (index > -1) {
+                                        items[index].state = 1;
+                                        items[index].sequence = sequence;
+                                        if (message.type == 'image') {
+                                            items[index].data = res.data as IMessageImage;
+                                            imagesRef.current.push(res.data as IMessageImage);
+                                        } else if (message.type == 'file') {
+                                            const data = res.data as IMessageFile;
+                                            message.data = {
+                                                ...data,
+                                                path: data.path,
+                                            };
+                                            const file = message.data;
+                                            if (file) {
+                                                file.path = data.path;
+                                                items[index].data = file;
+                                            }
+                                        } else if (message.type === 'video') {
+                                            const data = res.data as IMessageVideo;
+                                            message.data = {
+                                                ...data,
+                                                path: data.path,
+                                            };
+                                            const file = message.data;
+                                            if (file) {
+                                                file.path = data.path;
+                                                file.thumbnail = data.thumbnail
+                                                items[index].data = file;
+                                            }
+    
                                         }
-                                    } else if (message.type === 'video') {
-                                        const data = res.data as IMessageVideo;
-                                        message.data = {
-                                            ...data,
-                                            path: data.path,
-                                        };
-                                        const file = message.data;
-                                        if (file) {
-                                            file.path = data.path;
-                                            file.thumbnail = data.thumbnail
-                                            items[index].data = file;
-                                        }
-
                                     }
-                                }
-                                return items;
-                            });
-                        }).catch((err) => {
-                            // 將消息狀態改爲發送失敗
-                            console.log('發送失敗', err);
-                            setMessages((items) => {
-                                const index = items.findIndex((item) => item.mid == message.mid);
-                                if (index > -1) {
-                                    items[index].state = 2;
-                                }
-                                return items;
-                            });
-                        }).finally(() => {
-                            loadingModalRef.current?.close();
-                        })
+                                    return items;
+                                });
+                            }).catch((err) => {
+                                // 將消息狀態改爲發送失敗
+                                console.log('發送失敗', err);
+                                setMessages((items) => {
+                                    const index = items.findIndex((item) => item.mid == message.mid);
+                                    if (index > -1) {
+                                        items[index].state = 2;
+                                    }
+                                    return items;
+                                });
+                            }).finally(() => {
+                                loadingModalRef.current?.close();
+                            })
+                        }
+                       
                     }, 100)
 
-                }} tools={tools} />
+                }} tools={tools} onSwap={onSwap} />
             </View>
             <EncImagePreview ref={encImagePreviewRef} />
             <EncFilePreview ref={encFilePreviewRef} />

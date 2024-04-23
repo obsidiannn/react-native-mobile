@@ -17,8 +17,10 @@ import { globalStorage } from "@/lib/storage";
 import groupService from "@/service/group.service";
 import toast from "@/lib/toast";
 import quickAes from "@/lib/quick-aes";
-import { GroupInfoItem } from "@/api/types/group";
+import { GroupInfoItem, GroupMemberItemVO } from "@/api/types/group";
 import colors from "@/config/colors";
+import dayjs from 'dayjs'
+import { WalletRemitReq } from "@/api/types/wallet";
 export interface ChatPageRef {
     init: (chatId: string,group: GroupInfoItem,authUser: UserInfoItem) => void;
     close: () => void;
@@ -26,7 +28,7 @@ export interface ChatPageRef {
 export default forwardRef((_,ref) => {
     const insets = useSafeAreaInsets();
     const [messages, setMessages] = useState<IMessage<DataType>[]>([])
-
+    
     const [keyboardHeight, setKeyboardHeight] = useState<number>(300);
     const [keyboardState, setKeyboardState] = useState(false);
     const conversationIdRef = useRef<string>('');
@@ -139,6 +141,43 @@ export default forwardRef((_,ref) => {
         init,
         close,
     }));
+
+    
+
+
+    const onSwap = async (req: WalletRemitReq)=>{
+        console.log('发起转账', req);
+        loadingModalRef.current?.open('处理中...');
+        setTimeout(()=>{
+            messageService.doRemit(
+                {...req,chatId: conversationIdRef.current},
+                sharedSecretRef.current,'gswap'
+            ).then(res=>{
+                const { sequence = 0 } = res;
+                if (sequence > lastSeq.current) {
+                    lastSeq.current = sequence;
+                }
+                const message: IMessage<'gswap'> = {
+                    mid: req.id,
+                    type: 'gswap',
+                    state: 1,
+                    time: dayjs(res.time),
+                    sequence: res.sequence,
+                    data: {
+                        amount: req.amount,
+                        remark: req.remark??'',
+                        uid: req.objUId
+                    }
+                }
+                setMessages((items) => {
+                    return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
+                });
+            }).finally(()=>{
+                loadingModalRef.current?.close();
+            })
+        },1000)
+}
+
     return (
         <>
             <View style={{
@@ -191,10 +230,16 @@ export default forwardRef((_,ref) => {
                         android: keyboardState ? (Platform.OS == 'ios' ? keyboardHeight : 0) : 0,
                     })
                 }}>
-                <InputToolkit ref={inputToolkitRef} onSend={async (message) => {
+                <InputToolkit ref={inputToolkitRef} sourceId={group?.id}
+                
+                onSwap={onSwap}
+                onSend={async (message) => {
                     console.log('發送消息@@@@@@@', message);
                     if (!group) {
                         throw new ToastException('信息錯誤！');
+                    }
+                    if(message.type === 'gswap'){
+                        return
                     }
                     setMessages((items) => {
                         return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);

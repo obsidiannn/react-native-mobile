@@ -7,4 +7,5 @@ const getList = async () => {
 }
 
 
+
 export  default {getList}

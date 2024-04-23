@@ -8,9 +8,9 @@ import { wordlist } from '@scure/bip39/wordlists/english';
 import quickAes from "../lib/quick-aes";
 import { SelectMemberOption } from "@/components/select-member-modal";
 import { CommonEnum } from "@/api/types/common";
-
-import { GroupApplyJoinReq, GroupCreateReq, GroupDetailItem, GroupInfoItem } from "@/api/types/group";
-import utils from "@/lib/utils";
+import userService from "./user.service";
+import { GroupApplyJoinReq, GroupCreateReq, GroupDetailItem, GroupInfoItem, GroupMemberItemVO } from "@/api/types/group";
+import utils from "@/lib/utils"; 
 const quit = async (gid: string) => {
     return true;
 }
@@ -18,11 +18,49 @@ const quitAll = async () => {
     return true;
 }
 
-const groupMemberSecret = ()=>{
+const groupMemberSecret = () => {
 
 }
 
-const create = async (name: string, avatar: string,isEnc: boolean,searchType: string) => {
+// 用于群组成员索引表的数据接口
+const getMemberList = async (gid: string):Promise<GroupMemberItemVO[]> => {
+    const data = await groupApi.getGroupMembersById({ id: gid });
+    const { items } = data;
+    const uids = items.map(i => i.uid)
+    const userHash = await userService.getUserHash(uids)
+    const result = items.map(i => {
+        const user = userHash.get(i.uid)
+        const vo: GroupMemberItemVO = {
+            id: i.id,
+            gid: i.gid,
+            uid: i.uid,
+            role: i.role,
+            a: i.myAlias ? i.myAlias : user?.name ?? '',
+            ai: i.aliasIdx ? i.aliasIdx : user?.nameIndex ?? '',
+            alias: i.myAlias,aliasIdx: i.aliasIdx,
+            name: user?.name??'',nameIndex: user?.nameIndex??'',
+            pubKey: user?.pubKey??'',sign: user?.sign??'',gender: user?.gender??0,
+            avatar: user?.avatar ?? ''
+        }
+        return vo
+    })
+    return result
+}
+
+const alphabetList = (items: GroupMemberItemVO[])=> {
+    items.sort((a, b) => a.ai.charCodeAt(0) - b.ai.charCodeAt(0));
+    const alphabet = [...new Set(items.map(item => item.ai))];
+    const alphabetIndex: { [key: string]: number } = {}
+    alphabet.forEach((item) => {
+        alphabetIndex[item] = items.findIndex((i) => i.ai === item);
+    })
+    return {
+        alphabet,
+        alphabetIndex
+    };
+}
+
+const create = async (name: string, avatar: string, isEnc: boolean, searchType: string) => {
     if (!globalThis.wallet) {
         throw new Error('请先登录');
     }
@@ -41,33 +79,33 @@ const create = async (name: string, avatar: string,isEnc: boolean,searchType: st
     const sharedSecret = wallet.signingKey.computeSharedSecret(Buffer.from(selfPub.substring(2), 'hex')).substring(4);
     const enc_pri = quickAes.En(pri, sharedSecret);
     const enc_key = quickAes.En(key, sharedSecret);
-    
-    const group:GroupCreateReq = 
+
+    const group: GroupCreateReq =
     {
         id: utils.generateId(),
         pubKey: pub,
         avatar: avatar,
         name: name,
-        isEnc: isEnc?CommonEnum.ON:CommonEnum.OFF,
+        isEnc: isEnc ? CommonEnum.ON : CommonEnum.OFF,
         type: 1,
         banType: 0,
         searchType: Number(searchType),
         encPri: enc_pri,
         encKey: enc_key
     }
-    console.log('group create: ',group);
-    
+    console.log('group create: ', group);
+
     await groupApi.create(group);
     return group;
 }
 
-const invite = async (gid: string, members: SelectMemberOption[],groupInfo: GroupCreateReq) => {
+const invite = async (gid: string, members: SelectMemberOption[], groupInfo: GroupCreateReq) => {
     const group = await getInfo(gid);
     if (!globalThis.wallet || !group) {
         return;
     }
     const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(group.pubKey.substring(2), 'hex')).substring(4);
-    
+
     const pri = quickAes.De(groupInfo.encPri, sharedSecret);
     const key = quickAes.De(groupInfo.encKey, sharedSecret);
     const groupWallet = new ethers.Wallet(pri);
@@ -83,7 +121,7 @@ const invite = async (gid: string, members: SelectMemberOption[],groupInfo: Grou
             encKey: enkey,
         })
     })
-    if(items.length>0){
+    if (items.length > 0) {
         await groupApi.inviteJoin({
             id: group.id,
             items: items,
@@ -116,14 +154,14 @@ const getList = async () => {
 // 获取群组成员列表
 const getMembers = async (id: string) => {
     const data = await groupApi.getGroupMembers({
-       id
+        id
     })
     return data.items;
 }
 // 获取群组信息
-const getInfo = async (id: string): Promise<GroupDetailItem > => {
+const getInfo = async (id: string): Promise<GroupDetailItem> => {
     const data = await groupApi.groupDetail({
-        ids:[id]
+        ids: [id]
     });
     if (data.items.length == 0) {
         throw new Error('群组不存在');
@@ -140,29 +178,29 @@ const encInfo = async (id: string) => {
     }
     return data.items[0];
 }
-const join = async (id: string,encKey: string,encPri: string): Promise<void> => {
-    groupApi.requireJoin({ id,encKey,encPri });
+const join = async (id: string, encKey: string, encPri: string): Promise<void> => {
+    groupApi.requireJoin({ id, encKey, encPri });
 }
 const myApplyList = async (ids: string[] = []) => {
-    return groupApi.myApplyList({ids});
+    return groupApi.myApplyList({ ids });
 }
 // 待审核列表
 const applyList = async (ids: string[] = []) => {
-    return groupApi.applyList({ids});
+    return groupApi.applyList({ ids });
 }
 // 拒绝加入
-const rejectJoin = async (id: string,uids:string[]) => {
-    return groupApi.rejectJoin({ id,uids });
+const rejectJoin = async (id: string, uids: string[]) => {
+    return groupApi.rejectJoin({ id, uids });
 }
 
 // 允许加入群聊
-const adminAgree =async (params: GroupApplyJoinReq) => {
+const adminAgree = async (params: GroupApplyJoinReq) => {
     return groupApi.agreeJoin(params);
 }
 // 剔出群聊
 const kickOut = async (params: {
     id: string;
-    uids:string[];
+    uids: string[];
 }) => {
     return groupApi.kickOut(params);
 }
@@ -173,6 +211,8 @@ export default {
     getList,
     getInfo,
     getMembers,
+    getMemberList,
+    alphabetList,
     encInfo,
     join,
     myApplyList,

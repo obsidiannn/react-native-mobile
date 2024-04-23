@@ -22,7 +22,7 @@ export default [
     {
         title: '轉賬',
         icon: require('./icons/transfer.svg'),
-        key: 'swap'
+        key: 'gswap'
     },
     {
         title: '紅包',
