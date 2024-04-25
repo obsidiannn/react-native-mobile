@@ -1,5 +1,6 @@
 import crypto from "react-native-quick-crypto";
 import authService from "@/service/auth.service";
+import RootSiblings from 'react-native-root-siblings';
 
 import dayjs from 'dayjs'
 
@@ -12,7 +13,6 @@ const bytesToSize = (bytes: number) => {
 }
 
 // mongo id 生成，需要12位的随机数
-
 const generateId = (): string => {
     return Buffer.from(crypto.randomBytes(12)).toString('hex')
 }
@@ -26,6 +26,19 @@ const currentUser = () => {
         return globalThis.currentUser
     }
     return null
+}
+
+
+export const showModels = (renderModel:any,elementRef:any) =>{
+    // if (elementRef.current) {
+    //     elementRef.current?.destroy();
+    // }
+    const onClose = () =>{
+        elementRef?.destroy()
+        elementRef = null
+    }
+    elementRef.current = new RootSiblings(renderModel(onClose))
+    return onClose
 }
 
 // const refreshCurrentInfo = async () =>{
@@ -58,6 +71,7 @@ const changeF2Y = (amountCent: number|null|undefined):string => {
     }
     return Number(amountCent/100).toFixed(2)
 }
+
 
 export default {
     bytesToSize,

@@ -1,3 +1,4 @@
+import { RedPacketTypeEnum } from "@/api/types/enums";
 import { UserInfoItem } from "@/api/types/user";
 import dayjs from "dayjs";
 export interface IMessageImage {
@@ -44,14 +45,17 @@ export interface IMessageSwap {
     uid: string // 接收人
 }
 
-export interface IMessageRedPackage {
+export interface IMessageRedPacket {
     remark: string
-    enable: boolean
     sender: string
+    packetId: string
+    type: RedPacketTypeEnum
+    objUId?: string
+    objUName?: string
 }
 
 
-export type IMessageType = 'text' | 'image' | 'video' | 'audio' | 'file' | 'swap'|'gswap' ;
+export type IMessageType = 'text' | 'image' | 'video' | 'audio' | 'file' | 'swap' | 'gswap' | 'packet' | 'gpacket';
 export interface IMessageTypeMap {
     text: string;
     image: IMessageImage;
@@ -59,7 +63,9 @@ export interface IMessageTypeMap {
     audio: IMessageAudio;
     file: IMessageFile;
     swap: IMessageSwap;
-    gswap: IMessageSwap
+    gswap: IMessageSwap;
+    packet: IMessageRedPacket;
+    gpacket: IMessageRedPacket;
 }
 type DataType = keyof IMessageTypeMap;
 export interface IMessage<T extends DataType> {

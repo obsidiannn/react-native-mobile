@@ -39,6 +39,9 @@ export default (props: {
         estimatedItemSize={50}
         renderItem={(params) => {
             const { item } = params;
+            console.log('m==================');
+            console.log(item);
+            
             const isSelf = item.user?.id == props.authUid;
             return <ListItem
                 onPress={() => {

@@ -193,3 +193,11 @@ export interface GroupCategoryListItem {
     name: string;
     checked: boolean;
 }
+
+// 
+
+export interface GroupContext{
+    gid: string
+	chatId: string
+    members?: GroupMemberItemVO[]
+}

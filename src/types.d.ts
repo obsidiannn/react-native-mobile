@@ -1,3 +1,4 @@
+import { RedPacketSourceEnum } from "./api/types/enums";
 import { FriendInfoItem } from "./api/types/friend";
 
 type RootStackParamList = {
@@ -73,7 +74,12 @@ type RootStackParamList = {
     },
     WalletTopupRecord:{},
     WalletWithdraw: {},
-    GroupPacket: {}
+    GroupPacket: {
+        gid: string
+    },
+    SimplePacket: {
+        uid: string
+    }
 };
 
 

@@ -3,9 +3,7 @@ import { scale, verticalScale } from "react-native-size-matters/extend"
 import GroupMemberItem from "./group-member-item"
 import { FlashList } from "@shopify/flash-list"
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react"
-import { FriendInfoItem } from "@/api/types/friend"
 import AlphabetIndex from "./alphabet-index"
-import friendService from "@/service/friend.service"
 import groupService from "@/service/group.service"
 import colors from "@/config/colors"
 import { GroupMemberItemVO } from "@/api/types/group"
@@ -13,7 +11,8 @@ import Navbar from "@/components/navbar"
 
 export interface GroupMemberListType {
     open: (params: {
-        gid: string,
+        gid?: string,
+        members?: GroupMemberItemVO[],
         onPress: (uid: string) => void
     }) => void
 }
@@ -30,14 +29,24 @@ export default forwardRef((_, ref) => {
     useImperativeHandle(ref, () => ({
         open: async (params: {
             gid: string,
+            members?: GroupMemberItemVO[],
             onPress: (uid: string) => void
         }) => {
-            const items = await groupService.getMemberList(params.gid)
-            const { alphabet, alphabetIndex } = groupService.alphabetList(items)
+            if (params.members && params.members.length > 0) {
+                const { alphabet, alphabetIndex } = groupService.alphabetList(params.members)
+                setContactAlphabetIndex(alphabetIndex);
+                setAplphabet(alphabet);
+                setContacts(params.members);
+            } else {
+                const items = await groupService.getMemberList(params.gid)
+                const { alphabet, alphabetIndex } = groupService.alphabetList(items)
+                setContactAlphabetIndex(alphabetIndex);
+                setAplphabet(alphabet);
+                setContacts(items);
+            }
+
             onPressRef.current = params.onPress
-            setContactAlphabetIndex(alphabetIndex);
-            setAplphabet(alphabet);
-            setContacts(items);
+
             setVisible(true)
         }
     }));

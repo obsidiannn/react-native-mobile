@@ -33,6 +33,8 @@ export interface MessageListItem {
 };
 
 export type MessageExtra = {
+	id?:string
+	
 };
 
 export type MessageAction = {};

@@ -8,8 +8,9 @@ import Avatar from "./modules/avatar";
 import React, { useEffect, useState } from "react";
 import MessageContainer from "./modules/message-container";
 import Info from "./modules/info";
-import { DataType, IMessage, IMessageFile, IMessageImage, IMessageSwap, IMessageVideo } from "../input-toolkit/types";
+import { DataType, IMessage, IMessageFile, IMessageImage, IMessageRedPacket, IMessageSwap, IMessageVideo } from "../input-toolkit/types";
 import SwapItem from "./modules/swap-item";
+import RedPacketItem from "./modules/red-packet-item";
 export default (props: {
     isSelf: boolean;
     item: IMessage<DataType>;
@@ -61,12 +62,15 @@ export default (props: {
             }
             break;
         case "swap":
-            const swap = item.data as IMessageSwap;
-            message = <SwapItem data={swap} isSelf={props.isSelf} uid={item.user?.id??''}/>;
-            break;
         case "gswap":
-            const gswap = item.data as IMessageSwap;
-            message = <SwapItem data={gswap} isSelf={props.isSelf} uid={item.user?.id??''}/>;
+            const swap = item.data as IMessageSwap;
+            message = <SwapItem data={swap} isSelf={props.isSelf} uid={item.user?.id ?? ''} />;
+            break;
+        case "packet":
+        case "gpacket":
+            const packet = item.data as IMessageRedPacket;
+            // packet.packetId = item.
+            message = <RedPacketItem data={packet} isSelf={props.isSelf} uid={item.user?.id ?? ''} />;
             break;
         default:
             message = <TextItem text="[未知消息]" isSelf={props.isSelf} />

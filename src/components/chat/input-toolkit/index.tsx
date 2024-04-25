@@ -1,6 +1,6 @@
-import { Keyboard, View } from "react-native";
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import crypto from "react-native-quick-crypto";
+import { Keyboard, View} from "react-native";
+import React, { forwardRef, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import RootSiblings from 'react-native-root-siblings';
 import { InputAccessoryItemType } from "./accessory";
 import dayjs from "dayjs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -11,22 +11,26 @@ import Accessory from "./accessory";
 import { globalStorage } from "@/lib/storage";
 import util from '@/lib/utils'
 import fileService from "@/service/file.service";
-import { navigate } from "@/lib/root-navigation";
 import MoneyTransfer, { MoneyTransferModalType } from "@/screens/wallet/components/money-transfer";
 import { WalletRemitReq, WalletRemitResp } from "@/api/types/wallet";
 import SelectMemberModal, { SelectMemberModalType, SelectMemberOption } from "@/components/select-member-modal";
-import { GroupMemberItemVO } from "@/api/types/group";
+import { GroupContext, GroupMemberItemVO } from "@/api/types/group";
 import GroupMemberList, { GroupMemberListType } from "@/screens/contact/components/group-list/group-member-list";
+import GroupPacket, { GroupPacketCreateModalType } from "@/screens/red-packet/group-packet";
+import { RedPacketCreateReq } from "@/api/types/red-packet";
 export interface InputToolKitRef {
     down: () => void;
 }
+
 export interface InputToolKitProps {
     tools: InputAccessoryItemType[];
     onSend: (message: IMessage<DataType>) => Promise<void>;
     onSwap: (req: WalletRemitReq) => Promise<void>;
+    onRedPacket?: (req: RedPacketCreateReq) => Promise<void>
     sourceId?: string
-    members?: GroupMemberItemVO[]
+    members?: GroupMemberItemVO []
 }
+
 export default forwardRef((props: InputToolKitProps, ref) => {
     const { tools } = props;
     const insets = useSafeAreaInsets();
@@ -36,6 +40,10 @@ export default forwardRef((props: InputToolKitProps, ref) => {
     const moneyTransferRef = useRef<MoneyTransferModalType>(null)
     // 选人弹窗
     const groupMemberModalRef = useRef<GroupMemberListType>(null);
+    const groupPacketRef = useRef<GroupPacketCreateModalType>(null);
+    const simplePacketRef = useRef<RootSiblings>();
+
+   
     useEffect(() => {
         const showSubscription = Keyboard.addListener("keyboardDidShow", (e) => {
             setAccessoryHeight(0);
@@ -182,8 +190,8 @@ export default forwardRef((props: InputToolKitProps, ref) => {
                     case 'gswap':
                         // 群组转账，先弹选人，再弹转账
                         groupMemberModalRef.current?.open({
-                            gid: props.sourceId,
-                            onPress: (uid: string)=>{
+                            gid: props.sourceId ?? '',
+                            onPress: (uid: string) => {
                                 moneyTransferRef.current?.open({
                                     uid: uid,
                                     onFinish: async (obj: WalletRemitReq | null) => {
@@ -194,7 +202,20 @@ export default forwardRef((props: InputToolKitProps, ref) => {
                                 })
                             }
                         })
+
+                        break
+                    case 'gpacket':
+                        // 群组转账，先弹选人，再弹转账
+                        console.log('gpacket');
                         
+                        groupPacketRef.current?.open({
+                            gid:props.sourceId??'',
+                            onFinish: (o:RedPacketCreateReq)=>{
+                                if(o !== null && props.onRedPacket !== undefined){
+                                    props.onRedPacket(o)
+                                }
+                            }
+                        })
                         break
                     default:
                         break;
@@ -203,5 +224,8 @@ export default forwardRef((props: InputToolKitProps, ref) => {
         </View>
         <MoneyTransfer ref={moneyTransferRef} />
         <GroupMemberList ref={groupMemberModalRef} />
-    </View>
+        <GroupPacket ref={groupPacketRef} members={props.members}/>
+        {/* <SimplePacket ref={simplePacketRef} /> */}
+    </View> 
 });
+

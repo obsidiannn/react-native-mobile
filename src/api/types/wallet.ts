@@ -59,6 +59,7 @@ export interface WalletRemitReq {
     content: string
     chatId: string
     remark?: string
+    
 }
 
 export interface WalletRemitResp {

@@ -155,6 +155,9 @@ export const formatVideo = async (input: string, output: string): Promise<boolea
 
 let baseUrl: string | undefined;
 const getFullUrl = (key: string) => {
+    if(key.startsWith('http')){
+        return key
+    }
     if (!baseUrl) {
         baseUrl = globalStorage.getString('sys-static-url');
     }

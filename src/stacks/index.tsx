@@ -10,7 +10,6 @@ import {
     UnlockScreen,
     RegisterScreen,
     NotificationClick,
-    GroupPacketScreen
 } from '../screens/index'
 import AuthStackNav from './auth-stack';
 import { RootStackParamList } from '@/types';
@@ -19,8 +18,8 @@ const MainStack = () => {
     return <Stack.Navigator screenOptions={{
         headerShown: false,
     }}
-        // initialRouteName={globalThis.wallet ? 'AuthStackNav' : 'Entry'}
-        //  initialRouteName={'GroupPacket'}
+        initialRouteName={globalThis.wallet ? 'AuthStackNav' : 'Entry'}
+        //  initialRouteName={'Unlock'}
     >
         <Stack.Screen name="Entry" component={EntryScreen} />
         <Stack.Screen name="Web" component={WebScreen} />
@@ -29,7 +28,6 @@ const MainStack = () => {
         <Stack.Screen name="Unlock" component={UnlockScreen} />
         <Stack.Screen name='AuthStackNav' component={AuthStackNav} />
         <Stack.Screen name='NotificationClick' component={NotificationClick}/>
-        <Stack.Screen name='GroupPacket' component={GroupPacketScreen}/>
     </Stack.Navigator>
 }
 

@@ -5,12 +5,14 @@ import dayjs from 'dayjs';
 import userService from "./user.service";
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import fileService, { format, formatVideo, uploadFile } from "./file.service";
-import { DataType, IMessage, IMessageSwap, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
+import { DataType, IMessage, IMessageRedPacket, IMessageSwap, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
 import { MessageTypeEnum } from "@/api/types/enums";
 import { MessageDetailItem, MessageExtra, MessageListItem } from "@/api/types/message";
 import { WalletRemitReq, WalletRemitResp } from "@/api/types/wallet";
 import utils from "@/lib/utils";
 import walletApi from '@/api/v2/wallet'
+import { RedPacketCreateReq, RedPacketInfo } from "@/api/types/red-packet";
+import redPacketApi from "@/api/v2/red-packet";
 const _send = async (chatId: string, key: string, mid: string, type: MessageTypeEnum, data: {
     t: string;
     d: any;
@@ -42,6 +44,22 @@ const doRemit = async (req: WalletRemitReq,key: string,swapType: 'swap'|'gswap')
     }
     return await walletApi.doRemit(remitReq)
 }
+
+// 發紅包消息
+const doRedPacket = async (req: RedPacketCreateReq,key: string,packetType: 'packet'|'gpacket'): Promise<RedPacketInfo> => {
+    const data: IMessageRedPacket = {
+        remark: req.remark,
+        sender: req.sender??'',
+        packetId: '',
+        type: req.type
+    }
+    const rpReq: RedPacketCreateReq = {
+        ...req,
+        content: quickAes.En(JSON.stringify({t: packetType,d: data}), key),
+    }
+    return await redPacketApi.doRedPacket(rpReq)
+}
+
 
 const sendText = async (chatId: string, key: string, message: IMessage<'text'>) => {
     const data = {
@@ -248,15 +266,21 @@ const getList = async (chatId: string, key: string, sequence: number, direction:
     const userHash = await userService.getUserHash(userIds)
     return data.items.map((item) => {
         const detail = messageHash.get(item.msgId)
-        const data = decrypt(key, detail?.content ?? '');
-        const t = data.t as DataType;
-
+        const _data = decrypt(key, detail?.content ?? '');
+        const t = _data.t as DataType;
+        const _d = _data.d as IMessageTypeMap[DataType]
+        // 組裝紅包id
+        if(detail?.type === MessageTypeEnum.RED_PACKET){
+            const extra = JSON.parse(String(detail.extra));
+            console.log('packetId ===' ,extra.id);
+            _d.packetId = extra.id
+        }
         const time = dayjs(item.createdAt)
         const user = userHash.get(detail?.fromUid ?? '')
         return {
             mid: item.id,
             type: t,
-            data: data.d as IMessageTypeMap[DataType],
+            data: _d,
             state: 1,
             time,
             user,
@@ -277,5 +301,6 @@ export default {
     removeBatch,
     clearAll,
     send,
-    doRemit
+    doRemit,
+    doRedPacket
 }

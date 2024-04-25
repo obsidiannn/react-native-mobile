@@ -1,5 +1,6 @@
 import { createRequestInstance } from "../lib/request";
 import { BaseIdReq, BasePageResp } from "../types/common";
+import { RedPacketCreateReq } from "../types/red-packet";
 import { BillDetailResp, BillRecordItem, BillRecordReq, WalletDetailResp, WalletRecordPageResp, WalletRemitReq, WalletRemitResp } from "../types/wallet";
 
 // 我的钱包详情
@@ -19,6 +20,7 @@ const billDetail = (data: BaseIdReq):Promise<BillDetailResp> =>{
 const doRemit = (data: WalletRemitReq): Promise<WalletRemitResp>=>{
     return createRequestInstance(true).post('/wallet/remit',data);
 }
+
 
 export default {
     mineWalletDetail,

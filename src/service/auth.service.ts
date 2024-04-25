@@ -20,8 +20,8 @@ const register = async (password: string): Promise<Wallet | null> => {
         return wallet;
     } catch (error) {
         console.error(error);
-        globalThis.wallet = null;
-        deleteAccount(password);
+        // globalThis.wallet = null;
+        // deleteAccount(password);
         return null;
     }
 }

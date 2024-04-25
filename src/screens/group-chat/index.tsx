@@ -14,10 +14,11 @@ import { globalStorage } from "@/lib/storage";
 import groupService from "@/service/group.service";
 import toast from "@/lib/toast";
 import authService from "@/service/auth.service";
-import { GroupDetailItem, GroupInfoItem, GroupMemberItemVO } from "@/api/types/group";
+import { GroupContext, GroupDetailItem, GroupInfoItem, GroupMemberItemVO } from "@/api/types/group";
 import PagerView from "react-native-pager-view";
 import ChatPage, { ChatPageRef } from './pagers/chat-page';
 import InfoPage from "./pagers/info-page/index";
+import chat from "@/api/v2/chat";
 const GroupChatScreen = ({ navigation, route }: Props) => {
     const insets = useSafeAreaInsets();
     const [keyboardHeight, setKeyboardHeight] = useState<number>(300);
@@ -32,9 +33,11 @@ const GroupChatScreen = ({ navigation, route }: Props) => {
     const pagerViewRef = useRef<PagerView>(null);
     const [members, setMembers] = useState<GroupMemberItemVO[]>([]);
 
+
     const loadMembers = useCallback(async () => {
         groupService.getMemberList(groupIdRef.current).then((res) => {
             setMembers(res)
+            chatPageRef.current?.loadMember(res)
         });
     }, []);
     const init = useCallback(async () => {
@@ -145,7 +148,7 @@ const GroupChatScreen = ({ navigation, route }: Props) => {
                 }} onPageSelected={(v) => {
                     setPageIndex(v.nativeEvent.position);
                 }} initialPage={pageIndex}>
-                <ChatPage ref={chatPageRef} />
+                <ChatPage ref={chatPageRef} members={members} />
                 <InfoPage onChangeMemberList={() => {
                     loadMembers();
                 }} members={members} authUser={authUser} group={group ?? undefined} />

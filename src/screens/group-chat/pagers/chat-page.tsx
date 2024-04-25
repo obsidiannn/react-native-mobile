@@ -11,7 +11,7 @@ import EncImagePreview, { IEncImagePreviewRef } from "@/components/chat/enc-imag
 import EncFilePreview, { IEncFilePreviewRef } from "@/components/chat/enc-file-preview-modal";
 import LoadingModal, { ILoadingModalRef } from "@/components/common/loading-modal";
 import InputToolkit, { InputToolKitRef } from "@/components/chat/input-toolkit";
-import { DataType, IMessage, IMessageFile, IMessageImage, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
+import { DataType, IMessage, IMessageFile, IMessageImage, IMessageRedPacket, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
 import MessageList from "@/components/chat/message-list";
 import { globalStorage } from "@/lib/storage";
 import groupService from "@/service/group.service";
@@ -21,14 +21,17 @@ import { GroupInfoItem, GroupMemberItemVO } from "@/api/types/group";
 import colors from "@/config/colors";
 import dayjs from 'dayjs'
 import { WalletRemitReq } from "@/api/types/wallet";
+import { RedPacketCreateReq } from "@/api/types/red-packet";
+import RedPacketDialog, { RedPacketDialogType } from "@/screens/red-packet/red-packet-dialog";
 export interface ChatPageRef {
-    init: (chatId: string,group: GroupInfoItem,authUser: UserInfoItem) => void;
+    init: (chatId: string, group: GroupInfoItem, authUser: UserInfoItem) => void;
+    loadMember: (members: GroupMemberItemVO[]) => void
     close: () => void;
 }
-export default forwardRef((_,ref) => {
+export default forwardRef((_, ref) => {
     const insets = useSafeAreaInsets();
     const [messages, setMessages] = useState<IMessage<DataType>[]>([])
-    
+
     const [keyboardHeight, setKeyboardHeight] = useState<number>(300);
     const [keyboardState, setKeyboardState] = useState(false);
     const conversationIdRef = useRef<string>('');
@@ -44,6 +47,9 @@ export default forwardRef((_,ref) => {
     const imagesRef = useRef<IMessageImage[]>([]);
     const loadingModalRef = useRef<ILoadingModalRef>();
     const inputToolkitRef = useRef<InputToolKitRef>(null);
+    const redPacketDialogRef = useRef<RedPacketDialogType>();
+    const [members, setMembers] = useState<GroupMemberItemVO[]>([])
+
     const loadMessages = useCallback((direction: 'up' | 'down') => {
         if (loadingRef.current) {
             return;
@@ -79,7 +85,7 @@ export default forwardRef((_,ref) => {
             loadingRef.current = false;
         })
     }, [])
-    const init = useCallback((chatId: string,g: GroupInfoItem,a: UserInfoItem) => {
+    const init = useCallback((chatId: string, g: GroupInfoItem, a: UserInfoItem) => {
         setMessages([]);
         imagesRef.current = [];
         conversationIdRef.current = chatId;
@@ -98,7 +104,7 @@ export default forwardRef((_,ref) => {
         //     console.log('羣加密信息', res);
         //     sharedSecretRef.current = quickAes.De(res.enc_key, sharedSecret);
         //     console.log('sharedSecretRef.current', sharedSecretRef.current);
-            
+
         //     // intervalRef.current = setInterval(() => {
         //     //     loadMessages('down');
         //     // }, 2000);
@@ -140,19 +146,19 @@ export default forwardRef((_,ref) => {
     useImperativeHandle(ref, () => ({
         init,
         close,
+        loadMember: (members: GroupMemberItemVO[]) => {
+            setMembers(members)
+        }
     }));
 
-    
-
-
-    const onSwap = async (req: WalletRemitReq)=>{
+    const onSwap = async (req: WalletRemitReq) => {
         console.log('发起转账', req);
         loadingModalRef.current?.open('处理中...');
-        setTimeout(()=>{
+        setTimeout(() => {
             messageService.doRemit(
-                {...req,chatId: conversationIdRef.current},
-                sharedSecretRef.current,'gswap'
-            ).then(res=>{
+                { ...req, chatId: conversationIdRef.current },
+                sharedSecretRef.current, 'gswap'
+            ).then(res => {
                 const { sequence = 0 } = res;
                 if (sequence > lastSeq.current) {
                     lastSeq.current = sequence;
@@ -165,18 +171,55 @@ export default forwardRef((_,ref) => {
                     sequence: res.sequence,
                     data: {
                         amount: req.amount,
-                        remark: req.remark??'',
+                        remark: req.remark ?? '',
                         uid: req.objUId
                     }
                 }
                 setMessages((items) => {
                     return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
                 });
-            }).finally(()=>{
+            }).finally(() => {
                 loadingModalRef.current?.close();
             })
-        },1000)
-}
+        }, 1000)
+    }
+
+
+
+    const onRedPacketFunc = async (req: RedPacketCreateReq) => {
+        console.log('发起紅包', req);
+        loadingModalRef.current?.open('处理中...');
+        setTimeout(() => {
+            messageService.doRedPacket(
+                { ...req, sender: authUser?.id },
+                sharedSecretRef.current, 'gpacket'
+            ).then(res => {
+                const { sequence = 0 } = res;
+                if (sequence > lastSeq.current) {
+                    lastSeq.current = sequence;
+                }
+                const message: IMessage<'gpacket'> = {
+                    mid: req.id,
+                    type: 'gpacket',
+                    state: 1,
+                    time: dayjs(res.createdAt),
+                    sequence: res.sequence,
+                    data: {
+                        remark: res.remark ?? '',
+                        sender: res.fromUid,
+                        packetId: res.packetId,
+                        type: req.type,
+                    }
+                }
+                setMessages((items) => {
+                    return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
+                });
+            }).finally(() => {
+                loadingModalRef.current?.close();
+            })
+        }, 1000)
+    }
+
 
     return (
         <>
@@ -217,6 +260,15 @@ export default forwardRef((_,ref) => {
                                     })
                                 }
                             }
+                            if(m.type === 'packet' || m.type === 'gpacket'){
+                                redPacketDialogRef.current?.open({
+                                    data: m.data as IMessageRedPacket,
+                                    onPress: ()=>{
+                                        
+                                    }
+
+                                })
+                            }
                         }} />
                     </View>
                 </TouchableWithoutFeedback>
@@ -224,83 +276,85 @@ export default forwardRef((_,ref) => {
             <View
                 style={{
                     width: '100%',
-                    position:'absolute',
+                    position: 'absolute',
                     bottom: Platform.select({
                         ios: 0,
                         android: keyboardState ? (Platform.OS == 'ios' ? keyboardHeight : 0) : 0,
                     })
                 }}>
                 <InputToolkit ref={inputToolkitRef} sourceId={group?.id}
-                
-                onSwap={onSwap}
-                onSend={async (message) => {
-                    console.log('發送消息@@@@@@@', message);
-                    if (!group) {
-                        throw new ToastException('信息錯誤！');
-                    }
-                    if(message.type === 'gswap'){
-                        return
-                    }
-                    setMessages((items) => {
-                        return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
-                    });
-                    setTimeout(() => {
-                        if (message.type == 'image' || message.type == "file") {
-                            loadingModalRef.current?.open('加密處理中...');
+                    members={members}
+                    onSwap={onSwap}
+                    onRedPacket={onRedPacketFunc}
+                    onSend={async (message) => {
+                        console.log('發送消息@@@@@@@', message);
+                        if (!group) {
+                            throw new ToastException('信息錯誤！');
                         }
-                        messageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
-                            if (!res) {
-                                return;
+                        if (message.type === 'gswap') {
+                            return
+                        }
+                        setMessages((items) => {
+                            return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
+                        });
+                        setTimeout(() => {
+                            if (message.type == 'image' || message.type == "file") {
+                                loadingModalRef.current?.open('加密處理中...');
                             }
-                            // 將消息狀態改爲已發送
-                            const { sequence = 0 } = res;
-                            if (sequence > lastSeq.current) {
-                                lastSeq.current = sequence;
-                            }
-                            setMessages((items) => {
-                                const index = items.findIndex((item) => item.mid == message.mid);
-                                if (index > -1) {
-                                    items[index].state = 1;
-                                    items[index].sequence = sequence;
-                                    if (message.type == 'image') {
-                                        items[index].data = res.data as IMessageImage;
-                                        imagesRef.current.push(res.data as IMessageImage);
-                                    } else if (message.type == 'file') {
-                                        const data = res.data as IMessageFile;
-                                        message.data = {
-                                            ...data,
-                                            path: data.path,
-                                        };
-                                        const file = message.data;
-                                        if (file) {
-                                            file.path = data.path;
-                                            items[index].data = file;
+                            messageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
+                                if (!res) {
+                                    return;
+                                }
+                                // 將消息狀態改爲已發送
+                                const { sequence = 0 } = res;
+                                if (sequence > lastSeq.current) {
+                                    lastSeq.current = sequence;
+                                }
+                                setMessages((items) => {
+                                    const index = items.findIndex((item) => item.mid == message.mid);
+                                    if (index > -1) {
+                                        items[index].state = 1;
+                                        items[index].sequence = sequence;
+                                        if (message.type == 'image') {
+                                            items[index].data = res.data as IMessageImage;
+                                            imagesRef.current.push(res.data as IMessageImage);
+                                        } else if (message.type == 'file') {
+                                            const data = res.data as IMessageFile;
+                                            message.data = {
+                                                ...data,
+                                                path: data.path,
+                                            };
+                                            const file = message.data;
+                                            if (file) {
+                                                file.path = data.path;
+                                                items[index].data = file;
+                                            }
+
                                         }
-
                                     }
-                                }
-                                return items;
-                            });
-                        }).catch((err) => {
-                            // 將消息狀態改爲發送失敗
-                            console.log('發送失敗', err);
-                            setMessages((items) => {
-                                const index = items.findIndex((item) => item.mid == message.mid);
-                                if (index > -1) {
-                                    items[index].state = 2;
-                                }
-                                return items;
-                            });
-                        }).finally(() => {
-                            loadingModalRef.current?.close();
-                        })
-                    }, 100)
+                                    return items;
+                                });
+                            }).catch((err) => {
+                                // 將消息狀態改爲發送失敗
+                                console.log('發送失敗', err);
+                                setMessages((items) => {
+                                    const index = items.findIndex((item) => item.mid == message.mid);
+                                    if (index > -1) {
+                                        items[index].state = 2;
+                                    }
+                                    return items;
+                                });
+                            }).finally(() => {
+                                loadingModalRef.current?.close();
+                            })
+                        }, 100)
 
-                }} tools={tools} />
+                    }} tools={tools} />
             </View>
             <EncImagePreview ref={encImagePreviewRef} />
             <EncFilePreview ref={encFilePreviewRef} />
             <LoadingModal ref={loadingModalRef} />
+            <RedPacketDialog ref={redPacketDialogRef} />
         </>
     )
 });

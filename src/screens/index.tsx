@@ -68,5 +68,4 @@ export {
     WalletRecordPageScreen,   
     WalletTopupRecordScreen,
     WalletWithdrawScreen,
-    GroupPacketScreen
 }

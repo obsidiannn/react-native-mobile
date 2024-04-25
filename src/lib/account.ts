@@ -55,6 +55,8 @@ export const readMN = async (password: string) => {
     if (accountList.length === 0) {
         throw new ToastException('账号列表为空');
     }
+    console.log(accountList);
+    
     const salt = accountList[0] as string;
     const passwordHash = hash.update(password.substring(0, 3) + salt).digest('hex');
     const passwordHashList = accountList[2] as string[];
