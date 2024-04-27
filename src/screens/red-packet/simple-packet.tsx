@@ -1,7 +1,7 @@
 
 import Navbar from "@/components/navbar";
 import colors from "@/config/colors";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native"
+import { Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native"
 import userService from "@/service/user.service";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { UserInfoItem } from "@/api/types/user";
@@ -14,18 +14,14 @@ import { WalletDetailResp, WalletRemitReq, WalletRemitResp } from "@/api/types/w
 import { CurrencyTypeEnum, RedPacketSourceEnum, RedPacketTypeEnum } from "@/api/types/enums";
 import utils from "@/lib/utils";
 import { readAccount } from "@/lib/account";
-import { StackScreenProps } from "@react-navigation/stack";
-import { RootStackParamList } from "@/types";
 import FontIcon from 'react-native-vector-icons/FontAwesome'
 import { Image } from 'expo-image'
-import { GroupMemberItemVO } from "@/api/types/group";
-import GroupMemberList, { GroupMemberListType } from "../contact/components/group-list/group-member-list";
+import { RedPacketCreateReq } from "@/api/types/red-packet";
 
-export interface GroupPacketCreateModalType {
+export interface SimplePacketCreateModalType {
     open: (params: {
         uid: string
-        targetUser?: UserInfoItem
-        onFinish: (obj: WalletRemitReq | null) => void;
+        onFinish: (obj: RedPacketCreateReq | null) => void;
     }) => void;
 }
 
@@ -40,15 +36,10 @@ interface PacketStateType {
     objUids?: string[]
 }
 
-type Props = StackScreenProps<RootStackParamList, 'SimplePacket'>;
 
-const GroupPacket = ((props: Props) => {
+export default forwardRef((props,ref) => {
     const maxTotalAmount = 200
-    const packetTypes = [
-        { label: '普通紅包', value: '1' },
-        { label: '拼手氣紅包', value: '2' },
-        { label: '專屬紅包', value: '3' },
-    ]
+    const defaultRemark = '恭喜發財，大吉大利'
     const [targetUser, setTargetUser] = useState<UserInfoItem|null>(null)
     const [walletBalance, setWalletBalance] = useState<WalletDetailResp>({
         balance: 0,
@@ -57,7 +48,7 @@ const GroupPacket = ((props: Props) => {
     })
 
     const [state, setState] = useState<PacketStateType>({
-        type: RedPacketTypeEnum.NORMAL,
+        type: RedPacketTypeEnum.TARGETED,
         sourceType: RedPacketSourceEnum.USER,
         remark: '',
         packetCount: 1,
@@ -70,15 +61,15 @@ const GroupPacket = ((props: Props) => {
             type: 1
         })
         setState({
-            type: RedPacketTypeEnum.RANDOM,
-            sourceType: RedPacketSourceEnum.GROUP,
+            type: RedPacketTypeEnum.TARGETED,
+            sourceType: RedPacketSourceEnum.USER,
             remark: '',
-            packetCount: 0,
+            packetCount: 1,
             totalAmount: 0,
         })
         setTargetUser(null)
     }
-    const onFinishRef = useRef<(obj: WalletRemitReq | null) => void>();
+    const onFinishRef = useRef<(obj: RedPacketCreateReq | null) => void>();
     const payConfirmModalRef = useRef<PayConfirmModalType>(null);
     const [visible, setVisible] = useState(false)
     const [error, setError] = useState<string[]>(['', '', ''])
@@ -111,18 +102,21 @@ const GroupPacket = ((props: Props) => {
         </View>
     }
 
-    // useImperativeHandle(ref, () => ({
-    //     open: (params: {
-    //         gid: string
-    //         onFinish: (obj: WalletRemitReq | null) => void;
-    //     }) => {
-    //         walletApi.mineWalletDetail().then((res: WalletDetailResp) => {
-    //             setWalletBalance(res)
-    //         })
-    //         onFinishRef.current = params.onFinish
-    //         setVisible(true)
-    //     }
-    // }));
+    useImperativeHandle(ref, () => ({
+        open: (params: {
+            uid: string
+            onFinish: (obj: RedPacketCreateReq | null) => void;
+        }) => {
+            walletApi.mineWalletDetail().then((res: WalletDetailResp) => {
+                setWalletBalance(res)
+            })
+            userService.getInfo(params.uid).then((res)=>{
+                setTargetUser(res)
+            })
+            onFinishRef.current = params.onFinish
+            setVisible(true)
+        }
+    }));
 
     const changeSingleAmount = (singleAmount: string) => {
         const _totalAmount = Number((singleAmount ?? '0')) * state.packetCount
@@ -138,14 +132,42 @@ const GroupPacket = ((props: Props) => {
         })
     }
 
-    const renderPickerItems = () => {
-        return packetTypes.map(option => (
-            <Picker.Item key={option.value} value={option.value} label={option.label}>
-            </Picker.Item>
-        ))
+
+    const preCheck = (): boolean => {
+      
+        if (state.totalAmount <= 0 || (state.totalAmount * 100) > walletBalance.balance) {
+            return false
+        }
+        if (error.filter(e => e !== '').length > 0) {
+            return false
+        }
+        if (state.type === RedPacketTypeEnum.NORMAL) {
+            if (state.packetCount <= 0 || (Number(state.singleAmount ?? '0')) <= 0) {
+                return false
+            }
+        }
+       
+        return true
     }
-    return <View style={{ flex: 1, backgroundColor: colors.gray200 }}
-    // transparent={false} visible={visible} 
+
+    const generateReq = (): RedPacketCreateReq => {
+        const redPacketCreateReq: RedPacketCreateReq = {
+            id: utils.generateId(),
+            type: state.type,
+            sourceType: state.sourceType,
+            packetCount: state.packetCount,
+            remark: (state.remark ?? '') === ''?defaultRemark: state.remark,
+            singleAmount: Number(state.singleAmount) * 100,
+            totalAmount: state.totalAmount * 100,
+            objUIds: [targetUser?.id ?? ''],
+            groupId: ''
+        }
+        return redPacketCreateReq
+    }
+
+  
+    return <Modal style={{ flex: 1, backgroundColor: colors.gray200 }} 
+    transparent={false} visible={visible} 
     >
         <Navbar title="發紅包" onLeftPress={() => {
             onClose()
@@ -157,7 +179,7 @@ const GroupPacket = ((props: Props) => {
                 {renderAmountNormal()}
                 <View>
                     <TextInput
-                        placeholder="恭喜發財，大吉大利"
+                        placeholder={defaultRemark}
                         placeholderTextColor={colors.gray400}
                         style={styles.remark_style}
                         maxLength={140}
@@ -208,18 +230,14 @@ const GroupPacket = ((props: Props) => {
                                 if (uid === '') {
                                     return
                                 }
+                                if (!preCheck()) {
+                                    return
+                                }
                                 const oneWallet = await readAccount(val)
                                 if (oneWallet !== null) {
-                                    const remitReq: WalletRemitReq = {
-                                        id: utils.generateId(),
-                                        objUId: targetUser?.id ?? '',
-                                        chatId: '',
-                                        amount: Number(state.totalAmount) * 100,
-                                        remark: state.remark,
-                                        content: '',
-                                    }
+                                    const redPacketCreateReq = generateReq()
                                     onClose()
-                                    onFinishRef.current?.(remitReq)
+                                    onFinishRef.current?.(redPacketCreateReq)
                                 }
                             } catch (e) {
                                 console.error(e);
@@ -234,8 +252,9 @@ const GroupPacket = ((props: Props) => {
             <Text style={{ textAlign: 'center', marginTop: scale(64), color: '#ff4b4b' }} >未領取的紅包，將於24小時後發起退款</Text>
         </View>
         <PayConfirmModel ref={payConfirmModalRef} />
-    </View>
+    </Modal>
 })
+
 
 const styles = StyleSheet.create({
     head_container: {
@@ -275,5 +294,3 @@ const styles = StyleSheet.create({
         margin: 0
     }
 })
-
-export default GroupPacket

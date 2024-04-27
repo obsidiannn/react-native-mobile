@@ -70,7 +70,7 @@ export default (props: {
         case "gpacket":
             const packet = item.data as IMessageRedPacket;
             // packet.packetId = item.
-            message = <RedPacketItem data={packet} isSelf={props.isSelf} uid={item.user?.id ?? ''} />;
+            message = <RedPacketItem reload={reload} data={packet} isSelf={props.isSelf} uid={item.user?.id ?? ''} />;
             break;
         default:
             message = <TextItem text="[未知消息]" isSelf={props.isSelf} />
@@ -81,7 +81,15 @@ export default (props: {
         display: 'flex',
     }}>
         <Info isSelf={props.isSelf} name={item.user?.name} time={item.time.fromNow()} />
-        <MessageContainer onLongPress={props.onLongPress} onPress={props.onPress} message={item} isSelf={props.isSelf}>
+        <MessageContainer onLongPress={props.onLongPress} onPress={()=>{
+            if(props.onPress){
+                props.onPress(item)
+            }
+            if(item.type === 'packet' || item.type === 'gpacket'){
+                console.log(item.data);
+                setReload(!reload)
+            }
+        }} message={item} isSelf={props.isSelf}>
             {message}
         </MessageContainer>
     </View>;

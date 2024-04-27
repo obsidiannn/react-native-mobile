@@ -1,4 +1,4 @@
-import { Keyboard, View} from "react-native";
+import { Keyboard, View } from "react-native";
 import React, { forwardRef, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import RootSiblings from 'react-native-root-siblings';
 import { InputAccessoryItemType } from "./accessory";
@@ -18,6 +18,7 @@ import { GroupContext, GroupMemberItemVO } from "@/api/types/group";
 import GroupMemberList, { GroupMemberListType } from "@/screens/contact/components/group-list/group-member-list";
 import GroupPacket, { GroupPacketCreateModalType } from "@/screens/red-packet/group-packet";
 import { RedPacketCreateReq } from "@/api/types/red-packet";
+import SimplePacket, { SimplePacketCreateModalType } from "@/screens/red-packet/simple-packet";
 export interface InputToolKitRef {
     down: () => void;
 }
@@ -28,7 +29,7 @@ export interface InputToolKitProps {
     onSwap: (req: WalletRemitReq) => Promise<void>;
     onRedPacket?: (req: RedPacketCreateReq) => Promise<void>
     sourceId?: string
-    members?: GroupMemberItemVO []
+    members?: GroupMemberItemVO[]
 }
 
 export default forwardRef((props: InputToolKitProps, ref) => {
@@ -41,9 +42,8 @@ export default forwardRef((props: InputToolKitProps, ref) => {
     // 选人弹窗
     const groupMemberModalRef = useRef<GroupMemberListType>(null);
     const groupPacketRef = useRef<GroupPacketCreateModalType>(null);
-    const simplePacketRef = useRef<RootSiblings>();
+    const simplePacketRef = useRef<SimplePacketCreateModalType>();
 
-   
     useEffect(() => {
         const showSubscription = Keyboard.addListener("keyboardDidShow", (e) => {
             setAccessoryHeight(0);
@@ -207,11 +207,22 @@ export default forwardRef((props: InputToolKitProps, ref) => {
                     case 'gpacket':
                         // 群组转账，先弹选人，再弹转账
                         console.log('gpacket');
-                        
+
                         groupPacketRef.current?.open({
-                            gid:props.sourceId??'',
-                            onFinish: (o:RedPacketCreateReq)=>{
-                                if(o !== null && props.onRedPacket !== undefined){
+                            gid: props.sourceId ?? '',
+                            onFinish: (o: RedPacketCreateReq) => {
+                                if (o !== null && props.onRedPacket !== undefined) {
+                                    props.onRedPacket(o)
+                                }
+                            }
+                        })
+                        break
+                    case 'packet':
+                        // 群组转账，先弹选人，再弹转账
+                        simplePacketRef.current?.open({
+                            uid: props.sourceId ?? '',
+                            onFinish: (o: RedPacketCreateReq|null) => {
+                                if (o !== null && props.onRedPacket !== undefined) {
                                     props.onRedPacket(o)
                                 }
                             }
@@ -224,8 +235,8 @@ export default forwardRef((props: InputToolKitProps, ref) => {
         </View>
         <MoneyTransfer ref={moneyTransferRef} />
         <GroupMemberList ref={groupMemberModalRef} />
-        <GroupPacket ref={groupPacketRef} members={props.members}/>
-        {/* <SimplePacket ref={simplePacketRef} /> */}
-    </View> 
+        <GroupPacket ref={groupPacketRef} members={props.members} />
+        <SimplePacket ref={simplePacketRef} />
+    </View>
 });
 

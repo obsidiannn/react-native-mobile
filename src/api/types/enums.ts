@@ -137,6 +137,14 @@ export enum RedPacketStatusEnum {
   EXPIRED_REFUND = 4
 }
 
+// 已失效 已过期 已领取 已抢光
+export enum RedPacketResultEnum {
+  DISABLE = 1,
+  EXPIRED = 2,
+  TOUCHED = 3,
+  USEDUP = 4
+}
+
 export enum MediaTypeEnum {
   IMAGE = 1,
   VIDEO = 2,
@@ -193,7 +201,7 @@ export enum PropConstant {
 export enum SourceType {
   CHAT_USER = 'chat_user',
   CHAT_GROUP = 'chat_group',
-  FRIEND_APPLY= 'friend_apply',
+  FRIEND_APPLY = 'friend_apply',
   APPLY_REJECT = 'apply_reject',
   APPLY_AGREE = 'apply_agree'
 }

@@ -14,7 +14,7 @@ export const createRequestInstance = (en = true) => {
   // const API_BASE_URL = process.en
   // const API_BASE_URL = 'http://192.168.1.5:4000'
   const instance: AxiosInstance = axios.create({
-    baseURL: 'http://192.168.0.102:4000',//API_BASE_URL,
+    baseURL: 'http://192.168.0.101:4000',//API_BASE_URL,
     // baseURL: API_BASE_URL,//API_BASE_URL,
     withCredentials: false,
     timeout: 3000,
@@ -177,6 +177,8 @@ instance.interceptors.response.use(async (rep): Promise<any> => {
     if (!err.response) {
       toast('网络错误,请稍后重试!');
     } else {
+      console.error(err.response.data);
+      
       toast(err.response.data.message ?? '');
     }
   }

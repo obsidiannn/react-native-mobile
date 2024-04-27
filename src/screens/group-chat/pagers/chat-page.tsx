@@ -23,6 +23,9 @@ import dayjs from 'dayjs'
 import { WalletRemitReq } from "@/api/types/wallet";
 import { RedPacketCreateReq } from "@/api/types/red-packet";
 import RedPacketDialog, { RedPacketDialogType } from "@/screens/red-packet/red-packet-dialog";
+import { RedPacketTypeEnum } from "@/api/types/enums";
+import redPacketApi from "@/api/v2/red-packet";
+import { navigate } from "@/lib/root-navigation";
 export interface ChatPageRef {
     init: (chatId: string, group: GroupInfoItem, authUser: UserInfoItem) => void;
     loadMember: (members: GroupMemberItemVO[]) => void
@@ -260,14 +263,42 @@ export default forwardRef((_, ref) => {
                                     })
                                 }
                             }
-                            if(m.type === 'packet' || m.type === 'gpacket'){
-                                redPacketDialogRef.current?.open({
-                                    data: m.data as IMessageRedPacket,
-                                    onPress: ()=>{
-                                        
-                                    }
+                            if (m.type === 'packet' || m.type === 'gpacket') {
+                                const _data = m.data as IMessageRedPacket
+                                if (_data.pkInfo) {
+                                    redPacketDialogRef.current?.open({
+                                        data: _data,
+                                        onPress: () => {
+                                            console.log('调用');
+                                            navigate('RedPacketDetail',{id: _data.packetId})
+                                            if (_data.pkInfo?.enable === false || _data.pkInfo?.touchFlag === true) {
+                                                // jump
+                                                return
+                                            }
+                                            if (_data?.pkInfo?.enable) {
+                                                // 如果可以抢
+                                                if (_data?.type === RedPacketTypeEnum.TARGETED) {
+                                                    if (authUser?.id !== _data.objUId) {
+                                                        // jump
+                                                    } else {
+                                                        // // 抢
+                                                        // redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
 
-                                })
+                                                        // })
+                                                    }
+                                                } else {
+                                                    // 抢
+                                                    // redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
+
+                                                    // })
+                                                }
+                                            }
+                                        }
+                                    })
+
+
+                                }
+
                             }
                         }} />
                     </View>

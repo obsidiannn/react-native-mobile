@@ -79,7 +79,8 @@ type RootStackParamList = {
     },
     SimplePacket: {
         uid: string
-    }
+    },
+    RedPacketDetail: {id: string}
 };
 
 

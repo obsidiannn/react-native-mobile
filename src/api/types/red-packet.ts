@@ -1,4 +1,4 @@
-import { RedPacketSourceEnum,RedPacketTypeEnum } from "./enums"
+import { RedPacketResultEnum, RedPacketSourceEnum, RedPacketTypeEnum } from "./enums"
 
 export interface RedPacketCreateReq {
     id: string
@@ -38,6 +38,7 @@ export interface RedPacketResp {
     expiredFlag: boolean
     createdAt: Date
     expireSecond: number
+    touchFlag: boolean
 }
 
 export interface RedPacketReq {
@@ -68,4 +69,9 @@ export interface RedPacketDetail {
     expiredFlag: boolean
     remark: string
     records: RedPacketRecordItem[]
+}
+
+export interface RedPacketTouchResult {
+    result: RedPacketResultEnum
+    packetId: string
 }

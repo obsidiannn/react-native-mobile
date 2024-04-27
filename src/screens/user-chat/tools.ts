@@ -27,6 +27,6 @@ export default [
     {
         title: '紅包',
         icon: require('./icons/redpack.svg'),
-        key: 'red-envelope',
+        key: 'packet',
     }
 ]

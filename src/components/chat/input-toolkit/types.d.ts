@@ -1,4 +1,5 @@
 import { RedPacketTypeEnum } from "@/api/types/enums";
+import { RedPacketResp } from "@/api/types/red-packet";
 import { UserInfoItem } from "@/api/types/user";
 import dayjs from "dayjs";
 export interface IMessageImage {
@@ -52,6 +53,8 @@ export interface IMessageRedPacket {
     type: RedPacketTypeEnum
     objUId?: string
     objUName?: string
+    pkInfo?:RedPacketResp
+    stateFunc?:(state:number)=>void
 }
 
 

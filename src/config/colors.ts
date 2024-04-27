@@ -10,4 +10,5 @@ export default {
     gray800: '#1f2937',
     gray900: '#111827',
     gray950: '#030712',
+    redpacket: '#ff4b4b'
 }

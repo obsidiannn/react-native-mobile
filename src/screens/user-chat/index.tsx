@@ -26,6 +26,8 @@ import MessageList from "@/components/chat/message-list";
 import { globalStorage } from "@/lib/storage";
 import { WalletRemitReq } from "@/api/types/wallet";
 import dayjs from 'dayjs'
+import { SimplePacketCreateModalType } from "../red-packet/simple-packet";
+import { RedPacketCreateReq } from "@/api/types/red-packet";
 const UserChatScreen = ({ navigation, route }: Props) => {
     const insets = useSafeAreaInsets();
     const [messages, setMessages] = useState<IMessage<DataType>[]>([])
@@ -45,7 +47,6 @@ const UserChatScreen = ({ navigation, route }: Props) => {
     const encFilePreviewRef = useRef<IEncFilePreviewRef>();
     const encVideoPreviewRef = useRef<IEncVideoPreviewRef>();
     const imagesRef = useRef<IMessageImage[]>([]);
-
     const listRef = useRef<FlashList<IMessage<DataType>>>();
     const loadingModalRef = useRef<ILoadingModalRef>();
     const inputToolkitRef = useRef<InputToolKitRef>(null);
@@ -189,6 +190,43 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                 })
             },1000)
     }
+
+
+
+    const onRedPacketFunc = async (req: RedPacketCreateReq) => {
+        console.log('发起紅包', req);
+        loadingModalRef.current?.open('处理中...');
+        setTimeout(() => {
+            messageService.doRedPacket(
+                { ...req, sender: authUser?.id },
+                sharedSecretRef.current, 'packet'
+            ).then(res => {
+                const { sequence = 0 } = res;
+                if (sequence > lastSeq.current) {
+                    lastSeq.current = sequence;
+                }
+                const message: IMessage<'packet'> = {
+                    mid: req.id,
+                    type: 'packet',
+                    state: 1,
+                    time: dayjs(res.createdAt),
+                    sequence: res.sequence,
+                    data: {
+                        remark: res.remark ?? '',
+                        sender: res.fromUid,
+                        packetId: res.packetId,
+                        type: req.type,
+                    }
+                }
+                setMessages((items) => {
+                    return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
+                });
+            }).finally(() => {
+                loadingModalRef.current?.close();
+            })
+        }, 1000)
+    }
+
 
     return (
         <View
@@ -361,12 +399,13 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                        
                     }, 100)
 
-                }} tools={tools} onSwap={onSwap} />
+                }} tools={tools} onSwap={onSwap} onRedPacket={onRedPacketFunc} />
             </View>
             <EncImagePreview ref={encImagePreviewRef} />
             <EncFilePreview ref={encFilePreviewRef} />
             <EncVideoPreview ref={encVideoPreviewRef}/>
             <LoadingModal ref={loadingModalRef}/>
+
         </View>
 
     )

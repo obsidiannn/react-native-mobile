@@ -323,7 +323,7 @@ export default forwardRef((props: { members: GroupMemberItemVO[] }, ref) => {
         return redPacketCreateReq
     }
 
-    return <Modal style={{ flex: 1, }} transparent={false} visible={visible} >
+    return <Modal style={{ flex: 1, }} transparent={true} visible={visible} >
         <Navbar title="發紅包" onLeftPress={() => {
             onClose()
             setVisible(false)
