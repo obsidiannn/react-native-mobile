@@ -21,13 +21,17 @@ import EncVideoPreview, { IEncVideoPreviewRef } from "@/components/chat/enc-vide
 import LoadingModal,{ILoadingModalRef} from "@/components/common/loading-modal";
 import { RootStackParamList } from "@/types";
 import InputToolkit, { InputToolKitRef } from "@/components/chat/input-toolkit";
-import { DataType, IMessage, IMessageFile, IMessageImage, IMessageTypeMap, IMessageVideo } from "@/components/chat/input-toolkit/types";
+import { DataType, IMessage, IMessageFile, IMessageImage, IMessageRedPacket, IMessageTypeMap, IMessageVideo } from "@/components/chat/input-toolkit/types";
 import MessageList from "@/components/chat/message-list";
 import { globalStorage } from "@/lib/storage";
 import { WalletRemitReq } from "@/api/types/wallet";
 import dayjs from 'dayjs'
 import { SimplePacketCreateModalType } from "../red-packet/simple-packet";
 import { RedPacketCreateReq } from "@/api/types/red-packet";
+import RedPacketDialog, { RedPacketDialogType } from "../red-packet/red-packet-dialog";
+import PacketDetail, { RedPacketDetailModalType } from "../red-packet/packet-detail";
+import { RedPacketTypeEnum } from "@/api/types/enums";
+import redPacketApi from "@/api/v2/red-packet";
 const UserChatScreen = ({ navigation, route }: Props) => {
     const insets = useSafeAreaInsets();
     const [messages, setMessages] = useState<IMessage<DataType>[]>([])
@@ -49,6 +53,9 @@ const UserChatScreen = ({ navigation, route }: Props) => {
     const imagesRef = useRef<IMessageImage[]>([]);
     const listRef = useRef<FlashList<IMessage<DataType>>>();
     const loadingModalRef = useRef<ILoadingModalRef>();
+    const redPacketDialogRef = useRef<RedPacketDialogType>();
+    const redPacketDetailRef = useRef<RedPacketDetailModalType>();
+
     const inputToolkitRef = useRef<InputToolKitRef>(null);
     const loadMessages = useCallback((direction: 'up' | 'down') => {
         if (loadingRef.current) {
@@ -312,6 +319,56 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                                 })
                             }
                         }
+
+                        if (m.type === 'packet') {
+                            const _data = m.data as IMessageRedPacket
+                            if (_data.pkInfo) {
+                                if (_data.pkInfo?.enable === false || _data.pkInfo?.touchFlag === true) {
+                                    // jump
+                                    redPacketDetailRef.current?.open({id: _data.packetId})
+                                    return
+                                }
+
+                                if (_data?.type === RedPacketTypeEnum.TARGETED) {
+                                    if (authUser?.id !== _data.objUId) {
+                                        // jump
+                                        redPacketDetailRef.current?.open({id: _data.packetId})
+                                        return 
+                                    } 
+                                }
+
+                                redPacketDialogRef.current?.open({
+                                    data: _data,
+                                    onPress: () => {
+                                        console.log('调用');
+                                        console.log(_data.pkInfo);
+                                        
+                                        if (_data?.pkInfo?.enable) {
+                                            // 如果可以抢
+                                            if (_data?.type === RedPacketTypeEnum.TARGETED) {
+                                                if (authUser?.id === _data.objUId) {
+                                                    // // 抢
+                                                    redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
+                                                        if(_data.stateFunc){
+                                                            _data.stateFunc(res.result)
+                                                        }
+                                                        redPacketDetailRef.current?.open({id: _data.packetId})
+                                                    })
+                                                }
+                                            } else {
+                                                // 抢
+                                                redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
+                                                    if(_data.stateFunc){
+                                                        _data.stateFunc(res.result)
+                                                    }
+                                                    redPacketDetailRef.current?.open({id: _data.packetId})
+                                                })
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+                        }
                     }}/>
                 </View>
 
@@ -405,7 +462,8 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             <EncFilePreview ref={encFilePreviewRef} />
             <EncVideoPreview ref={encVideoPreviewRef}/>
             <LoadingModal ref={loadingModalRef}/>
-
+            <RedPacketDialog ref={redPacketDialogRef} />
+            <PacketDetail ref={redPacketDetailRef} />
         </View>
 
     )

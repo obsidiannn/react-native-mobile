@@ -26,6 +26,7 @@ import RedPacketDialog, { RedPacketDialogType } from "@/screens/red-packet/red-p
 import { RedPacketTypeEnum } from "@/api/types/enums";
 import redPacketApi from "@/api/v2/red-packet";
 import { navigate } from "@/lib/root-navigation";
+import PacketDetail, { RedPacketDetailModalType } from "@/screens/red-packet/packet-detail";
 export interface ChatPageRef {
     init: (chatId: string, group: GroupInfoItem, authUser: UserInfoItem) => void;
     loadMember: (members: GroupMemberItemVO[]) => void
@@ -51,6 +52,7 @@ export default forwardRef((_, ref) => {
     const loadingModalRef = useRef<ILoadingModalRef>();
     const inputToolkitRef = useRef<InputToolKitRef>(null);
     const redPacketDialogRef = useRef<RedPacketDialogType>();
+    const redPacketDetailRef = useRef<RedPacketDetailModalType>();
     const [members, setMembers] = useState<GroupMemberItemVO[]>([])
 
     const loadMessages = useCallback((direction: 'up' | 'down') => {
@@ -266,39 +268,51 @@ export default forwardRef((_, ref) => {
                             if (m.type === 'packet' || m.type === 'gpacket') {
                                 const _data = m.data as IMessageRedPacket
                                 if (_data.pkInfo) {
+                                    if (_data.pkInfo?.enable === false || _data.pkInfo?.touchFlag === true) {
+                                        // jump
+                                        redPacketDetailRef.current?.open({id: _data.packetId})
+                                        return
+                                    }
+
+                                    if (_data?.type === RedPacketTypeEnum.TARGETED) {
+                                        if (authUser?.id !== _data.objUId) {
+                                            // jump
+                                            redPacketDetailRef.current?.open({id: _data.packetId})
+                                            return 
+                                        } 
+                                    }
+
                                     redPacketDialogRef.current?.open({
                                         data: _data,
                                         onPress: () => {
                                             console.log('调用');
-                                            navigate('RedPacketDetail',{id: _data.packetId})
-                                            if (_data.pkInfo?.enable === false || _data.pkInfo?.touchFlag === true) {
-                                                // jump
-                                                return
-                                            }
+                                            console.log(_data.pkInfo);
+                                            
                                             if (_data?.pkInfo?.enable) {
                                                 // 如果可以抢
                                                 if (_data?.type === RedPacketTypeEnum.TARGETED) {
-                                                    if (authUser?.id !== _data.objUId) {
-                                                        // jump
-                                                    } else {
+                                                    if (authUser?.id === _data.objUId) {
                                                         // // 抢
-                                                        // redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
-
-                                                        // })
+                                                        redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
+                                                            if(_data.stateFunc){
+                                                                _data.stateFunc(res.result)
+                                                            }
+                                                            redPacketDetailRef.current?.open({id: _data.packetId})
+                                                        })
                                                     }
                                                 } else {
                                                     // 抢
-                                                    // redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
-
-                                                    // })
+                                                    redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
+                                                        if(_data.stateFunc){
+                                                            _data.stateFunc(res.result)
+                                                        }
+                                                        redPacketDetailRef.current?.open({id: _data.packetId})
+                                                    })
                                                 }
                                             }
                                         }
                                     })
-
-
                                 }
-
                             }
                         }} />
                     </View>
@@ -386,6 +400,7 @@ export default forwardRef((_, ref) => {
             <EncFilePreview ref={encFilePreviewRef} />
             <LoadingModal ref={loadingModalRef} />
             <RedPacketDialog ref={redPacketDialogRef} />
+            <PacketDetail ref={redPacketDetailRef} />
         </>
     )
 });

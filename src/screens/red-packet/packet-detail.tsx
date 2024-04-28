@@ -6,14 +6,20 @@ import { StyleSheet, Text } from "react-native";
 import { View } from "react-native";
 import { scale } from "react-native-size-matters/extend";
 import redPacketApi from "@/api/v2/red-packet";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { RedPacketDetail } from "@/api/types/red-packet";
 import { Image } from "expo-image";
 import fileService from "@/service/file.service";
 import { RedPacketStatusEnum, RedPacketTypeEnum } from "@/api/types/enums";
 import utils from "@/lib/utils";
+import { Modal } from "react-native";
 
-type Props = StackScreenProps<RootStackParamList, 'RedPacketDetail'>;
+export interface RedPacketDetailModalType {
+    open: (param: {
+        id: string,
+    }) => void
+}
+
 
 interface PacketDetailState extends RedPacketDetail {
     touchedCount: number
@@ -21,45 +27,58 @@ interface PacketDetailState extends RedPacketDetail {
     selfTouchedAmount: number
 }
 
-const RedPacketDetailScreen = (props: Props) => {
+
+export default forwardRef((props, ref) => {
     const [detail, setDetail] = useState<PacketDetailState | null>(null)
+    const [visible, setVisible] = useState<boolean>(false)
     const onClose = () => {
         setDetail(null)
+        setVisible(false)
     }
-    useEffect(() => {
-        redPacketApi.detail({ id: props.route.params.id }).then(res => {
-            if (res !== null) {
-                const _detail: PacketDetailState = {
-                    ...res, touchedAmount: 0, touchedCount: 0, selfTouchedAmount: 0
-                }
-                if (_detail.type !== RedPacketTypeEnum.TARGETED) {
-                    _detail.records = res.records.filter(r => {
-                        return r.status === RedPacketStatusEnum.USED
-                    })
-                }
-                if (_detail.records && _detail.records.length > 0) {
-                    let _count = 0
-                    let _amount = 0
-                    for (let index = 0; index < _detail.records.length; index++) {
-                        const element = _detail.records[index];
-                        if (element.status === RedPacketStatusEnum.USED) {
-                            _count++
-                            _amount += element.amount ?? 0
-                            const _uid = element.uid ?? ''
-                            if (_uid !== '' && _uid === globalThis.wallet?.address) {
-                                _detail.selfTouchedAmount = element.amount ?? 0
+
+    useImperativeHandle(ref, () => ({
+        open: (params: {
+            id: string
+        }) => {
+            redPacketApi.detail({ id: params.id }).then(res => {
+                if (res !== null) {
+                    const _detail: PacketDetailState = {
+                        ...res, touchedAmount: 0, touchedCount: 0, selfTouchedAmount: 0
+                    }
+                    if (_detail.type !== RedPacketTypeEnum.TARGETED) {
+                        _detail.records = res.records.filter(r => {
+                            return r.status === RedPacketStatusEnum.USED
+                        })
+                    }
+                    if (_detail.records && _detail.records.length > 0) {
+                        let _count = 0
+                        let _amount = 0
+                        for (let index = 0; index < _detail.records.length; index++) {
+                            const element = _detail.records[index];
+                            if (element.status === RedPacketStatusEnum.USED) {
+                                _count++
+                                _amount += element.amount ?? 0
+                                const _uid = element.uid ?? ''
+                                if (_uid !== '' && _uid === globalThis.wallet?.address) {
+                                    _detail.selfTouchedAmount = element.amount ?? 0
+                                }
                             }
                         }
+                        _detail.touchedCount = _count
+                        _detail.touchedAmount = _amount
                     }
-                    _detail.touchedCount = _count
-                    _detail.touchedAmount = _amount
+                    setDetail(_detail)
+                    setVisible(true)
                 }
-                setDetail(_detail)
-            }
-        })
-    }, [])
-    return <View style={{ flex: 1, backgroundColor: colors.gray200 }}>
-        <Navbar theme="dark" backgroundColor={colors.redpacket} />
+            })
+        }
+    }));
+
+    return <Modal style={{ flex: 1, backgroundColor: colors.gray200 }}
+        transparent={false} visible={visible}
+        animationType="slide"
+    >
+        <Navbar theme="dark" backgroundColor={colors.redpacket} onLeftPress={onClose} />
         <View style={styles.main_style}>
             <View style={styles.title_style}>
                 <Image source={fileService.getFullUrl(detail?.createdAvatar ?? '')}
@@ -139,8 +158,8 @@ const RedPacketDetailScreen = (props: Props) => {
 
         </View>
         <Text style={{ textAlign: 'center', bottom: scale(64), color: colors.redpacket }} >未領取的紅包，將於24小時後發起退款</Text>
-    </View>
-}
+    </Modal>
+})
 
 const styles = StyleSheet.create({
     main_style: {
@@ -181,5 +200,3 @@ const styles = StyleSheet.create({
         borderBottomWidth: scale(1)
     }
 })
-
-export default RedPacketDetailScreen

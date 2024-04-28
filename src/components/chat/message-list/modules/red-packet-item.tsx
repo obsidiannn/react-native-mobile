@@ -38,7 +38,13 @@ export default (props: {
             .then((res) => {
                 props.data.pkInfo = res
                 if (res.enable === false) {
-
+                    setState(3)
+                }else{
+                    if(res.touchFlag){
+                        setState(2)
+                    }else{
+                        setState(1)
+                    }
                 }
             })
     }, [])
@@ -61,7 +67,8 @@ export default (props: {
                     color: textColor, fontSize: scale(16),
                     marginRight: (miss>0? scale(10 * miss): 0)
                 }}>{labelFillin(props.data.remark)}</Text>
-                {/* <Text>{state}a</Text> */}
+                {state === 2? <Text style={{color: textColor}}>已领取</Text>: null}
+                {state === 3? <Text style={{color: textColor}}>已全部领取</Text>: null}
             </View>
         </View>
         <View style={{

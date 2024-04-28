@@ -27,7 +27,6 @@ const MainStack = () => {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Unlock" component={UnlockScreen} />
         <Stack.Screen name='AuthStackNav' component={AuthStackNav} />
-        <Stack.Screen name='NotificationClick' component={NotificationClick}/>
     </Stack.Navigator>
 }
 
