@@ -1,9 +1,8 @@
 import { StackScreenProps } from "@react-navigation/stack";
 import { Keyboard, View, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Navbar from "@/components/navbar";
-type Props = StackScreenProps<RootStackParamList, 'GroupChat'>;
 import { UserInfoItem } from "@/api/types/user";
 import userService from "@/service/user.service";
 import { scale } from "react-native-size-matters/extend";
@@ -18,8 +17,12 @@ import { GroupContext, GroupDetailItem, GroupInfoItem, GroupMemberItemVO } from 
 import PagerView from "react-native-pager-view";
 import ChatPage, { ChatPageRef } from './pagers/chat-page';
 import InfoPage from "./pagers/info-page/index";
-import chat from "@/api/v2/chat";
+import { ChatDetailItem } from "@/api/types/chat";
+
+
+type Props = StackScreenProps<RootStackParamList, 'GroupChat'>;
 const GroupChatScreen = ({ navigation, route }: Props) => {
+    const [chatItem,setChatItem] = useState<ChatDetailItem>()
     const insets = useSafeAreaInsets();
     const [keyboardHeight, setKeyboardHeight] = useState<number>(300);
     const [keyboardState, setKeyboardState] = useState(false);
@@ -41,8 +44,15 @@ const GroupChatScreen = ({ navigation, route }: Props) => {
         });
     }, []);
     const init = useCallback(async () => {
-        conversationIdRef.current = route.params.chatId ?? '';
-        groupIdRef.current = route.params.groupId ?? ''
+         
+        const _chatItem = route.params.item as ChatDetailItem
+        console.log(_chatItem);
+        
+        setChatItem(_chatItem)
+        console.log(_chatItem.id);
+        
+        conversationIdRef.current = _chatItem.id ?? '';
+        groupIdRef.current = _chatItem.sourceId ?? ''
         console.log('會話id conversationIdRef', conversationIdRef.current)
         console.log('羣id', groupIdRef.current)
         const res = await groupService.getInfo(groupIdRef.current)
@@ -59,7 +69,7 @@ const GroupChatScreen = ({ navigation, route }: Props) => {
         }
         const a = await authService.info()
         setAuthUser(a);
-        chatPageRef.current?.init(conversationIdRef.current, res, a);
+        chatPageRef.current?.init(conversationIdRef.current, _chatItem, a,res);
         loadMembers();
     }, [])
     useEffect(() => {

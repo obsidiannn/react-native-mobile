@@ -1,12 +1,10 @@
 import Navbar from "@/components/navbar";
 import colors from "@/config/colors";
-import { RootStackParamList } from "@/types";
-import { StackScreenProps } from "@react-navigation/stack";
 import { StyleSheet, Text } from "react-native";
 import { View } from "react-native";
 import { scale } from "react-native-size-matters/extend";
 import redPacketApi from "@/api/v2/red-packet";
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import { RedPacketDetail } from "@/api/types/red-packet";
 import { Image } from "expo-image";
 import fileService from "@/service/file.service";

@@ -101,10 +101,11 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             
             setMessages([]);
             imagesRef.current = [];
-            conversationIdRef.current = route.params.chatId ?? '';
+            const _chatItem = route.params.item
+            conversationIdRef.current = _chatItem.id;
             //conversationIdRef.current = 's_e36812780132627e';
             console.log('會話id conversationIdRef', conversationIdRef.current)
-            const uid = route.params.uid;//'0xb929da34c0791dff8541fc129c5b61323a996a7a';//
+            const uid = _chatItem.sourceId;//'0xb929da34c0791dff8541fc129c5b61323a996a7a';//
             if (!uid) {
                 navigation.goBack();
                 return;

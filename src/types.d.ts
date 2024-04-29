@@ -1,3 +1,4 @@
+import { ChatDetailItem } from "./api/types/chat";
 import { RedPacketSourceEnum } from "./api/types/enums";
 import { FriendInfoItem } from "./api/types/friend";
 
@@ -25,12 +26,12 @@ type RootStackParamList = {
     };
     UserCard: undefined;
     UserChat: {
-        chatId?: string;
+        item: ChatDetailItem
+        // chatId?: string;
         uid?: string;
     };
     GroupChat: {
-        chatId?: string;
-        groupId: string
+        item: ChatDetailItem
     },
     NewFriend: undefined;
     InviteInfo: {

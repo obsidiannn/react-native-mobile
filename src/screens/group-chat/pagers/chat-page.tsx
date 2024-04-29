@@ -14,10 +14,9 @@ import InputToolkit, { InputToolKitRef } from "@/components/chat/input-toolkit";
 import { DataType, IMessage, IMessageFile, IMessageImage, IMessageRedPacket, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
 import MessageList from "@/components/chat/message-list";
 import { globalStorage } from "@/lib/storage";
-import groupService from "@/service/group.service";
 import toast from "@/lib/toast";
 import quickAes from "@/lib/quick-aes";
-import { GroupInfoItem, GroupMemberItemVO } from "@/api/types/group";
+import { GroupDetailItem, GroupInfoItem, GroupMemberItemVO } from "@/api/types/group";
 import colors from "@/config/colors";
 import dayjs from 'dayjs'
 import { WalletRemitReq } from "@/api/types/wallet";
@@ -25,10 +24,13 @@ import { RedPacketCreateReq } from "@/api/types/red-packet";
 import RedPacketDialog, { RedPacketDialogType } from "@/screens/red-packet/red-packet-dialog";
 import { RedPacketTypeEnum } from "@/api/types/enums";
 import redPacketApi from "@/api/v2/red-packet";
-import { navigate } from "@/lib/root-navigation";
 import PacketDetail, { RedPacketDetailModalType } from "@/screens/red-packet/packet-detail";
+import { ChatDetailItem } from "@/api/types/chat";
 export interface ChatPageRef {
-    init: (chatId: string, group: GroupInfoItem, authUser: UserInfoItem) => void;
+    init: (chatId: string,
+        _chatItem: ChatDetailItem,
+        author: UserInfoItem,
+        groupItem: GroupDetailItem) => void;
     loadMember: (members: GroupMemberItemVO[]) => void
     close: () => void;
 }
@@ -40,7 +42,8 @@ export default forwardRef((_, ref) => {
     const [keyboardState, setKeyboardState] = useState(false);
     const conversationIdRef = useRef<string>('');
     const [authUser, setAuthUser] = useState<UserInfoItem>();
-    const [group, setGroup] = useState<GroupInfoItem | null>(null);
+    const [chatItem, setChatItem] = useState<ChatDetailItem>()
+    const [group, setGroup] = useState<GroupDetailItem>()
     const sharedSecretRef = useRef<string>('');
     const firstSeq = useRef<number>(0);
     const lastSeq = useRef<number>(0);
@@ -59,22 +62,36 @@ export default forwardRef((_, ref) => {
         if (loadingRef.current) {
             return;
         }
+        loadingRef.current = true
         const seq = direction == 'up' ? firstSeq.current : lastSeq.current;
-        messageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction).then((res) => {
+        messageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction)
+        .then((res) => {
+            console.log('res===',res);
+            
+            if (direction === 'up') {
+                if (seq <= (res[res.length - 1].sequence ?? 0)) {
+                    return
+                }
+            } else {
+                if (seq >= (res[0].sequence ?? 0)) {
+                    return
+                }
+            }
             if (res.length > 0) {
                 if (direction == 'up') {
-                    firstSeq.current = res[res.length - 1].sequence ?? 0;
+                    firstSeq.current = res[0].sequence ?? 0;
                     if (lastSeq.current == 0) {
-                        lastSeq.current = res[0].sequence ?? 0;
+                        lastSeq.current = res[res.length - 1].sequence ?? 0;
                     }
                 } else {
                     lastSeq.current = res[res.length - 1].sequence ?? 0;
                 }
             }
-            console.log('消息列表', res);
+            
             setMessages((items) => {
                 return res.concat(items);
             });
+
             // 存儲圖片
             const tmps: IMessageImage[] = [];
             res.forEach((item) => {
@@ -83,19 +100,23 @@ export default forwardRef((_, ref) => {
                 }
             });
             imagesRef.current = tmps.concat(imagesRef.current);
-            console.log('圖片列表', imagesRef.current);
         }).catch((err) => {
             console.log('err', err);
         }).finally(() => {
             loadingRef.current = false;
         })
     }, [])
-    const init = useCallback((chatId: string, g: GroupInfoItem, a: UserInfoItem) => {
-        setMessages([]);
+    const init = useCallback((
+        chatId: string,
+        _chatItem: ChatDetailItem,
+        a: UserInfoItem,
+        g: GroupDetailItem
+    ) => {
         imagesRef.current = [];
         conversationIdRef.current = chatId;
         console.log('會話id conversationIdRef', conversationIdRef.current)
-        setGroup(g);
+        setGroup(g)
+        setChatItem(_chatItem)
         if (!globalThis.wallet || !g?.pubKey) {
             toast('錢包未初始化');
             return;
@@ -103,19 +124,30 @@ export default forwardRef((_, ref) => {
         // const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(Buffer.from(g.pubKey, 'hex')).substring(4);
         const sharedSecret = globalThis.wallet.signingKey.computeSharedSecret(g.pubKey);
         console.log('sharedSecret', sharedSecret);
-        loadMessages('up');
-        loadMessages('down');
+        sharedSecretRef.current = sharedSecret
+        messageLoad(_chatItem)
         // groupService.encInfo(conversationIdRef.current).then((res) => {
         //     console.log('羣加密信息', res);
         //     sharedSecretRef.current = quickAes.De(res.enc_key, sharedSecret);
         //     console.log('sharedSecretRef.current', sharedSecretRef.current);
-
         //     // intervalRef.current = setInterval(() => {
         //     //     loadMessages('down');
         //     // }, 2000);
         // })
         setAuthUser(a);
     }, []);
+
+    const messageLoad = async (_chatItem: ChatDetailItem) => {
+        firstSeq.current = _chatItem.lastReadSequence
+        lastSeq.current = _chatItem.lastReadSequence
+        // 有未读
+        if (_chatItem.lastReadSequence === 0 || _chatItem.lastReadSequence === _chatItem.lastSequence) {
+            loadMessages('up');
+        } else {
+            loadMessages('down');
+        }
+    }
+
     const close = useCallback(() => {
         setMessages([]);
         firstSeq.current = 0;
@@ -241,80 +273,89 @@ export default forwardRef((_, ref) => {
                         width: '100%',
                         paddingBottom: keyboardState ? verticalScale(60) : (verticalScale(60) + insets.bottom),
                     }}>
-                        <MessageList authUid={authUser?.id ?? ''} encKey={sharedSecretRef.current} messages={messages} onLongPress={(m) => {
-                            console.log('長按', m);
-                        }} onPress={(m) => {
-                            const data = m.data as IMessageTypeMap[DataType];
-                            if (m.type == 'image') {
-                                console.log('點擊圖片', m);
-                                const data = m.data as IMessageImage;
-                                const initialIndex = imagesRef.current.findIndex((image) => image.original == data.original)
-                                if (m.state == 1) {
-                                    encImagePreviewRef.current?.open({
-                                        encKey: sharedSecretRef.current,
-                                        images: imagesRef.current,
-                                        initialIndex,
-                                    })
-                                }
-                            }
-                            if (m.type == 'file') {
-                                if (m.data && m.state == 1) {
-                                    encFilePreviewRef.current?.open({
-                                        encKey: sharedSecretRef.current,
-                                        file: m.data as IMessageFile,
-                                    })
-                                }
-                            }
-                            if (m.type === 'packet' || m.type === 'gpacket') {
-                                const _data = m.data as IMessageRedPacket
-                                if (_data.pkInfo) {
-                                    if (_data.pkInfo?.enable === false || _data.pkInfo?.touchFlag === true) {
-                                        // jump
-                                        redPacketDetailRef.current?.open({id: _data.packetId})
-                                        return
+                        <MessageList authUid={authUser?.id ?? ''}
+                            encKey={sharedSecretRef.current}
+                            messages={messages} onLongPress={(m) => {
+                                console.log('長按', m);
+                            }}
+                            onTopReached={() => {
+                                loadMessages('up')
+                            }}
+                            onEndReached={() => {
+                                loadMessages('down')
+                            }}
+                            onPress={(m) => {
+                                const data = m.data as IMessageTypeMap[DataType];
+                                if (m.type == 'image') {
+                                    console.log('點擊圖片', m);
+                                    const data = m.data as IMessageImage;
+                                    const initialIndex = imagesRef.current.findIndex((image) => image.original == data.original)
+                                    if (m.state == 1) {
+                                        encImagePreviewRef.current?.open({
+                                            encKey: sharedSecretRef.current,
+                                            images: imagesRef.current,
+                                            initialIndex,
+                                        })
                                     }
-
-                                    if (_data?.type === RedPacketTypeEnum.TARGETED) {
-                                        if (authUser?.id !== _data.objUId) {
+                                }
+                                if (m.type == 'file') {
+                                    if (m.data && m.state == 1) {
+                                        encFilePreviewRef.current?.open({
+                                            encKey: sharedSecretRef.current,
+                                            file: m.data as IMessageFile,
+                                        })
+                                    }
+                                }
+                                if (m.type === 'packet' || m.type === 'gpacket') {
+                                    const _data = m.data as IMessageRedPacket
+                                    if (_data.pkInfo) {
+                                        if (_data.pkInfo?.enable === false || _data.pkInfo?.touchFlag === true) {
                                             // jump
-                                            redPacketDetailRef.current?.open({id: _data.packetId})
-                                            return 
-                                        } 
-                                    }
+                                            redPacketDetailRef.current?.open({ id: _data.packetId })
+                                            return
+                                        }
 
-                                    redPacketDialogRef.current?.open({
-                                        data: _data,
-                                        onPress: () => {
-                                            console.log('调用');
-                                            console.log(_data.pkInfo);
-                                            
-                                            if (_data?.pkInfo?.enable) {
-                                                // 如果可以抢
-                                                if (_data?.type === RedPacketTypeEnum.TARGETED) {
-                                                    if (authUser?.id === _data.objUId) {
-                                                        // // 抢
-                                                        redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
-                                                            if(_data.stateFunc){
-                                                                _data.stateFunc(res.result)
-                                                            }
-                                                            redPacketDetailRef.current?.open({id: _data.packetId})
-                                                        })
-                                                    }
-                                                } else {
-                                                    // 抢
-                                                    redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
-                                                        if(_data.stateFunc){
-                                                            _data.stateFunc(res.result)
-                                                        }
-                                                        redPacketDetailRef.current?.open({id: _data.packetId})
-                                                    })
-                                                }
+                                        if (_data?.type === RedPacketTypeEnum.TARGETED) {
+                                            if (authUser?.id !== _data.objUId) {
+                                                // jump
+                                                redPacketDetailRef.current?.open({ id: _data.packetId })
+                                                return
                                             }
                                         }
-                                    })
+
+                                        redPacketDialogRef.current?.open({
+                                            data: _data,
+                                            onPress: () => {
+                                                console.log('调用');
+                                                console.log(_data.pkInfo);
+
+                                                if (_data?.pkInfo?.enable) {
+                                                    // 如果可以抢
+                                                    if (_data?.type === RedPacketTypeEnum.TARGETED) {
+                                                        if (authUser?.id === _data.objUId) {
+                                                            // // 抢
+                                                            redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
+                                                                if (_data.stateFunc) {
+                                                                    _data.stateFunc(res.result)
+                                                                }
+                                                                redPacketDetailRef.current?.open({ id: _data.packetId })
+                                                            })
+                                                        }
+                                                    } else {
+                                                        // 抢
+                                                        redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
+                                                            if (_data.stateFunc) {
+                                                                _data.stateFunc(res.result)
+                                                            }
+                                                            redPacketDetailRef.current?.open({ id: _data.packetId })
+                                                        })
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    }
                                 }
-                            }
-                        }} />
+                            }} />
                     </View>
                 </TouchableWithoutFeedback>
             </View>
@@ -327,7 +368,7 @@ export default forwardRef((_, ref) => {
                         android: keyboardState ? (Platform.OS == 'ios' ? keyboardHeight : 0) : 0,
                     })
                 }}>
-                <InputToolkit ref={inputToolkitRef} sourceId={group?.id}
+                <InputToolkit ref={inputToolkitRef} sourceId={group?.gid}
                     members={members}
                     onSwap={onSwap}
                     onRedPacket={onRedPacketFunc}

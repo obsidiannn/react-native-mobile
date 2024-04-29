@@ -33,14 +33,16 @@ export default (props: {
     return <TouchableOpacity onPress={() => {
         if (item.type === ChatTypeEnum.NORMAL) {
             navigate('UserChat',{
-                uid: item.sourceId,
-                chatId: item.id,
+                item: item,
+                // uid: item.sourceId,
+                // chatId: item.id,
             })
         }else if(item.type === ChatTypeEnum.GROUP){
             console.log('group item', item);
             navigate('GroupChat',{
-                chatId: item.id,
-                groupId: item.sourceId
+                item: item,
+                // chatId: item.id,
+                // groupId: item.sourceId
             })
         }
     }} style={styles.container}>

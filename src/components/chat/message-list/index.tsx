@@ -10,29 +10,22 @@ export default (props: {
     onPress?: (message: IMessage<DataType>) => void;
     onLongPress?: (message: IMessage<DataType>) => void;
     style?: ViewStyle;
+    onEndReached?: () => void
+    onTopReached?: () => void
 }) => {
     const listRef = useRef<FlashList<IMessage<DataType>>>();
     return <FlashList
         contentContainerStyle={props.style}
         onEndReachedThreshold={0.5}
+        onScrollToTop={() => {
+            if (props.onTopReached) {
+                props.onTopReached()
+            }
+        }}
         onEndReached={() => {
-            // const lastMessage = messages[messages.length - 1];
-            // const lastMessageId = Number(lastMessage.mid);
-            // const tmps: IMessage[] = [];
-            // for (let i = 1; i < 10; i++) {
-            //     const user = users.current[Math.floor(Math.random() * users.current.length)];
-            //     const id = (lastMessageId - i) + '';
-            //     tmps.push({
-            //         mid,
-            //         user: user,
-            //         type: 'text',
-            //         text: `Hello developer${id}`,
-            //         time: new Date(),
-            //         state: 0,
-            //     })
-            // }
-            // setMessages(messages.concat(tmps))
-
+            if(props.onEndReached){
+                props.onEndReached()
+            }
         }}
         data={props.messages}
         ref={r => listRef.current = r as FlashList<IMessage<DataType>>}
@@ -41,7 +34,7 @@ export default (props: {
             const { item } = params;
             console.log('m==================');
             console.log(item);
-            
+
             const isSelf = item.user?.id == props.authUid;
             return <ListItem
                 onPress={() => {

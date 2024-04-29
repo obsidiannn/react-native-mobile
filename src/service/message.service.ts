@@ -245,9 +245,12 @@ const decrypt = (key: string, content: string) => {
  * @returns 
  */
 const getList = async (chatId: string, key: string, sequence: number, direction: 'up' | 'down'): Promise<IMessage<DataType>[]> => {
+    if(chatId === ''){
+        return []
+    }
     const data = await messageApi.getMessageList({
         chatId,
-        limit: 20,
+        limit: 10,
         sequence,
         direction,
     });
