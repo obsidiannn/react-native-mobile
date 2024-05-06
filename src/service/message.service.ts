@@ -225,14 +225,14 @@ const send = async (chatId: string, key: string, message: IMessage<DataType>) =>
     }
 }
 const decrypt = (key: string, content: string) => {
-    const data = quickAes.De(content, key);
     try {
+        const data = quickAes.De(content, key);
         return JSON.parse(data) as { t: string, d: any };
     } catch (error) {
-        return {
-            t: 'text',
-            d: '解密失败'
-        }
+    }
+    return {
+        t: 'text',
+        d: '解密失败'
     }
 }
 
@@ -267,19 +267,21 @@ const getList = async (chatId: string, key: string, sequence: number, direction:
         userIds.push(d.fromUid)
     })
     const userHash = await userService.getUserHash(userIds)
+    
     return data.items.map((item) => {
         const detail = messageHash.get(item.msgId)
         const _data = decrypt(key, detail?.content ?? '');
         const t = _data.t as DataType;
         const _d = _data.d as IMessageTypeMap[DataType]
-        // 組裝紅包id
+        const time = dayjs(item.createdAt)
+        const user = userHash.get(detail?.fromUid ?? '')
+
         if(detail?.type === MessageTypeEnum.RED_PACKET){
             const extra = JSON.parse(String(detail.extra));
             console.log('packetId ===' ,extra.id);
             _d.packetId = extra.id
         }
-        const time = dayjs(item.createdAt)
-        const user = userHash.get(detail?.fromUid ?? '')
+        
         return {
             mid: item.id,
             type: t,

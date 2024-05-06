@@ -1,6 +1,6 @@
 import { Keyboard, View, Platform, TouchableWithoutFeedback } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import tools from '../tools';
 import { UserInfoItem } from "@/api/types/user";
 import userService from "@/service/user.service";
@@ -22,10 +22,15 @@ import dayjs from 'dayjs'
 import { WalletRemitReq } from "@/api/types/wallet";
 import { RedPacketCreateReq } from "@/api/types/red-packet";
 import RedPacketDialog, { RedPacketDialogType } from "@/screens/red-packet/red-packet-dialog";
-import { RedPacketTypeEnum } from "@/api/types/enums";
+import { RedPacketTypeEnum, SocketTypeEnum } from "@/api/types/enums";
 import redPacketApi from "@/api/v2/red-packet";
 import PacketDetail, { RedPacketDetailModalType } from "@/screens/red-packet/packet-detail";
 import { ChatDetailItem } from "@/api/types/chat";
+import EventManager from '@/lib/events'
+import { SocketMessageEvent } from "@/api/types/message";
+import { FlatList } from "react-native-gesture-handler";
+import { id } from "ethers";
+
 export interface ChatPageRef {
     init: (chatId: string,
         _chatItem: ChatDetailItem,
@@ -34,10 +39,9 @@ export interface ChatPageRef {
     loadMember: (members: GroupMemberItemVO[]) => void
     close: () => void;
 }
-export default forwardRef((_, ref) => {
+export default forwardRef((props, ref) => {
     const insets = useSafeAreaInsets();
     const [messages, setMessages] = useState<IMessage<DataType>[]>([])
-
     const [keyboardHeight, setKeyboardHeight] = useState<number>(300);
     const [keyboardState, setKeyboardState] = useState(false);
     const conversationIdRef = useRef<string>('');
@@ -57,54 +61,85 @@ export default forwardRef((_, ref) => {
     const redPacketDialogRef = useRef<RedPacketDialogType>();
     const redPacketDetailRef = useRef<RedPacketDetailModalType>();
     const [members, setMembers] = useState<GroupMemberItemVO[]>([])
-
-    const loadMessages = useCallback((direction: 'up' | 'down') => {
+    const messageListRef = useRef<FlatList<IMessage<DataType>>>();
+    // const [focusIdx,setFocusIdx] = useState<number>(-1)
+    // useMemo(() => {
+    //     const idx = messages.findIndex(d => { return d.sequence === lastSeq.current })
+    //     if (idx >= 0) {
+    //         console.log('scroll to idx', idx, ' ' + lastSeq.current);
+    //        setFocusIdx(idx)
+    //     }
+    // }, [messages])
+    const loadMessages = useCallback((direction: 'up' | 'down', init?: boolean) => {
         if (loadingRef.current) {
             return;
         }
         loadingRef.current = true
         const seq = direction == 'up' ? firstSeq.current : lastSeq.current;
         messageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction)
-        .then((res) => {
-            console.log('res===',res);
-            
-            if (direction === 'up') {
-                if (seq <= (res[res.length - 1].sequence ?? 0)) {
+            .then((res) => {
+                if (res.length <= 0) {
                     return
                 }
-            } else {
-                if (seq >= (res[0].sequence ?? 0)) {
-                    return
-                }
-            }
-            if (res.length > 0) {
-                if (direction == 'up') {
-                    firstSeq.current = res[0].sequence ?? 0;
-                    if (lastSeq.current == 0) {
-                        lastSeq.current = res[res.length - 1].sequence ?? 0;
+                const fs = res[0].sequence ?? 0
+                const ls = res[res.length - 1].sequence ?? 0
+                let _data: any[] = []
+                if (direction === 'up') {
+                    if (firstSeq.current <= fs) {
+                        return
+                    } else {
+                        _data = res.filter(r => {
+                            if (init) {
+                                return true
+                            }
+                            return (r.sequence ?? 0) < firstSeq.current
+                        })
+                        firstSeq.current = fs
+                        if (_data.length > 0) {
+                            setMessages((items) => {
+                                return  _data.concat(items)
+                            });
+                        }
                     }
-                } else {
-                    lastSeq.current = res[res.length - 1].sequence ?? 0;
                 }
-            }
-            
-            setMessages((items) => {
-                return res.concat(items);
-            });
 
-            // 存儲圖片
-            const tmps: IMessageImage[] = [];
-            res.forEach((item) => {
-                if (item.type == 'image') {
-                    tmps.push(item.data as IMessageImage)
+                if (direction === 'down') {
+                    if (lastSeq.current >= ls) {
+                        return
+                    } else {
+                        _data = res.filter(r => {
+                            if (init) {
+                                return true
+                            }
+                            return (r.sequence ?? 0) > lastSeq.current
+                        })
+                        lastSeq.current = ls
+                        if (_data.length > 0) {
+                            setMessages((items) => {
+                                return items.concat(_data);
+                            });
+                            messageListRef.current?.scrollToEnd()
+                        }
+                    }
                 }
-            });
-            imagesRef.current = tmps.concat(imagesRef.current);
-        }).catch((err) => {
-            console.log('err', err);
-        }).finally(() => {
-            loadingRef.current = false;
-        })
+
+                // 存儲圖片
+                if (_data.length > 0) {
+                    const tmps: IMessageImage[] = [];
+                    _data.forEach((item) => {
+                        if (item.type == 'image') {
+                            tmps.push(item.data as IMessageImage)
+                        }
+                    });
+                    imagesRef.current = tmps.concat(imagesRef.current);
+                }
+
+            }).catch((err) => {
+                console.log('err', err);
+            }).finally(() => {
+                loadingRef.current = false;
+
+            })
     }, [])
     const init = useCallback((
         chatId: string,
@@ -126,29 +161,34 @@ export default forwardRef((_, ref) => {
         console.log('sharedSecret', sharedSecret);
         sharedSecretRef.current = sharedSecret
         messageLoad(_chatItem)
-        // groupService.encInfo(conversationIdRef.current).then((res) => {
-        //     console.log('羣加密信息', res);
-        //     sharedSecretRef.current = quickAes.De(res.enc_key, sharedSecret);
-        //     console.log('sharedSecretRef.current', sharedSecretRef.current);
-        //     // intervalRef.current = setInterval(() => {
-        //     //     loadMessages('down');
-        //     // }, 2000);
-        // })
+        const _eventKey = EventManager.generateKey(SocketTypeEnum.MESSAGE, conversationIdRef.current)
+        EventManager.addEventSingleListener(_eventKey, handleEvent)
         setAuthUser(a);
     }, []);
+
+    const handleEvent = (e: any) => {
+        console.log('[event]', e);
+        const _eventItem = e as SocketMessageEvent
+        if (lastSeq.current < _eventItem.sequence) {
+            loadMessages('down')
+
+        }
+    }
 
     const messageLoad = async (_chatItem: ChatDetailItem) => {
         firstSeq.current = _chatItem.lastReadSequence
         lastSeq.current = _chatItem.lastReadSequence
         // 有未读
         if (_chatItem.lastReadSequence === 0 || _chatItem.lastReadSequence === _chatItem.lastSequence) {
-            loadMessages('up');
+            loadMessages('up', true);
         } else {
-            loadMessages('down');
+            loadMessages('down', true);
         }
     }
 
     const close = useCallback(() => {
+        const _eventKey = EventManager.generateKey(SocketTypeEnum.MESSAGE, conversationIdRef.current)
+        EventManager.removeListener(_eventKey, handleEvent)
         setMessages([]);
         firstSeq.current = 0;
         lastSeq.current = 0;
@@ -275,6 +315,7 @@ export default forwardRef((_, ref) => {
                     }}>
                         <MessageList authUid={authUser?.id ?? ''}
                             encKey={sharedSecretRef.current}
+                            ref={messageListRef}
                             messages={messages} onLongPress={(m) => {
                                 console.log('長按', m);
                             }}
@@ -381,7 +422,7 @@ export default forwardRef((_, ref) => {
                             return
                         }
                         setMessages((items) => {
-                            return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
+                            return items.concat([{ ...message, user: authUser } as IMessage<DataType>])
                         });
                         setTimeout(() => {
                             if (message.type == 'image' || message.type == "file") {

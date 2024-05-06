@@ -1,4 +1,4 @@
-import { BasePageReq,BasePageResp,CommonEnum,GroupTypeEnum } from "./common";
+import { SocketTypeEnum } from "./enums";
 
 export interface MessageSendReq {
   id: string;
@@ -62,7 +62,17 @@ export interface MessageDeleteByIdReq{
   chatIds: string[]
 }
 
-export class MessageDeleteByMsgIdReq{
+export interface MessageDeleteByMsgIdReq{
 	msgIds: string[]
 }
 
+export interface IEvent {
+	type: SocketTypeEnum
+}
+
+export interface SocketMessageEvent extends IEvent {
+	chatId: string
+	msgId: string
+	sequence: number
+	date: Date
+}

@@ -207,3 +207,6 @@ export enum SourceType {
 }
 
 
+export enum SocketTypeEnum{
+  MESSAGE = 1
+}
