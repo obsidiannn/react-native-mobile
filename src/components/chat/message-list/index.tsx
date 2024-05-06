@@ -5,6 +5,11 @@ import { FlatList, ViewStyle } from "react-native";
 
 
 
+export interface MessageListRefType {
+    scrollToEnd: () => void;
+    updateEnableJump:(val:boolean) =>void
+}
+
 export default forwardRef((props: {
     authUid: string;
     messages: IMessage<DataType>[];
@@ -14,10 +19,10 @@ export default forwardRef((props: {
     style?: ViewStyle;
     onEndReached?: () => void
     onTopReached?: () => void
-}, messageListRef: any) => {
+}, ref: any) => {
     const [onMove, setOnMove] = useState(true)
     const [enableJump,setEnableJump] = useState<boolean>(true)
-    // const ref = useRef<FlatList<IMessage<DataType>>>();
+    const messageListRef = useRef<FlatList<IMessage<DataType>>>();
     const [content, setContent] = useState<{
         y: number,
         h: number
@@ -26,7 +31,17 @@ export default forwardRef((props: {
         h: -1
     })
  
-    const handleContentsizeChange = (w, h) => {
+    useImperativeHandle(ref, () => ({
+        scrollToEnd: () => {
+            messageListRef.current?.scrollToEnd()
+            setEnableJump(true)
+        },
+        updateEnableJump: (val: boolean) =>{
+            setEnableJump(val)
+        }
+    }));
+
+    const handleContentsizeChange = (_:any, h:number) => {
         if(enableJump){
             const _offset = content.y + (h - content.h)
             console.log('new offset',_offset,h);
@@ -43,7 +58,6 @@ export default forwardRef((props: {
     }
 
     return <FlatList
-   
         contentContainerStyle={props.style}
         onContentSizeChange={handleContentsizeChange}
         // onScroll={(e: any) => {
@@ -74,7 +88,7 @@ export default forwardRef((props: {
          }}
         contentOffset={{x: 0,y: content.y}}
         data={props.messages}
-        ref={r => messageListRef = r as FlatList<IMessage<DataType>>}
+        ref={r => messageListRef.current = r as FlatList<IMessage<DataType>>}
         renderItem={(params) => {
             const { item } = params;
             const isSelf = item.user?.id == props.authUid;

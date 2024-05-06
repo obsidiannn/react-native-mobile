@@ -12,7 +12,7 @@ import EncFilePreview, { IEncFilePreviewRef } from "@/components/chat/enc-file-p
 import LoadingModal, { ILoadingModalRef } from "@/components/common/loading-modal";
 import InputToolkit, { InputToolKitRef } from "@/components/chat/input-toolkit";
 import { DataType, IMessage, IMessageFile, IMessageImage, IMessageRedPacket, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
-import MessageList from "@/components/chat/message-list";
+import MessageList, { MessageListRefType } from "@/components/chat/message-list";
 import { globalStorage } from "@/lib/storage";
 import toast from "@/lib/toast";
 import quickAes from "@/lib/quick-aes";
@@ -61,7 +61,7 @@ export default forwardRef((props, ref) => {
     const redPacketDialogRef = useRef<RedPacketDialogType>();
     const redPacketDetailRef = useRef<RedPacketDetailModalType>();
     const [members, setMembers] = useState<GroupMemberItemVO[]>([])
-    const messageListRef = useRef<FlatList<IMessage<DataType>>>();
+    const messageListRef = useRef<MessageListRefType>();
     // const [focusIdx,setFocusIdx] = useState<number>(-1)
     // useMemo(() => {
     //     const idx = messages.findIndex(d => { return d.sequence === lastSeq.current })
@@ -115,6 +115,7 @@ export default forwardRef((props, ref) => {
                         })
                         lastSeq.current = ls
                         if (_data.length > 0) {
+                            messageListRef.current?.updateEnableJump(false)
                             setMessages((items) => {
                                 return items.concat(_data);
                             });
