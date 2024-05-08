@@ -111,6 +111,19 @@ export enum MessageTypeEnum {
   REMIT = 3,
   RED_PACKET = 4
 }
+
+export enum IMessageTypeValueEnum{
+  TEXT = 'TEXT',
+  IMAGE = 'image',
+  VIDEO = 'video',
+  AUDTO = 'audio',
+  FILE = 'file',
+  SWAP = 'swap',
+  GSWAP = 'gswap',
+  PACKET = 'packet',
+  GPACKET = 'gpacket'
+}
+
 export enum MessageStatusEnum {
   DELETED = 0,
   NORMAL = 1,

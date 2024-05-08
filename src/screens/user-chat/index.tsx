@@ -18,7 +18,7 @@ import { Image } from "@/components/image";
 import EncImagePreview, { IEncImagePreviewRef } from "@/components/chat/enc-image-preview-modal";
 import EncFilePreview, { IEncFilePreviewRef } from "@/components/chat/enc-file-preview-modal";
 import EncVideoPreview, { IEncVideoPreviewRef } from "@/components/chat/enc-video-preview-model";
-import LoadingModal,{ILoadingModalRef} from "@/components/common/loading-modal";
+import LoadingModal, { ILoadingModalRef } from "@/components/common/loading-modal";
 import { RootStackParamList } from "@/types";
 import InputToolkit, { InputToolKitRef } from "@/components/chat/input-toolkit";
 import { DataType, IMessage, IMessageFile, IMessageImage, IMessageRedPacket, IMessageTypeMap, IMessageVideo } from "@/components/chat/input-toolkit/types";
@@ -45,7 +45,6 @@ const UserChatScreen = ({ navigation, route }: Props) => {
     const conversationIdRef = useRef<string>('');
     const [title, setTitle] = useState<string>('');
     const [authUser, setAuthUser] = useState<UserInfoItem>();
-    const [chatItem, setChatItem] = useState<ChatDetailItem>()
     const [user, setUser] = useState<FriendInfoItem>();
     const sharedSecretRef = useRef<string>('');
     const firstSeq = useRef<number>(0);
@@ -62,13 +61,16 @@ const UserChatScreen = ({ navigation, route }: Props) => {
     const redPacketDetailRef = useRef<RedPacketDetailModalType>();
     const messageListRef = useRef<MessageListRefType>();
     const inputToolkitRef = useRef<InputToolKitRef>(null);
-    const loadMessages = useCallback(async (direction: 'up' | 'down',init?:boolean ) => {
+    const loadMessages = useCallback(async (direction: 'up' | 'down', init?: boolean) => {
         if (loadingRef.current) {
             return;
         }
+        const chatItem = route.params.item
         const seq = direction == 'up' ? firstSeq.current : lastSeq.current;
-        if(!init && firstSeq.current === 1){
-            return 
+        console.log('判斷', chatItem);
+
+        if (!init && (firstSeq.current <= (chatItem.firstSequence))) {
+            return
         }
         return messageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction).then((res) => {
             if (res.length <= 0) {
@@ -78,7 +80,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             const fs = res[res.length - 1].sequence ?? 0
             let _data: any[] = []
             if (direction === 'up') {
-                if (!init && firstSeq.current <= fs) {
+                if (firstSeq.current <= fs) {
                     return
                 } else {
                     _data = res.filter(r => {
@@ -95,7 +97,6 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     }
                 }
             }
-
             if (direction === 'down') {
                 if (lastSeq.current >= ls) {
                     return
@@ -116,6 +117,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                 }
             }
 
+
             // 存儲圖片
             if (_data.length > 0) {
                 const tmps: IMessageImage[] = [];
@@ -133,20 +135,19 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             loadingRef.current = false;
         })
     }, [])
+    
     useEffect(() => {
-        // 監聽頁面獲取焦點
+
         const focusEvent = navigation.addListener('focus', () => {
             console.log('focus');
-            
-            setMessages([]);
-            imagesRef.current = [];
+            // 監聽頁面獲取焦點
             const _chatItem = route.params.item
-            console.log('chatitem',_chatItem);
-            
-            conversationIdRef.current = _chatItem.id;
-            //conversationIdRef.current = 's_e36812780132627e';
+
+            console.log('chatitem', _chatItem);
+            imagesRef.current = [];
+            conversationIdRef.current = _chatItem?.id ?? '';
             console.log('會話id conversationIdRef', conversationIdRef.current)
-            const uid = _chatItem.sourceId;//'0xb929da34c0791dff8541fc129c5b61323a996a7a';//
+            const uid = _chatItem?.sourceId;//'0xb929da34c0791dff8541fc129c5b61323a996a7a';//
             if (!uid) {
                 navigation.goBack();
                 return;
@@ -157,7 +158,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     let pubKey = res.pubKey;
                     sharedSecretRef.current = globalThis.wallet.signingKey.computeSharedSecret(pubKey);
                     setUser(res);
-                    setTitle((res?.remark ) || res.name);
+                    setTitle((res?.remark) || res.name);
                     messageLoad(_chatItem)
                     const _eventKey = EventManager.generateKey(SocketTypeEnum.MESSAGE, conversationIdRef.current)
                     EventManager.addEventSingleListener(_eventKey, handleEvent)
@@ -188,7 +189,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                 loadMessages('down')
             }
         }
-        
+
         const blurEvent = navigation.addListener('blur', () => {
             setMessages([]);
             const _eventKey = EventManager.generateKey(SocketTypeEnum.MESSAGE, conversationIdRef.current)
@@ -230,15 +231,15 @@ const UserChatScreen = ({ navigation, route }: Props) => {
     }, [])
 
 
-    const onSwap = async (req: WalletRemitReq)=>{
-            console.log('发起转账', req);
-            if (!user) {
-                throw new ToastException('信息錯誤！');
-            }
-            loadingModalRef.current?.open('处理中...');
-            setTimeout(()=>{
-                messageService.doRemit({...req,chatId: conversationIdRef.current},
-                    sharedSecretRef.current,'swap').then(res=>{
+    const onSwap = async (req: WalletRemitReq) => {
+        console.log('发起转账', req);
+        if (!user) {
+            throw new ToastException('信息錯誤！');
+        }
+        loadingModalRef.current?.open('处理中...');
+        setTimeout(() => {
+            messageService.doRemit({ ...req, chatId: conversationIdRef.current },
+                sharedSecretRef.current, 'swap').then(res => {
                     const { sequence = 0 } = res;
                     if (sequence > lastSeq.current) {
                         lastSeq.current = sequence;
@@ -251,17 +252,17 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                         sequence: res.sequence,
                         data: {
                             amount: req.amount,
-                            remark: req.remark??'',
+                            remark: req.remark ?? '',
                             uid: req.objUId
                         }
                     }
                     setMessages((items) => {
                         return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
                     });
-                }).finally(()=>{
+                }).finally(() => {
                     loadingModalRef.current?.close();
                 })
-            },1000)
+        }, 1000)
     }
 
 
@@ -348,108 +349,108 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     Keyboard.dismiss();
                     inputToolkitRef.current?.down();
                 }}>
-                <View style={{
-                    flex: 1,
-                    width: '100%',
-                    paddingBottom: keyboardState ? verticalScale(60) : (verticalScale(60) + insets.bottom),
-                }}>
-                    <MessageList authUid={authUser?.id ?? ''} 
-                    encKey={sharedSecretRef.current} 
-                    ref={messageListRef}
-                    messages={messages} 
-                    onLongPress={(m)=>{
-                        console.log('長按',m);
-                    }} 
-                    onTopReached={() => {
-                        return loadMessages('up')
-                    }}
-                    onEndReached={() => {
-                        return loadMessages('down')
-                    }}
-                    onPress={(m) => {
-                        // const data = m.data as IMessageTypeMap[DataType];
-                        if (m.type == 'image') {
-                            console.log('點擊圖片', m);
-                            const data = m.data as IMessageImage;
-                            const initialIndex = imagesRef.current.findIndex((image) => image.original == data.original)
-                            if (m.state == 1) {
-                                encImagePreviewRef.current?.open({
-                                    encKey: sharedSecretRef.current,
-                                    images: imagesRef.current,
-                                    initialIndex,
-                                })
-                            }
-                        }
-                        if (m.type == 'file') {
-                            if (m.data && m.state == 1) {
-                                encFilePreviewRef.current?.open({
-                                    encKey: sharedSecretRef.current,
-                                    file: m.data as IMessageFile,
-                                })
-                            }
-                        }
-                        if (m.type == 'video') {
-                            if (m.data && m.state === 1) {
-                                encVideoPreviewRef.current?.open({
-                                    encKey: sharedSecretRef.current,
-                                    video: m.data as IMessageVideo,
-                                })
-                            }
-                        }
-
-                        if (m.type === 'packet') {
-                            const _data = m.data as IMessageRedPacket
-                            if (_data.pkInfo) {
-                                if (_data.pkInfo?.enable === false || _data.pkInfo?.touchFlag === true) {
-                                    // jump
-                                    redPacketDetailRef.current?.open({id: _data.packetId})
-                                    return
+                    <View style={{
+                        flex: 1,
+                        width: '100%',
+                        paddingBottom: keyboardState ? verticalScale(60) : (verticalScale(60) + insets.bottom),
+                    }}>
+                        <MessageList authUid={authUser?.id ?? ''}
+                            encKey={sharedSecretRef.current}
+                            ref={messageListRef}
+                            messages={messages}
+                            onLongPress={(m) => {
+                                console.log('長按', m);
+                            }}
+                            onTopReached={() => {
+                                return loadMessages('up')
+                            }}
+                            onEndReached={() => {
+                                return loadMessages('down')
+                            }}
+                            onPress={(m) => {
+                                // const data = m.data as IMessageTypeMap[DataType];
+                                if (m.type == 'image') {
+                                    console.log('點擊圖片', m);
+                                    const data = m.data as IMessageImage;
+                                    const initialIndex = imagesRef.current.findIndex((image) => image.original == data.original)
+                                    if (m.state == 1) {
+                                        encImagePreviewRef.current?.open({
+                                            encKey: sharedSecretRef.current,
+                                            images: imagesRef.current,
+                                            initialIndex,
+                                        })
+                                    }
+                                }
+                                if (m.type == 'file') {
+                                    if (m.data && m.state == 1) {
+                                        encFilePreviewRef.current?.open({
+                                            encKey: sharedSecretRef.current,
+                                            file: m.data as IMessageFile,
+                                        })
+                                    }
+                                }
+                                if (m.type == 'video') {
+                                    if (m.data && m.state === 1) {
+                                        encVideoPreviewRef.current?.open({
+                                            encKey: sharedSecretRef.current,
+                                            video: m.data as IMessageVideo,
+                                        })
+                                    }
                                 }
 
-                                if (_data?.type === RedPacketTypeEnum.TARGETED) {
-                                    if (authUser?.id !== _data.objUId) {
-                                        // jump
-                                        redPacketDetailRef.current?.open({id: _data.packetId})
-                                        return 
-                                    } 
-                                }
+                                if (m.type === 'packet') {
+                                    const _data = m.data as IMessageRedPacket
+                                    if (_data.pkInfo) {
+                                        if (_data.pkInfo?.enable === false || _data.pkInfo?.touchFlag === true) {
+                                            // jump
+                                            redPacketDetailRef.current?.open({ id: _data.packetId })
+                                            return
+                                        }
 
-                                redPacketDialogRef.current?.open({
-                                    data: _data,
-                                    onPress: () => {
-                                        console.log('调用');
-                                        console.log(_data.pkInfo);
-                                        
-                                        if (_data?.pkInfo?.enable) {
-                                            // 如果可以抢
-                                            if (_data?.type === RedPacketTypeEnum.TARGETED) {
-                                                if (authUser?.id === _data.objUId) {
-                                                    // // 抢
-                                                    redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
-                                                        if(_data.stateFunc){
-                                                            _data.stateFunc(res.result)
-                                                        }
-                                                        redPacketDetailRef.current?.open({id: _data.packetId})
-                                                    })
-                                                }
-                                            } else {
-                                                // 抢
-                                                redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
-                                                    if(_data.stateFunc){
-                                                        _data.stateFunc(res.result)
-                                                    }
-                                                    redPacketDetailRef.current?.open({id: _data.packetId})
-                                                })
+                                        if (_data?.type === RedPacketTypeEnum.TARGETED) {
+                                            if (authUser?.id !== _data.objUId) {
+                                                // jump
+                                                redPacketDetailRef.current?.open({ id: _data.packetId })
+                                                return
                                             }
                                         }
-                                    }
-                                })
-                            }
-                        }
-                    }}/>
-                </View>
 
-                    
+                                        redPacketDialogRef.current?.open({
+                                            data: _data,
+                                            onPress: () => {
+                                                console.log('调用');
+                                                console.log(_data.pkInfo);
+
+                                                if (_data?.pkInfo?.enable) {
+                                                    // 如果可以抢
+                                                    if (_data?.type === RedPacketTypeEnum.TARGETED) {
+                                                        if (authUser?.id === _data.objUId) {
+                                                            // // 抢
+                                                            redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
+                                                                if (_data.stateFunc) {
+                                                                    _data.stateFunc(res.result)
+                                                                }
+                                                                redPacketDetailRef.current?.open({ id: _data.packetId })
+                                                            })
+                                                        }
+                                                    } else {
+                                                        // 抢
+                                                        redPacketApi.touchPacket({ id: _data.packetId }).then(res => {
+                                                            if (_data.stateFunc) {
+                                                                _data.stateFunc(res.result)
+                                                            }
+                                                            redPacketDetailRef.current?.open({ id: _data.packetId })
+                                                        })
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    }
+                                }
+                            }} />
+                    </View>
+
+
                 </TouchableWithoutFeedback>
             </View>
             <View
@@ -467,8 +468,8 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                         return [{ ...message, user: authUser } as IMessage<DataType>].concat(items);
                     });
                     setTimeout(() => {
-                        if(message.type !== 'swap'){
-                            if(message.type == 'image' || message.type =="file" || message.type == 'video'){
+                        if (message.type !== 'swap') {
+                            if (message.type == 'image' || message.type == "file" || message.type == 'video') {
                                 loadingModalRef.current?.open('加密處理中...');
                             }
                             messageService.send(conversationIdRef.current, sharedSecretRef.current, message).then((res) => {
@@ -511,7 +512,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                                                 file.thumbnail = data.thumbnail
                                                 items[index].data = file;
                                             }
-    
+
                                         }
                                     }
                                     return items;
@@ -530,15 +531,15 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                                 loadingModalRef.current?.close();
                             })
                         }
-                       
+
                     }, 100)
 
                 }} tools={tools} onSwap={onSwap} onRedPacket={onRedPacketFunc} />
             </View>
             <EncImagePreview ref={encImagePreviewRef} />
             <EncFilePreview ref={encFilePreviewRef} />
-            <EncVideoPreview ref={encVideoPreviewRef}/>
-            <LoadingModal ref={loadingModalRef}/>
+            <EncVideoPreview ref={encVideoPreviewRef} />
+            <LoadingModal ref={loadingModalRef} />
             <RedPacketDialog ref={redPacketDialogRef} />
             <PacketDetail ref={redPacketDetailRef} />
         </View>

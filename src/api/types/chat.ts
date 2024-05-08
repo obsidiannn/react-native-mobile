@@ -20,6 +20,7 @@ export interface ChatDetailItem {
 	isEnc: number;
 	lastReadSequence: number;
 	lastSequence: number;
+	firstSequence: number
 	lastTime: number;
 	createdAt: number;
 	avatar: string

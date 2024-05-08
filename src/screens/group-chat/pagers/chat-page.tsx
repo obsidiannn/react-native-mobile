@@ -68,7 +68,8 @@ export default forwardRef((props, ref) => {
         }
         loadingRef.current = true
         const seq = direction == 'up' ? firstSeq.current : lastSeq.current;
-        if (!init && firstSeq.current === 1) {
+        
+        if (!init && (firstSeq.current <= (chatItem?.firstSequence??1))) {
             return
         }
         return messageService.getList(
@@ -76,7 +77,6 @@ export default forwardRef((props, ref) => {
             sharedSecretRef.current,
             seq,
             direction,
-            init ?? false
         )
             .then((res) => {
                 if (res.length <= 0) {
@@ -140,7 +140,7 @@ export default forwardRef((props, ref) => {
             }).finally(() => {
                 loadingRef.current = false;
             })
-    }, [])
+    }, [chatItem])
     const init = useCallback((
         chatId: string,
         _chatItem: ChatDetailItem,

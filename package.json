@@ -87,7 +87,9 @@
     "socket.io-client": "^4.7.5",
     "stream-browserify": "^3.0.0",
     "text-encoding-polyfill": "^0.6.7",
-    "url": "^0.11.3"
+    "transliteration": "^2.3.5",
+    "url": "^0.11.3",
+    "xregexp": "^5.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -25,8 +25,6 @@ export type TServerDatabaseNames =
 
 type ObjectServerType<T> = T extends typeof models.SERVERS_TABLE
 	? definitions.TServerModel
-	: T extends typeof models.LOGGED_USERS_TABLE
-	? definitions.TLoggedUserModel
 	: never;
 
 export type TServerDatabase = {

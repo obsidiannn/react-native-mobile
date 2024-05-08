@@ -8,7 +8,7 @@ import serverSchema from './schema/servers'
 import serverMigrations from './model/servers/migrations'
 import appMigrations from './model/migrations'
 
-import MessageModel from './model/Message'
+import IMessageModel from './model/Message'
 
 if (__DEV__) {
 	console.log(`📂 ${appGroupPath}`);
@@ -29,7 +29,7 @@ export const getDatabase = (database = ''): Database => {
 	return new Database({
 		adapter,
 		modelClasses: [
-			MessageModel
+			IMessageModel
 		]
 	});
 };
@@ -50,7 +50,7 @@ class DB {
 				schema: serverSchema,
 				migrations: serverMigrations
 			}),
-			modelClasses: [MessageModel]
+			modelClasses: []
 		}) as TServerDatabase
 	};
 
@@ -84,7 +84,7 @@ class DB {
 		this.databases.shareDB = new Database({
 			adapter,
 			modelClasses: [
-				MessageModel
+				IMessageModel
 			]
 		}) as TAppDatabase;
 	}

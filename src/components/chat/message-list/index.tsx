@@ -46,6 +46,7 @@ export default forwardRef((props: {
         const { item } = params;
         const isSelf = item.user?.id == props.authUid;
         return <ListItem
+            key={item.mid}
             onPress={() => {
                 props.onPress?.(item);
             }}

@@ -76,7 +76,9 @@ export interface IMessage<T extends DataType> {
     type: T;
     sequence?: number;
     user?: UserInfoItem;
+    uid?: string
     time: dayjs.Dayjs;
+    content?: string
     state: number; // 0: 發送中 1: 發送成功 2: 發送失敗
     data: IMessageTypeMap[T];
 }

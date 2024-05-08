@@ -15,7 +15,7 @@ import { initNotification } from './src/service/notification.service'
 import { navigate } from "./src/lib/root-navigation";
 import messaging from '@react-native-firebase/messaging';
 import { SocketProvider } from './src/lib/socket'
-
+import db from './src/lib/database/index'
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -33,7 +33,7 @@ function App(): JSX.Element {
     const res = await sysApi.getInfo()
     globalStorage.setItem('sys-pub-key', res.pubKey);
     globalStorage.setItem('sys-static-url', res.staticUrl);
-
+    db.setActiveDB('bobo-app')
     await initNotification()
 
     messaging().onNotificationOpenedApp(remoteMessage => {

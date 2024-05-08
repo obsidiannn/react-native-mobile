@@ -47,9 +47,10 @@ const HomeScreen = ({ navigation }: Props) => {
         const unsubscribe = navigation.addListener('focus', () => {
             chatService.mineChatList().then((res) => {
                 const items:ConversationType[] = res.map((item) => {
+                    const _time = item.lastTime
                     return {
                         ...item,
-                        timestamp: item.lastTime > 0 ? dayjs(item.lastTime) : undefined,
+                        timestamp: _time > 0 ? dayjs(_time) : dayjs(),
                         unread: item.lastSequence - item.lastReadSequence,
                     }
                 });
@@ -124,7 +125,7 @@ const HomeScreen = ({ navigation }: Props) => {
                 <FlashList
                     keyExtractor={(item) => item.id}
                     data={conversations}
-                    renderItem={({ item, index }) => <ConversationItem item={item} isLast={index === conversations.length - 1} />}
+                    renderItem={({ item, index }) => <ConversationItem  key={item.id} item={item} isLast={index === conversations.length - 1} />}
                     estimatedItemSize={scale(76)}
                 />
             </View>

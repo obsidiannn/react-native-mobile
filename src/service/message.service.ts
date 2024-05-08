@@ -9,12 +9,11 @@ import { DataType, IMessage, IMessageRedPacket, IMessageSwap, IMessageTypeMap } 
 import { MessageTypeEnum } from "@/api/types/enums";
 import { MessageDetailItem, MessageExtra, MessageListItem } from "@/api/types/message";
 import { WalletRemitReq, WalletRemitResp } from "@/api/types/wallet";
-import utils from "@/lib/utils";
 import walletApi from '@/api/v2/wallet'
 import { RedPacketCreateReq, RedPacketInfo } from "@/api/types/red-packet";
 import redPacketApi from "@/api/v2/red-packet";
-import { globalChatStorage } from "@/lib/storage";
-import { database } from "@/model";
+import { deleteMessageByChatId, query as messageQueryPage, saveBatch as messageSaveBatch } from '@/lib/database/services/Message'
+
 const _send = async (chatId: string, key: string, mid: string, type: MessageTypeEnum, data: {
     t: string;
     d: any;
@@ -241,10 +240,48 @@ const decrypt = (key: string, content: string) => {
 
 const getListFromDb = async (
     chatId: string,
-    key: string,
     sequence: number,
     direction: 'up' | 'down',
-) => {
+    limit: number,
+    key: string
+): Promise<IMessage<DataType>[]> => {
+    const queryParam = {
+        chatId: chatId,
+        sequence: sequence,
+        direction: direction,
+        limit: limit
+    }
+    const list = await messageQueryPage(queryParam)
+    
+    const result = list.map(l=>{
+        const _data = decrypt(key, l.data ?? '');
+        const _d = _data.d as IMessageTypeMap[DataType]
+        if (l.type === MessageTypeEnum.RED_PACKET) {
+            _d.packetId = l.packetId
+        }
+        return {
+            ...l,
+            data: _d
+        }
+    })
+    console.log('讀取',result);
+    return result
+}
+
+const checkDiffFromWb = (
+    data: IMessage<DataType>[],
+    _seq: number,
+    direction: string,
+    _limit: number
+): { seq: number, limit: number } => {
+    if (data !== undefined && data !== null && data.length > 0) {
+        const lastSeq = data[data.length - 1].sequence ?? 1
+        if (data.length === _limit || lastSeq <= 1) {
+            return { seq: 0, limit: -1 }
+        }
+        return { seq: lastSeq, limit: _limit - data.length }
+    }
+    return { seq: _seq, limit: _limit }
 }
 
 /**
@@ -260,38 +297,73 @@ const getList = async (
     key: string,
     sequence: number,
     direction: 'up' | 'down',
-    init?: boolean
+): Promise<IMessage<DataType>[]> => {
+    
+    // await deleteMessageByChatId(chatId)
+    const list = await getMessageDetails(chatId, key, sequence, direction)
+    const userIds: string[] = []
+    list.forEach(d => {
+        if (d.uid !== undefined && d.uid !== null) {
+            userIds.push(d.uid ?? '')
+        }
+    })
+    const userHash = await userService.getUserHash(userIds)
+    return list.map((item) => {
+        const user = userHash.get(item?.uid ?? '')
+        return {
+            ...item,
+            user: user
+        }
+    });
+}
+
+const getMessageDetails = async (
+    chatId: string,
+    key: string,
+    sequence: number,
+    direction: 'up' | 'down',
 ): Promise<IMessage<DataType>[]> => {
     if (chatId === '') {
         return []
     }
+    const _limit = 20
+    const list = await getListFromDb(chatId, sequence, direction, _limit,key)
+    const checkResult = checkDiffFromWb(list, sequence, direction, _limit)
+    console.log('檢查',checkResult);
+    
+    if (checkResult.limit < 0) {
+        // 無需請求遠端
+        return list
+    } else if (checkResult.limit < _limit) {
+        // // 存在部分情況
+        // if (direction === 'up' ) {
+        //     if(sequence - _limit < 1)
+        //     // 這種也無需請求遠端
+        //     return list
+        // }
+    }
+
     const data = await messageApi.getMessageList({
         chatId,
-        limit: 10,
-        sequence,
+        limit: checkResult.limit,
+        sequence: checkResult.seq,
         direction,
     });
     if (data.items.length <= 0) {
         return []
     }
-    // const users = await userService.getBatchInfo(data.items.map((item) => item.fromUid));
-    const mids = data.items.map(i => i.msgId)
+    const mids: string[] = data.items.map(i => i.msgId)
     const details = await messageApi.getMessageDetail({ chatId, ids: mids })
     const messageHash = new Map<string, MessageDetailItem>();
-    const userIds: string[] = []
     details.items.forEach(d => {
         messageHash.set(d.id, d)
-        userIds.push(d.fromUid)
     })
-    const userHash = await userService.getUserHash(userIds)
-
-    return data.items.map((item) => {
+    const remoteData = data.items.map(item => {
         const detail = messageHash.get(item.msgId)
         const _data = decrypt(key, detail?.content ?? '');
         const t = _data.t as DataType;
         const _d = _data.d as IMessageTypeMap[DataType]
         const time = dayjs(item.createdAt)
-        const user = userHash.get(detail?.fromUid ?? '')
 
         if (detail?.type === MessageTypeEnum.RED_PACKET) {
             const extra = JSON.parse(String(detail.extra));
@@ -303,13 +375,19 @@ const getList = async (
             mid: item.id,
             type: t,
             data: _d,
+            content: detail?.content,
             state: 1,
             time,
-            user,
-            sequence: item.sequence
+            sequence: item.sequence,
+            uid: detail?.fromUid
         };
-    });
+    })
+    messageSaveBatch(remoteData, chatId)
+    return list.concat(remoteData)
 };
+
+
+
 const removeBatch = async (chatId: string, mids: string[]) => {
     return true;
 }
