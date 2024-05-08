@@ -53,8 +53,8 @@ export interface IMessageRedPacket {
     type: RedPacketTypeEnum
     objUId?: string
     objUName?: string
-    pkInfo?:RedPacketResp
-    stateFunc?:(state:number)=>void
+    pkInfo?: RedPacketResp
+    stateFunc?: (state: number) => void
 }
 
 

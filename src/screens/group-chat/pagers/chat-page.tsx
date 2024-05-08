@@ -62,27 +62,28 @@ export default forwardRef((props, ref) => {
     const redPacketDetailRef = useRef<RedPacketDetailModalType>();
     const [members, setMembers] = useState<GroupMemberItemVO[]>([])
     const messageListRef = useRef<MessageListRefType>();
-    // const [focusIdx,setFocusIdx] = useState<number>(-1)
-    // useMemo(() => {
-    //     const idx = messages.findIndex(d => { return d.sequence === lastSeq.current })
-    //     if (idx >= 0) {
-    //         console.log('scroll to idx', idx, ' ' + lastSeq.current);
-    //        setFocusIdx(idx)
-    //     }
-    // }, [messages])
-    const loadMessages = useCallback((direction: 'up' | 'down', init?: boolean) => {
+    const loadMessages = useCallback(async (direction: 'up' | 'down', init?: boolean) => {
         if (loadingRef.current) {
             return;
         }
         loadingRef.current = true
         const seq = direction == 'up' ? firstSeq.current : lastSeq.current;
-        messageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction)
+        if (!init && firstSeq.current === 1) {
+            return
+        }
+        return messageService.getList(
+            conversationIdRef.current,
+            sharedSecretRef.current,
+            seq,
+            direction,
+            init ?? false
+        )
             .then((res) => {
                 if (res.length <= 0) {
                     return
                 }
-                const fs = res[0].sequence ?? 0
-                const ls = res[res.length - 1].sequence ?? 0
+                const ls = res[0].sequence ?? 0
+                const fs = res[res.length - 1].sequence ?? 0
                 let _data: any[] = []
                 if (direction === 'up') {
                     if (firstSeq.current <= fs) {
@@ -97,7 +98,7 @@ export default forwardRef((props, ref) => {
                         firstSeq.current = fs
                         if (_data.length > 0) {
                             setMessages((items) => {
-                                return  _data.concat(items)
+                                return items.concat(_data)
                             });
                         }
                     }
@@ -115,7 +116,6 @@ export default forwardRef((props, ref) => {
                         })
                         lastSeq.current = ls
                         if (_data.length > 0) {
-                            messageListRef.current?.updateEnableJump(false)
                             setMessages((items) => {
                                 return items.concat(_data);
                             });
@@ -139,7 +139,6 @@ export default forwardRef((props, ref) => {
                 console.log('err', err);
             }).finally(() => {
                 loadingRef.current = false;
-
             })
     }, [])
     const init = useCallback((
@@ -190,6 +189,7 @@ export default forwardRef((props, ref) => {
     const close = useCallback(() => {
         const _eventKey = EventManager.generateKey(SocketTypeEnum.MESSAGE, conversationIdRef.current)
         EventManager.removeListener(_eventKey, handleEvent)
+        
         setMessages([]);
         firstSeq.current = 0;
         lastSeq.current = 0;
@@ -311,6 +311,7 @@ export default forwardRef((props, ref) => {
                 }}>
                     <View style={{
                         flex: 1,
+                        scaleY: -1,
                         width: '100%',
                         paddingBottom: keyboardState ? verticalScale(60) : (verticalScale(60) + insets.bottom),
                     }}>
@@ -321,10 +322,10 @@ export default forwardRef((props, ref) => {
                                 console.log('長按', m);
                             }}
                             onTopReached={() => {
-                                loadMessages('up')
+                                return loadMessages('up')
                             }}
                             onEndReached={() => {
-                                loadMessages('down')
+                                return loadMessages('down')
                             }}
                             onPress={(m) => {
                                 const data = m.data as IMessageTypeMap[DataType];

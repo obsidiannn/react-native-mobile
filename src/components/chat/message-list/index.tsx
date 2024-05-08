@@ -1,14 +1,15 @@
-import { ForwardedRef, forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { DataType, IMessage } from "../input-toolkit/types";
 import ListItem from "./list-item";
-import { FlatList, ViewStyle } from "react-native";
-
-
+import { ActivityIndicator, FlatListProps, ViewStyle } from "react-native";
+import { FlatList, RefreshControl } from 'react-native-gesture-handler'
+import Animated, { runOnJS, useAnimatedScrollHandler } from "react-native-reanimated";
 
 export interface MessageListRefType {
     scrollToEnd: () => void;
-    updateEnableJump:(val:boolean) =>void
 }
+
+const AnimatedFlatList = Animated.createAnimatedComponent<FlatListProps<IMessage<DataType>>>(FlatList)
 
 export default forwardRef((props: {
     authUid: string;
@@ -17,93 +18,113 @@ export default forwardRef((props: {
     onPress?: (message: IMessage<DataType>) => void;
     onLongPress?: (message: IMessage<DataType>) => void;
     style?: ViewStyle;
-    onEndReached?: () => void
-    onTopReached?: () => void
+    onEndReached?: () => Promise<void>
+    onTopReached?: () => Promise<void>
 }, ref: any) => {
-    const [onMove, setOnMove] = useState(true)
-    const [enableJump,setEnableJump] = useState<boolean>(true)
+
+    const [visible, setVisible] = useState<boolean>(false)
+    const [loading, setLoading] = useState(false)
     const messageListRef = useRef<FlatList<IMessage<DataType>>>();
-    const [content, setContent] = useState<{
-        y: number,
-        h: number
-    }>({
-        y: -1,
-        h: -1
-    })
- 
+    const isIos = globalThis.isIos
+
     useImperativeHandle(ref, () => ({
         scrollToEnd: () => {
             messageListRef.current?.scrollToEnd()
-            setEnableJump(true)
         },
-        updateEnableJump: (val: boolean) =>{
-            setEnableJump(val)
-        }
     }));
 
-    const handleContentsizeChange = (_:any, h:number) => {
-        if(enableJump){
-            const _offset = content.y + (h - content.h)
-            console.log('new offset',_offset,h);
-            setContent({y: _offset,h: h})
+
+    const renderFooter = () => {
+        if (loading) {
+            return <ActivityIndicator />
+        }
+        return null
+    }
+
+
+    const renderItems = (params: any) => {
+        const { item } = params;
+        const isSelf = item.user?.id == props.authUid;
+        return <ListItem
+            onPress={() => {
+                props.onPress?.(item);
+            }}
+            onLongPress={() => {
+                props.onLongPress?.(item);
+            }}
+            item={item}
+            isSelf={isSelf}
+            encKey={props.encKey}
+        />
+    }
+
+    const onLoad = async () => {
+        if (props.onTopReached) {
+            if (loading) {
+                return
+            }
+            setLoading(true)
+            try{
+                await props.onTopReached()
+            }finally{
+                setLoading(false)
+            }
         }
     }
 
-    const handleContent = (e:any) =>{
-        setContent({
-            y: e.nativeEvent.contentOffset.y,
-            h: e.nativeEvent.contentSize.height
-        })    
-        setOnMove(false)
-    }
-
-    return <FlatList
-        contentContainerStyle={props.style}
-        onContentSizeChange={handleContentsizeChange}
-        // onScroll={(e: any) => {
-        //     setContent({
-        //         y: e.nativeEvent.contentOffset.y,
-        //         h: e.nativeEvent.contentSize.height
-        //     })
-        // }}
-        viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
-        scrollToOverflowEnabled
-        onStartReachedThreshold={0.1}
-        onStartReached={() => {
-            if (props.onTopReached && !onMove) {
-                setOnMove(true)
-                props.onTopReached()
-            }
-        }}
-        onEndReached={() => {
-            console.log('load');
-            if (props.onEndReached && !onMove) {
-                setOnMove(true)
-                props.onEndReached()
-            }
-        }}
-        onEndReachedThreshold={0.1}
-        onMomentumScrollEnd={(e:any) => { 
-            handleContent(e)
-         }}
-        contentOffset={{x: 0,y: content.y}}
-        data={props.messages}
-        ref={r => messageListRef.current = r as FlatList<IMessage<DataType>>}
-        renderItem={(params) => {
-            const { item } = params;
-            const isSelf = item.user?.id == props.authUid;
-            return <ListItem
-                onPress={() => {
-                    props.onPress?.(item);
-                }}
-                onLongPress={() => {
-                    props.onLongPress?.(item);
-                }}
-                item={item}
-                isSelf={isSelf}
-                encKey={props.encKey}
-            />
-        }}
-        keyExtractor={(item) => item.mid}
-    />
+    return <>
+        <AnimatedFlatList
+            testID='message-list'
+            // @ts-ignore
+            ref={messageListRef}
+            keyExtractor={(item) => item.mid}
+            contentContainerStyle={props.style}
+            inverted={true}
+            removeClippedSubviews={isIos}
+            initialNumToRender={7}
+            windowSize={10}
+            scrollEventThrottle={16}
+            maxToRenderPerBatch={5}
+            data={props.messages}
+            renderItem={renderItems}
+            ListFooterComponent={renderFooter}
+            onEndReachedThreshold={0.3}
+            onEndReached={onLoad}
+        />
+    </>
+    // return <FlatList
+    //     ref={r => messageListRef.current = r as FlatList<IMessage<DataType>>}
+    //     data={props.messages}
+    //     keyExtractor={(item) => item.mid}
+    //     contentContainerStyle={props.style}
+    //     windowSize={9}
+    //     keyboardShouldPersistTaps='always'
+    //     removeClippedSubviews={isIos}
+    //     keyboardDismissMode={isIos ? 'on-drag' : 'none'}
+    //     onEndReached={() => {
+    //         console.log('load');
+    //         if (props.onEndReached) {
+    //             props.onEndReached()
+    //         }
+    //     }}
+    //     onEndReachedThreshold={0.5}
+    //     refreshControl={
+    //         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+    //     }
+    //     renderItem={(params) => {
+    //         const { item } = params;
+    //         const isSelf = item.user?.id == props.authUid;
+    //         return <ListItem
+    //             onPress={() => {
+    //                 props.onPress?.(item);
+    //             }}
+    //             onLongPress={() => {
+    //                 props.onLongPress?.(item);
+    //             }}
+    //             item={item}
+    //             isSelf={isSelf}
+    //             encKey={props.encKey}
+    //         />
+    //     }}
+    // />
 })

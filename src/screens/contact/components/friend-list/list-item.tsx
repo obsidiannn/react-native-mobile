@@ -5,17 +5,28 @@ import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { FriendInfoItem } from "@/api/types/friend";
 import { Image } from "@/components/image";
+import chatService from "@/service/chat.service";
+import { ConversationType } from "@/screens/home/components/conversation-item";
 dayjs.extend(relativeTime)
 export default (props: {
-    item:FriendInfoItem,
+    item: FriendInfoItem,
     isLast: boolean,
 }) => {
     const { item, isLast } = props;
     return <TouchableOpacity onPress={() => {
-        navigate('UserChat',{
-            chatId: item.chatId,
-            uid: item.uid,
+        chatService.chatDetail(item.chatId).then(res => {
+            if (res.length > 0) {
+                const item: ConversationType = {
+                    ...res[0],
+                    timestamp: res[0].lastTime > 0 ? dayjs(res[0].lastTime) : undefined,
+                    unread: res[0].lastSequence - res[0].lastReadSequence,
+                }
+                navigate('UserChat', {
+                    item: item
+                })
+            }
         })
+
     }} style={styles.container}>
         <View style={styles.avatarContainer}>
             <Image source={item.avatar} style={styles.avatar} />

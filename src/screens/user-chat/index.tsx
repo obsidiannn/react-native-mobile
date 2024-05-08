@@ -30,8 +30,12 @@ import { SimplePacketCreateModalType } from "../red-packet/simple-packet";
 import { RedPacketCreateReq } from "@/api/types/red-packet";
 import RedPacketDialog, { RedPacketDialogType } from "../red-packet/red-packet-dialog";
 import PacketDetail, { RedPacketDetailModalType } from "../red-packet/packet-detail";
-import { RedPacketTypeEnum } from "@/api/types/enums";
+import { RedPacketTypeEnum, SocketTypeEnum } from "@/api/types/enums";
 import redPacketApi from "@/api/v2/red-packet";
+import EventManager from '@/lib/events'
+import { SocketMessageEvent } from "@/api/types/message";
+import { ChatDetailItem } from "@/api/types/chat";
+
 const UserChatScreen = ({ navigation, route }: Props) => {
     const insets = useSafeAreaInsets();
     const [messages, setMessages] = useState<IMessage<DataType>[]>([])
@@ -41,6 +45,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
     const conversationIdRef = useRef<string>('');
     const [title, setTitle] = useState<string>('');
     const [authUser, setAuthUser] = useState<UserInfoItem>();
+    const [chatItem, setChatItem] = useState<ChatDetailItem>()
     const [user, setUser] = useState<FriendInfoItem>();
     const sharedSecretRef = useRef<string>('');
     const firstSeq = useRef<number>(0);
@@ -55,39 +60,73 @@ const UserChatScreen = ({ navigation, route }: Props) => {
     const loadingModalRef = useRef<ILoadingModalRef>();
     const redPacketDialogRef = useRef<RedPacketDialogType>();
     const redPacketDetailRef = useRef<RedPacketDetailModalType>();
-
+    const messageListRef = useRef<MessageListRefType>();
     const inputToolkitRef = useRef<InputToolKitRef>(null);
-    const loadMessages = useCallback((direction: 'up' | 'down') => {
+    const loadMessages = useCallback(async (direction: 'up' | 'down',init?:boolean ) => {
         if (loadingRef.current) {
             return;
         }
         const seq = direction == 'up' ? firstSeq.current : lastSeq.current;
-        messageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction).then((res) => {
-            if (res.length > 0) {
-                if (direction == 'up') {
-                    firstSeq.current = res[res.length - 1].sequence ?? 0;
-                    if (lastSeq.current == 0) {
-                        lastSeq.current = res[0].sequence ?? 0;
-                    }
+        if(!init && firstSeq.current === 1){
+            return 
+        }
+        return messageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction).then((res) => {
+            if (res.length <= 0) {
+                return
+            }
+            const ls = res[0].sequence ?? 0
+            const fs = res[res.length - 1].sequence ?? 0
+            let _data: any[] = []
+            if (direction === 'up') {
+                if (!init && firstSeq.current <= fs) {
+                    return
                 } else {
-                    lastSeq.current = res[res.length - 1].sequence ?? 0;
+                    _data = res.filter(r => {
+                        if (init) {
+                            return true
+                        }
+                        return (r.sequence ?? 0) < firstSeq.current
+                    })
+                    firstSeq.current = fs
+                    if (_data.length > 0) {
+                        setMessages((items) => {
+                            return items.concat(_data)
+                        });
+                    }
                 }
             }
-            console.log('消息列表', res);
-            setMessages((items) => {
-                const result = res.concat(items);
-                
-                return result
-            });
-            // 存儲圖片
-            const tmps: IMessageImage[] = [];
-            res.forEach((item) => {
-                if (item.type == 'image') {
-                    tmps.push(item.data as IMessageImage)
+
+            if (direction === 'down') {
+                if (lastSeq.current >= ls) {
+                    return
+                } else {
+                    _data = res.filter(r => {
+                        if (init) {
+                            return true
+                        }
+                        return (r.sequence ?? 0) > lastSeq.current
+                    })
+                    lastSeq.current = ls
+                    if (_data.length > 0) {
+                        setMessages((items) => {
+                            return items.concat(_data);
+                        });
+                        messageListRef.current?.scrollToEnd()
+                    }
                 }
-            });
-            imagesRef.current = tmps.concat(imagesRef.current);
-            console.log('圖片列表', imagesRef.current);
+            }
+
+            // 存儲圖片
+            if (_data.length > 0) {
+                const tmps: IMessageImage[] = [];
+                _data.forEach((item) => {
+                    if (item.type == 'image') {
+                        tmps.push(item.data as IMessageImage)
+                    }
+                });
+                imagesRef.current = tmps.concat(imagesRef.current);
+            }
+
         }).catch((err) => {
             console.log('err', err);
         }).finally(() => {
@@ -102,6 +141,8 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             setMessages([]);
             imagesRef.current = [];
             const _chatItem = route.params.item
+            console.log('chatitem',_chatItem);
+            
             conversationIdRef.current = _chatItem.id;
             //conversationIdRef.current = 's_e36812780132627e';
             console.log('會話id conversationIdRef', conversationIdRef.current)
@@ -117,8 +158,9 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     sharedSecretRef.current = globalThis.wallet.signingKey.computeSharedSecret(pubKey);
                     setUser(res);
                     setTitle((res?.remark ) || res.name);
-                    loadMessages('up');
-                    loadMessages('down');
+                    messageLoad(_chatItem)
+                    const _eventKey = EventManager.generateKey(SocketTypeEnum.MESSAGE, conversationIdRef.current)
+                    EventManager.addEventSingleListener(_eventKey, handleEvent)
                     // TODO: 這裏臨時是定時調用的
                     // intervalRef.current = setInterval(() => {
                     //     loadMessages('down');
@@ -126,8 +168,31 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                 }
             })
         });
+
+        const messageLoad = async (_chatItem: ChatDetailItem) => {
+            firstSeq.current = _chatItem.lastSequence
+            lastSeq.current = _chatItem.lastSequence
+            // 有未读
+            loadMessages('up', true);
+            // if (_chatItem.lastReadSequence === 0 || _chatItem.lastReadSequence === _chatItem.lastSequence) {
+            //     loadMessages('up', true);
+            // } else {
+            //     loadMessages('down', true);
+            // }
+        }
+
+        const handleEvent = (e: any) => {
+            console.log('[event]', e);
+            const _eventItem = e as SocketMessageEvent
+            if (lastSeq.current < _eventItem.sequence) {
+                loadMessages('down')
+            }
+        }
+        
         const blurEvent = navigation.addListener('blur', () => {
             setMessages([]);
+            const _eventKey = EventManager.generateKey(SocketTypeEnum.MESSAGE, conversationIdRef.current)
+            EventManager.removeListener(_eventKey, handleEvent)
             firstSeq.current = 0;
             lastSeq.current = 0;
             if (intervalRef.current) {
@@ -288,9 +353,20 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     width: '100%',
                     paddingBottom: keyboardState ? verticalScale(60) : (verticalScale(60) + insets.bottom),
                 }}>
-                    <MessageList authUid={authUser?.id ?? ''} encKey={sharedSecretRef.current} messages={messages} onLongPress={(m)=>{
+                    <MessageList authUid={authUser?.id ?? ''} 
+                    encKey={sharedSecretRef.current} 
+                    ref={messageListRef}
+                    messages={messages} 
+                    onLongPress={(m)=>{
                         console.log('長按',m);
-                    }} onPress={(m) => {
+                    }} 
+                    onTopReached={() => {
+                        return loadMessages('up')
+                    }}
+                    onEndReached={() => {
+                        return loadMessages('down')
+                    }}
+                    onPress={(m) => {
                         // const data = m.data as IMessageTypeMap[DataType];
                         if (m.type == 'image') {
                             console.log('點擊圖片', m);

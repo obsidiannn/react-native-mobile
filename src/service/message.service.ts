@@ -13,6 +13,8 @@ import utils from "@/lib/utils";
 import walletApi from '@/api/v2/wallet'
 import { RedPacketCreateReq, RedPacketInfo } from "@/api/types/red-packet";
 import redPacketApi from "@/api/v2/red-packet";
+import { globalChatStorage } from "@/lib/storage";
+import { database } from "@/model";
 const _send = async (chatId: string, key: string, mid: string, type: MessageTypeEnum, data: {
     t: string;
     d: any;
@@ -32,30 +34,30 @@ const _send = async (chatId: string, key: string, mid: string, type: MessageType
     });
 }
 
-const doRemit = async (req: WalletRemitReq,key: string,swapType: 'swap'|'gswap'): Promise<WalletRemitResp> => {
+const doRemit = async (req: WalletRemitReq, key: string, swapType: 'swap' | 'gswap'): Promise<WalletRemitResp> => {
     const data: IMessageSwap = {
-        remark:req.remark??'',
+        remark: req.remark ?? '',
         amount: req.amount,
         uid: req.objUId
     }
     const remitReq: WalletRemitReq = {
         ...req,
-        content: quickAes.En(JSON.stringify({t: swapType,d: data}), key),
+        content: quickAes.En(JSON.stringify({ t: swapType, d: data }), key),
     }
     return await walletApi.doRemit(remitReq)
 }
 
 // 發紅包消息
-const doRedPacket = async (req: RedPacketCreateReq,key: string,packetType: 'packet'|'gpacket'): Promise<RedPacketInfo> => {
+const doRedPacket = async (req: RedPacketCreateReq, key: string, packetType: 'packet' | 'gpacket'): Promise<RedPacketInfo> => {
     const data: IMessageRedPacket = {
         remark: req.remark,
-        sender: req.sender??'',
+        sender: req.sender ?? '',
         packetId: '',
         type: req.type
     }
     const rpReq: RedPacketCreateReq = {
         ...req,
-        content: quickAes.En(JSON.stringify({t: packetType,d: data}), key),
+        content: quickAes.En(JSON.stringify({ t: packetType, d: data }), key),
     }
     return await redPacketApi.doRedPacket(rpReq)
 }
@@ -236,6 +238,15 @@ const decrypt = (key: string, content: string) => {
     }
 }
 
+
+const getListFromDb = async (
+    chatId: string,
+    key: string,
+    sequence: number,
+    direction: 'up' | 'down',
+) => {
+}
+
 /**
  * 获取消息列表
  * @param chatId 
@@ -244,8 +255,14 @@ const decrypt = (key: string, content: string) => {
  * @param direction 
  * @returns 
  */
-const getList = async (chatId: string, key: string, sequence: number, direction: 'up' | 'down'): Promise<IMessage<DataType>[]> => {
-    if(chatId === ''){
+const getList = async (
+    chatId: string,
+    key: string,
+    sequence: number,
+    direction: 'up' | 'down',
+    init?: boolean
+): Promise<IMessage<DataType>[]> => {
+    if (chatId === '') {
         return []
     }
     const data = await messageApi.getMessageList({
@@ -267,7 +284,7 @@ const getList = async (chatId: string, key: string, sequence: number, direction:
         userIds.push(d.fromUid)
     })
     const userHash = await userService.getUserHash(userIds)
-    
+
     return data.items.map((item) => {
         const detail = messageHash.get(item.msgId)
         const _data = decrypt(key, detail?.content ?? '');
@@ -276,12 +293,12 @@ const getList = async (chatId: string, key: string, sequence: number, direction:
         const time = dayjs(item.createdAt)
         const user = userHash.get(detail?.fromUid ?? '')
 
-        if(detail?.type === MessageTypeEnum.RED_PACKET){
+        if (detail?.type === MessageTypeEnum.RED_PACKET) {
             const extra = JSON.parse(String(detail.extra));
-            console.log('packetId ===' ,extra.id);
+            console.log('packetId ===', extra.id);
             _d.packetId = extra.id
         }
-        
+
         return {
             mid: item.id,
             type: t,

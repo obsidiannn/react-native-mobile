@@ -24,6 +24,7 @@ class Storage {
     getAllKeys() {
         return this.storage?.getAllKeys() ?? []
     }
+    
     removeItem(key: string) {
         this.storage?.delete(key)
         return true;
@@ -41,6 +42,8 @@ class Storage {
 }
 export const globalStorage = new Storage('global', 'bobochat');
 export const EnFileCacheStorage = new Storage('en-file-cache', 'bobochat');
+export const globalChatStorage = new Storage('chat','bobochat')
+
 let userStorages = new Map<string, Storage>();
 
 export const getUserStorage = (id: string, key?: string) => {

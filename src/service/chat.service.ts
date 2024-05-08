@@ -13,6 +13,15 @@ const mineChatList = async ():Promise<ChatDetailItem[]> =>{
     return (await chatApi.chatDetail({ids: chatIds})).items??[]
 }
 
+/**
+ * 我的消息列表
+ */
+const chatDetail = async (id: string):Promise<ChatDetailItem[]> =>{
+    return (await chatApi.chatDetail({ids: [id]})).items??[]
+}
+
+
 export default {
-    mineChatList
+    mineChatList,
+    chatDetail
 }
