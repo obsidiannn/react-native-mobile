@@ -22,7 +22,7 @@ import LoadingModal, { ILoadingModalRef } from "@/components/common/loading-moda
 import { RootStackParamList } from "@/types";
 import InputToolkit, { InputToolKitRef } from "@/components/chat/input-toolkit";
 import { DataType, IMessage, IMessageFile, IMessageImage, IMessageRedPacket, IMessageTypeMap, IMessageVideo } from "@/components/chat/input-toolkit/types";
-import MessageList from "@/components/chat/message-list";
+import MessageList, { MessageListRefType } from "@/components/chat/message-list";
 import { globalStorage } from "@/lib/storage";
 import { WalletRemitReq } from "@/api/types/wallet";
 import dayjs from 'dayjs'
@@ -66,12 +66,20 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             return;
         }
         const chatItem = route.params.item
-        const seq = direction == 'up' ? firstSeq.current : lastSeq.current;
-        console.log('判斷', chatItem);
-
-        if (!init && (firstSeq.current <= (chatItem.firstSequence))) {
-            return
+        let seq = direction == 'up' ? firstSeq.current : lastSeq.current;
+        if (!init) {
+            if (direction === 'up') {
+                seq -= 1
+                if(seq <= (chatItem.firstSequence)){
+                    return
+                }
+            } else {
+                seq += 1
+            }
         }
+
+        console.log('load', direction, seq);
+
         return messageService.getList(conversationIdRef.current, sharedSecretRef.current, seq, direction).then((res) => {
             if (res.length <= 0) {
                 return
@@ -109,10 +117,11 @@ const UserChatScreen = ({ navigation, route }: Props) => {
                     })
                     lastSeq.current = ls
                     if (_data.length > 0) {
+                        console.log('[add data]', _data);
                         setMessages((items) => {
-                            return items.concat(_data);
+                            return _data.concat(items);
                         });
-                        messageListRef.current?.scrollToEnd()
+                        messageListRef.current?.scrollToIndex(lastSeq.current)
                     }
                 }
             }
@@ -135,7 +144,7 @@ const UserChatScreen = ({ navigation, route }: Props) => {
             loadingRef.current = false;
         })
     }, [])
-    
+
     useEffect(() => {
 
         const focusEvent = navigation.addListener('focus', () => {
@@ -400,6 +409,8 @@ const UserChatScreen = ({ navigation, route }: Props) => {
 
                                 if (m.type === 'packet') {
                                     const _data = m.data as IMessageRedPacket
+                                    console.log('紅包data',_data);
+                                    
                                     if (_data.pkInfo) {
                                         if (_data.pkInfo?.enable === false || _data.pkInfo?.touchFlag === true) {
                                             // jump
