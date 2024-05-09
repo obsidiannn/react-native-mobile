@@ -7,6 +7,7 @@ import Animated, { runOnJS, useAnimatedScrollHandler } from "react-native-reanim
 
 export interface MessageListRefType {
     scrollToEnd: () => void;
+    scrollToIndex: (seq: number) => void;
 }
 
 const AnimatedFlatList = Animated.createAnimatedComponent<FlatListProps<IMessage<DataType>>>(FlatList)
@@ -29,7 +30,14 @@ export default forwardRef((props: {
 
     useImperativeHandle(ref, () => ({
         scrollToEnd: () => {
-            messageListRef.current?.scrollToEnd()
+            console.log('[to end]');
+            
+            messageListRef.current?.scrollToEnd({animated:true})
+        },
+        scrollToIndex: (seq: number) => {
+            const idx = props.messages.findIndex(m=> m.sequence === seq)
+            console.log('[to index]',idx);
+            messageListRef.current?.scrollToIndex({animated:true,index: idx})
         },
     }));
 

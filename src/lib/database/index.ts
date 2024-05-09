@@ -9,7 +9,10 @@ import serverMigrations from './model/servers/migrations'
 import appMigrations from './model/migrations'
 
 import IMessageModel from './model/Message'
+import UserModel from './model/User';
+import fs from 'react-native-fs'
 
+import * as FileSystem from 'expo-file-system';
 if (__DEV__) {
 	console.log(`📂 ${appGroupPath}`);
 }
@@ -29,7 +32,8 @@ export const getDatabase = (database = ''): Database => {
 	return new Database({
 		adapter,
 		modelClasses: [
-			IMessageModel
+			IMessageModel,
+			UserModel
 		]
 	});
 };
@@ -84,13 +88,18 @@ class DB {
 		this.databases.shareDB = new Database({
 			adapter,
 			modelClasses: [
-				IMessageModel
+				IMessageModel,
+				UserModel
 			]
 		}) as TAppDatabase;
 	}
 
 	setActiveDB(database: string) {
 		this.databases.activeDB = getDatabase(database) as TAppDatabase;
+	// 	const path = database.replace(/(^\w+:|^)\/\//, '').replace(/\//g, '.');
+	// const dbName = getDatabasePath(path);
+	// fs.unlink(dbName)
+	// FileSystem.deleteAsync(dbName)
 	}
 }
 

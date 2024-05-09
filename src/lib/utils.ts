@@ -3,7 +3,6 @@ import authService from "@/service/auth.service";
 import RootSiblings from 'react-native-root-siblings';
 
 import dayjs from 'dayjs'
-
 const bytesToSize = (bytes: number) => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     if (bytes === 0) return '0 Byte';
@@ -72,6 +71,11 @@ const changeF2Y = (amountCent: number|null|undefined):string => {
     return Number(amountCent/100).toFixed(2)
 }
 
+// 數組求差集
+const arrayDifference = (a: string[],b: string[]): string[] =>{
+    const bs = new Set(b)
+    return Array.from(a.filter(i=> !bs.has(i)))
+}
 
 export default {
     bytesToSize,
@@ -81,6 +85,7 @@ export default {
     isNotBlank,
     isBlank,
     dateFormat,
-    changeF2Y
+    changeF2Y,
+    arrayDifference
     // refreshCurrentInfo
 }

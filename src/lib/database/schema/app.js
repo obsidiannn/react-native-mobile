@@ -1,7 +1,7 @@
 import { appSchema, tableSchema } from '@nozbe/watermelondb'
 
 export default appSchema({
-  version: 2,
+  version: 3,
   tables: [
     tableSchema({
       name: 'message',
@@ -15,6 +15,19 @@ export default appSchema({
         { name: 'state', type: 'number' },
         { name: 'data', type: 'string', isOptional: true },
         { name: 'packet_id', type: 'string', isOptional: true },
+      ]
+    }),
+    tableSchema({
+      name: 'users',
+      columns: [
+        { name: 'uid', type: 'string', isIndexed: true },
+        { name: 'avatar', type: 'string', isOptional: true },
+        { name: 'name', type: 'string' },
+        { name: 'name_index', type: 'string' },
+        { name: 'gender', type: 'number' },
+        { name: 'pub_key', type: 'string' },
+        { name: 'sign', type: 'string', isOptional: true },
+        { name: 'refresh_stamp', type: 'number' },
       ]
     }),
   ]

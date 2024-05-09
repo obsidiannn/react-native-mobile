@@ -50,7 +50,8 @@ export const query = async (param: MessqgeQueryType) => {
 			chatId: r.chatId,
 			uid: r.uid ?? '',
 			data: r.data,
-			time: dayjs(r.time)
+			time: dayjs(r.time),
+			packetId: r.packetId
 		}
 	}).sort((a, b) => {
 		return b.sequence - a.sequence
@@ -60,10 +61,10 @@ export const query = async (param: MessqgeQueryType) => {
 
 export const saveBatch = async (_data: IMessage<DataType>[], chatId: string) => {
 	const db = database.active;
-
+	const collection = getCollection(db)
 	const list: IMessageModel[] = (await Promise.all(
 		_data.map(d => {
-			return getCollection(db).prepareCreate(entity => {
+			return collection.prepareCreate(entity => {
 				entity.mid = d.mid
 				entity.type = d.type
 				entity.sequence = d.sequence

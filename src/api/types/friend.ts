@@ -26,6 +26,7 @@ export interface FriendInviteApplyItem{
 	objUid: string
 	remark: string;
 	rejectReason: string;
+	isSelf: boolean
 	status: number;
 	name?: string
 	avatar?: string
