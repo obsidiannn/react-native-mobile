@@ -19,7 +19,7 @@ const MainStack = () => {
         headerShown: false,
     }}
         initialRouteName={globalThis.wallet ? 'AuthStackNav' : 'Entry'}
-        //  initialRouteName={'Unlock'}
+        //  initialRouteName={'Entry'}
     >
         <Stack.Screen name="Entry" component={EntryScreen} />
         <Stack.Screen name="Web" component={WebScreen} />

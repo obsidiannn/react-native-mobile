@@ -86,7 +86,8 @@ export default forwardRef((props,ref) => {
             <View>
                 <TextInput
                     style={{
-                        textAlign: 'right'
+                        textAlign: 'right',
+                        color: colors.gray800
                     }}
                     placeholder="$0.00"
                     value={(state.singleAmount ?? 0) === 0 ? '' : state.singleAmount + ''}
@@ -290,6 +291,7 @@ const styles = StyleSheet.create({
     },
     remark_style: {
         fontSize: scale(14),
+        color: colors.gray800,
         padding: 0,
         margin: 0
     }

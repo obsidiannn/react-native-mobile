@@ -10,9 +10,7 @@ import appMigrations from './model/migrations'
 
 import IMessageModel from './model/Message'
 import UserModel from './model/User';
-import fs from 'react-native-fs'
 
-import * as FileSystem from 'expo-file-system';
 if (__DEV__) {
 	console.log(`📂 ${appGroupPath}`);
 }

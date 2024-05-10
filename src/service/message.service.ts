@@ -6,7 +6,7 @@ import userService from "./user.service";
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import fileService, { format, formatVideo, uploadFile } from "./file.service";
 import { DataType, IMessage, IMessageRedPacket, IMessageSwap, IMessageTypeMap } from "@/components/chat/input-toolkit/types";
-import { MessageTypeEnum } from "@/api/types/enums";
+import { IMessageTypeValueEnum, MessageTypeEnum } from "@/api/types/enums";
 import { MessageDetailItem, MessageExtra, MessageListItem } from "@/api/types/message";
 import { WalletRemitReq, WalletRemitResp } from "@/api/types/wallet";
 import walletApi from '@/api/v2/wallet'
@@ -48,11 +48,16 @@ const doRemit = async (req: WalletRemitReq, key: string, swapType: 'swap' | 'gsw
 
 // 發紅包消息
 const doRedPacket = async (req: RedPacketCreateReq, key: string, packetType: 'packet' | 'gpacket'): Promise<RedPacketInfo> => {
+    let objUId
+    if(req.objUIds && req.objUIds.length > 0){
+        objUId = req.objUIds[0]
+    }
     const data: IMessageRedPacket = {
         remark: req.remark,
         sender: req.sender ?? '',
         packetId: '',
-        type: req.type
+        type: req.type,
+        objUId: objUId
     }
     const rpReq: RedPacketCreateReq = {
         ...req,
@@ -252,11 +257,12 @@ const getListFromDb = async (
         limit: limit
     }
     const list = await messageQueryPage(queryParam)
-    
-    const result = list.map(l=>{
+
+    const result = list.map(l => {
         const _data = decrypt(key, l.data ?? '');
         const _d = _data.d as IMessageTypeMap[DataType]
-        if (l.type === MessageTypeEnum.RED_PACKET) {
+        if (l.type === IMessageTypeValueEnum.GPACKET || l.type === IMessageTypeValueEnum.PACKET ) {
+            console.log('packet==',_d);
             _d.packetId = l.packetId
         }
         return {
@@ -264,7 +270,7 @@ const getListFromDb = async (
             data: _d
         }
     })
-    console.log('讀取',result);
+    console.log('讀取', result);
     return result
 }
 
@@ -274,12 +280,44 @@ const checkDiffFromWb = (
     direction: string,
     _limit: number
 ): { seq: number, limit: number } => {
+
     if (data !== undefined && data !== null && data.length > 0) {
-        const lastSeq = data[data.length - 1].sequence ?? 1
-        if (data.length === _limit || lastSeq <= 1) {
-            return { seq: 0, limit: -1 }
+        const up: boolean = direction === 'up'
+        const success = { seq: 0, limit: -1 }
+        const min = data[data.length - 1].sequence ?? 1
+        const max = data[0].sequence ?? 1
+        console.log('max=', max, 'min=', min);
+        console.log('seq=', _seq);
+
+
+        if (up) {
+            const targetSeq = _seq - _limit <= 0 ? 1 : _seq - _limit
+            // 完全取得
+            if (max === _seq) {
+                if (data.length === _limit || min === 1) {
+                    return success
+                }
+            }
+            // 部分取得
+            if (max < _seq) {
+                return { seq: _seq, limit: _seq - max }
+            }
+            if (min > targetSeq) {
+                return { seq: min - 1, limit: min - targetSeq }
+            }
+        } else {
+            const targetSeq = _seq + _limit
+            // 完全取得
+            if (min === _seq && data.length === _limit || min === 1) {
+                return success
+            }
+            // 部分取得
+            if (max < targetSeq) {
+                return { seq: max + 1, limit: targetSeq - max }
+            }
+            return success
         }
-        return { seq: lastSeq, limit: _limit - data.length }
+
     }
     return { seq: _seq, limit: _limit }
 }
@@ -298,7 +336,7 @@ const getList = async (
     sequence: number,
     direction: 'up' | 'down',
 ): Promise<IMessage<DataType>[]> => {
-    
+
     // await deleteMessageByChatId(chatId)
     const list = await getMessageDetails(chatId, key, sequence, direction)
     const userIds: string[] = []
@@ -327,10 +365,10 @@ const getMessageDetails = async (
         return []
     }
     const _limit = 20
-    const list = await getListFromDb(chatId, sequence, direction, _limit,key)
+    const list:IMessage<DataType>[] = await getListFromDb(chatId, sequence, direction, _limit, key)
     const checkResult = checkDiffFromWb(list, sequence, direction, _limit)
-    console.log('檢查',checkResult);
-    
+    console.log('檢查', checkResult);
+
     if (checkResult.limit < 0) {
         // 無需請求遠端
         return list
@@ -358,7 +396,7 @@ const getMessageDetails = async (
     details.items.forEach(d => {
         messageHash.set(d.id, d)
     })
-    const remoteData = data.items.map(item => {
+    const remoteData:IMessage<DataType>[] = data.items.map(item => {
         const detail = messageHash.get(item.msgId)
         const _data = decrypt(key, detail?.content ?? '');
         const t = _data.t as DataType;
@@ -367,7 +405,6 @@ const getMessageDetails = async (
 
         if (detail?.type === MessageTypeEnum.RED_PACKET) {
             const extra = JSON.parse(String(detail.extra));
-            console.log('packetId ===', extra.id);
             _d.packetId = extra.id
         }
 
@@ -382,8 +419,21 @@ const getMessageDetails = async (
             uid: detail?.fromUid
         };
     })
-    messageSaveBatch(remoteData, chatId)
-    return list.concat(remoteData)
+    if(remoteData.length > 0){
+        messageSaveBatch(remoteData, chatId)
+        console.log('remote data',remoteData);
+        console.log('list data',list);
+        if(list.length <= 0){
+            return remoteData
+        }
+        const maxSeq = remoteData[0].sequence??0
+        if((maxSeq) > (list[0].sequence?? 1)){
+            return remoteData.concat(list)
+        }else{
+            return list.concat(remoteData)
+        }
+    }
+    return list
 };
 
 

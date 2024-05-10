@@ -12,6 +12,7 @@ import UserInfo from "./components/user-info";
 import { Image } from "@/components/image";
 import friendService from "@/service/friend.service";
 import { RootStackParamList } from "@/types";
+import { FriendApplyStatusEnum } from "@/api/types/enums";
 type Props = StackScreenProps<RootStackParamList, 'InviteInfo'>;
 
 const InviteInfoScreen = ({ navigation, route }: Props) => {
@@ -38,6 +39,8 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             const authUid = globalThis.wallet?.address??''
+            console.log('驗證',route.params);
+            
             const isSelf = authUid === route.params.obj_uid
             setInfo({
                 id: route.params.id,
@@ -87,7 +90,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                     </View> : null}
                 </View>
                 <View style={styles.actionContainer}>
-                    {info.status === 1 && !info.isSelf ? <>
+                    {info.status === FriendApplyStatusEnum.PENDING && info.isSelf ? <>
                         <Button size="large" style={styles.accpetButton} backgroundColor={colors.primary} onPress={() => {
                             if (loading) {
                                 return
@@ -118,7 +121,7 @@ const InviteInfoScreen = ({ navigation, route }: Props) => {
                             color: colors.primary,
                         }} label="拒絕" />
                     </> : null}
-                    {info.status === 1 && info.isSelf ? <Button disabled={true} size="large" style={styles.waitButton} backgroundColor={colors.primary} label="等待驗證" /> : null}
+                    {info.status === FriendApplyStatusEnum.PENDING &&!info.isSelf ? <Button disabled={true} size="large" style={styles.waitButton} backgroundColor={colors.primary} label="等待驗證" /> : null}
                 </View>
             </ScrollView>
         </View>

@@ -28,8 +28,6 @@ import PacketDetail, { RedPacketDetailModalType } from "@/screens/red-packet/pac
 import { ChatDetailItem } from "@/api/types/chat";
 import EventManager from '@/lib/events'
 import { SocketMessageEvent } from "@/api/types/message";
-import { FlatList } from "react-native-gesture-handler";
-import { id } from "ethers";
 
 export interface ChatPageRef {
     init: (chatId: string,
@@ -67,11 +65,21 @@ export default forwardRef((props, ref) => {
             return;
         }
         loadingRef.current = true
-        const seq = direction == 'up' ? firstSeq.current : lastSeq.current;
-        
-        if (!init && (firstSeq.current <= (chatItem?.firstSequence??1))) {
-            return
+        let seq = direction == 'up' ? firstSeq.current : lastSeq.current;
+
+        if (!init) {
+            if (direction === 'up') {
+                seq -= 1
+                if (seq <= (chatItem?.firstSequence ?? 1)) {
+                    return
+                }
+            } else {
+                seq += 1
+            }
         }
+        console.log('load group', direction, seq);
+
+
         return messageService.getList(
             conversationIdRef.current,
             sharedSecretRef.current,
@@ -117,9 +125,9 @@ export default forwardRef((props, ref) => {
                         lastSeq.current = ls
                         if (_data.length > 0) {
                             setMessages((items) => {
-                                return items.concat(_data);
+                                return _data.concat(items);
                             });
-                            messageListRef.current?.scrollToEnd()
+                            messageListRef.current?.scrollToIndex(lastSeq.current)
                         }
                     }
                 }
@@ -189,7 +197,7 @@ export default forwardRef((props, ref) => {
     const close = useCallback(() => {
         const _eventKey = EventManager.generateKey(SocketTypeEnum.MESSAGE, conversationIdRef.current)
         EventManager.removeListener(_eventKey, handleEvent)
-        
+
         setMessages([]);
         firstSeq.current = 0;
         lastSeq.current = 0;

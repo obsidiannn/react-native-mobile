@@ -23,14 +23,14 @@ const UnlockScreen = ({ navigation,route }: Props) => {
     const [,setCurrent] = useRecoilState(atomCurrentUser)
 
     useEffect(() => {
-        (async () => {
-            const oneWallet = await readAccount('111111');
-            setNowAccount(oneWallet);
-            globalThis.wallet = oneWallet;
-            console.log('oneWallet', oneWallet.address);
-            navigation.popToTop();
-            navigation.replace('AuthStackNav');
-        })();
+        // (async () => {
+        //     const oneWallet = await readAccount('111111');
+        //     setNowAccount(oneWallet);
+        //     globalThis.wallet = oneWallet;
+        //     console.log('oneWallet', oneWallet.address);
+        //     navigation.popToTop();
+        //     navigation.replace('AuthStackNav');
+        // })();
     }, []);
     return (
         <SafeAreaView style={styles.container}>

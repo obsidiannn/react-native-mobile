@@ -91,6 +91,7 @@ export default forwardRef((_, ref) => {
                             paddingLeft: 0,
                             height: scale(64),
                             fontSize: scale(32),
+                            color: colors.gray800,
                             borderBottomColor: colors.gray100,
                             borderBottomWidth: scale(1)
                         }}
@@ -117,6 +118,7 @@ export default forwardRef((_, ref) => {
                     style={{
                         padding: scale(8),
                         fontSize: scale(14),
+                        color: colors.gray800,
                     }}
                     maxLength={140}
                     value={remark}

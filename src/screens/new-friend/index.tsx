@@ -12,31 +12,40 @@ import friendApi from "@/api/v2/friend";
 import { FriendInviteApplyItem } from '@/api/types/friend'
 import { RootStackParamList } from "@/types";
 import userService from "@/service/user.service";
+import { Text } from "react-native";
 
-const NewFriendScreen = ({navigation }: Props) => {
+const NewFriendScreen = ({ navigation }: Props) => {
     const insets = useSafeAreaInsets();
     const [items, setItems] = useState<FriendInviteApplyItem[]>([]);
-    useEffect(()=>{
+    useEffect(() => {
+        const selfId = globalThis.wallet?.address
         const unsubscribe = navigation.addListener('focus', async () => {
             const res = await friendApi.getInviteList()
-                
-                if(res.items.length > 0){
-                const uids = res.items.map(i=>i.objUid)
+            const resResult = await friendApi.getApplyList()
+
+            const list = (res.items ?? []).concat(resResult.items ?? [])
+            if (list.length > 0) {
+                const uids:string[] = []
+                list.forEach(l=>{
+                    uids.push(l.uid)
+                    uids.push(l.objUid)
+                })
                 const userHash = await userService.getUserHash(uids)
                 let change = false
-                res.items.forEach(ri=>{
-                    const user = userHash.get(ri.objUid)
-                    if(user){
+                list.forEach(ri => {
+                    const user = userHash.get(ri.objUid === selfId? ri.uid: ri.objUid)
+                    ri.isSelf = ri.objUid === selfId
+                    if (user) {
                         change = true
                         ri.avatar = user.avatar
                         ri.name = user.name
                     }
                 })
-                    setItems(res.items);
-                }
+                setItems(list);
+            }
         });
         return unsubscribe;
-    },[navigation])
+    }, [navigation])
     return (
         <View style={{
             ...styles.container,
@@ -44,7 +53,7 @@ const NewFriendScreen = ({navigation }: Props) => {
             paddingBottom: insets.bottom,
         }}>
             <View>
-                <Navbar renderRight={() => <NavbarRight/>} title="新的好友" />
+                <Navbar renderRight={() => <NavbarRight />} title="新的好友" />
             </View>
             <View style={styles.listContainer}>
                 <FlashList
@@ -63,10 +72,10 @@ export default NewFriendScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-            backgroundColor: 'white',
+        backgroundColor: 'white',
     },
     listContainer: {
         flex: 1,
-        width: '100%' 
+        width: '100%'
     }
 })

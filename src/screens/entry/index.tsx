@@ -25,11 +25,11 @@ export default ({ navigation }: StackScreenProps<RootStackParamList, 'Entry'>) =
         setProtocols([
             {
                 name: '《隱私協議》',
-                url: 'https://www.baidu.com'
+                url: 'https://pages.ducloud.buzz/#/user-agreement'
             },
             {
                 name: '《可接受條款》',
-                url: 'https://sina.com'
+                url: 'https://pages.ducloud.buzz/#/privacy-policy'
             },
         ]);
         init();
@@ -47,8 +47,8 @@ export default ({ navigation }: StackScreenProps<RootStackParamList, 'Entry'>) =
                     <Image style={styles.logo} source={require('../../assets/logo.svg')} />
                 </View>
                 <View style={styles.sloganContainer}>
-                    <Text style={styles.sloganPrimaryText}>歡迎使用  BOBO</Text>
-                    <Text style={styles.sloganNormalText}>享受自由的世界</Text>
+                    <Text style={styles.sloganPrimaryText}>歡迎使用</Text>
+                    {/* <Text style={styles.sloganNormalText}>享受自由的世界</Text> */}
                 </View>
             </View>
             <View style={styles.bottomContainer}>
