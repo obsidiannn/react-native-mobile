@@ -1,15 +1,14 @@
 import fileService from "@/service/file.service";
-import { Dimensions } from 'react-native'
-import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
-import { Modal, Pressable, Text, ActivityIndicator, TouchableOpacity, StyleSheet } from "react-native";
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Modal, StyleSheet } from "react-native";
 import Navbar from "@/components/navbar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { View } from "react-native-ui-lib";
 import { scale } from "react-native-size-matters/extend";
-import Video, { VideoRef } from 'react-native-video'
 import toast from "@/lib/toast";
 import { IMessageVideo } from "./input-toolkit/types";
-import { TouchableWithoutFeedback } from "react-native";
+
+import { Video } from 'expo-av'
 
 export interface EncVideoPreviewVideo {
     thumbnail: string;
@@ -30,24 +29,16 @@ export default forwardRef((_, ref) => {
     const insets = useSafeAreaInsets();
     const [visible, setVisible] = useState(false);
     const [encKey, setEncKey] = useState("");
-    const videoRef = useRef<VideoRef>(null);
     const [data, setData] = useState<string>();
     const [loading, setLoading] = useState(true);
+    const videoRef = useRef(null)
 
-    const [paused, setPaused] = useState(false)
-    const [duration, setDuration] = useState(0)
-    const [videoProgress, setVideoProgress] = useState<{ progress: number, current: number }>({
-        progress: 0, current: 0
-    })
-
-
-    const loadVideo = useCallback(async (video: IMessageVideo,sharedKey: string) => {
+    const loadVideo = useCallback(async (video: IMessageVideo, sharedKey: string) => {
         const path = video.path ?? (video.trans ?? video.original)
         if (!path || path === '') {
             toast('數據異常')
             return
         }
-        setDuration(video.duration)
 
         if (path.startsWith('file://')) {
             if (await fileService.checkExist(path)) {
@@ -66,60 +57,22 @@ export default forwardRef((_, ref) => {
             toast('下載失敗');
             return;
         }
-        console.log('[video] key=',sharedKey);
-        
+        console.log('[video] key=', sharedKey);
+
         console.log('file is', decodePath);
         console.log('original md5:', video.o_md5);
         console.log('target md5', (await fileService.getFileInfo(decodePath)).md5);
 
-
         setData(decodePath)
-        // const originalPath = 'file:///data/user/0/com.tdchat/cache//03b3782126aaaa53202bb447_trans.mp4'
-        // const path = await fileService.fileSpliteEncode(originalPath,encKey)
-        // const decodePath = await fileService.videoSplitDecode(path.path, encKey) ?? null;
-        // console.log('path: ',decodePath);
-        // console.log('原始MD5:',path.md5)
-        // setData(decodePath??'')
-    },[encKey])
+    }, [])
 
-    //自定義進度條
-    const onProgress = (data: any) => {
-        if (paused) {
-            return
+    const handlePlayStatusUpdate = playStatus => {
+        if (playStatus.didJustFinish) {
+            videoRef.current?.setPositionAsync(0)
+            videoRef.current?.pauseAsync()
         }
-        let currentTime = data.currentTime;
-        let percent = 0;
-
-        if (duration !== 0) {
-            percent = Number((currentTime / duration).toFixed(2));
-        } else {
-            percent = 0
-        }
-
-        setVideoProgress({
-            progress: percent,
-            current: currentTime
-        })
     }
 
-    //視頻結束顯示重新播放按鈕
-    const onEnd = () => {
-        setVideoProgress({
-            progress: 1,
-            current: 1
-        })
-        setPaused(true)
-    }
-    //點擊按鈕重新播放
-    const _replay = () => {
-        if (videoProgress.progress == 1) {
-            videoRef.current.seek(0)
-        }
-        setPaused(false)
-    }
-    const onError = (e) => {
-        console.log(e);
-    }
     useImperativeHandle(ref, () => ({
         open: (params: {
             encKey: string;
@@ -132,7 +85,7 @@ export default forwardRef((_, ref) => {
                 setVisible(true);
                 setEncKey(params.encKey);
                 try {
-                    await loadVideo(params.video,params.encKey)
+                    await loadVideo(params.video, params.encKey)
                     setLoading(false)
                 } finally {
                     setLoading(false)
@@ -140,6 +93,7 @@ export default forwardRef((_, ref) => {
             })()
         }
     }));
+
     return <Modal visible={visible} animationType="slide" style={{
         flex: 1,
         backgroundColor: 'black',
@@ -151,48 +105,17 @@ export default forwardRef((_, ref) => {
             paddingBottom: insets.bottom,
         }}>
             <Navbar theme="dark" title="視頻預覽" onLeftPress={() => setVisible(false)} />
-            <TouchableWithoutFeedback
-                onPress={() => {
-                    setPaused(!paused)
-                }}>
-                <Video
-                    style={styles.videoStyle}
-                    source={{ uri: data, type: 'mp4' }}
-                    ref={videoRef}
-                    resizeMode='contain'
-                    paused={paused}
-                    onProgress={onProgress}
-                    onEnd={onEnd}
-                    onError={onError}
-                />
-            </TouchableWithoutFeedback>
-            {/* 進度條 */}
-            <View style={styles.progressBox}>
-                <View style={[styles.progress, { width: Dimensions.get('window').width * videoProgress.progress }]}></View>
-            </View>
-
-            {loading ? (
-                <View style={styles.wrap2}>
-                    <Text style={styles.loadingStyle}>
-                        <ActivityIndicator size={30} color="white" />
-                    </Text>
-                </View>
-            ) : null}
-
-            {
-                paused ?
-                    <TouchableOpacity style={styles.wrap2}
-                        onPress={_replay}
-                    >
-
-                        <View style={styles.play}>
-                            <Text style={{ color: '#ccc', fontSize: 30, lineHeight: 50, marginLeft: 5, marginBottom: 5 }} >▶</Text>
-                        </View>
-                    </TouchableOpacity>
-                    : <View></View>
-            }
+            <Video
+                ref={videoRef}
+                style={styles.videoStyle}
+                source={{ uri: data ?? '', type: 'mp4' }}
+                useNativeControls
+                shouldPlay
+                onPlaybackStatusUpdate={handlePlayStatusUpdate}
+                volume={1.0}
+                rate={1.0}
+            />
         </View>
-
     </Modal>
 });
 
@@ -204,14 +127,9 @@ var styles = StyleSheet.create({
     },
     videoStyle: {
         flex: 1,
-        // position: 'absolute',
-        // backgroundColor: 'blue',
-        // top:0,
-        // left: 0,
-        // bottom: 0,
-        // right: 0,
-        // width: 200,
-        // height: 200
+        justifyContent: 'center',
+        alignItems: 'center'
+
     },
     progressBox: {
         width: '100%',

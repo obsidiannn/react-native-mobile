@@ -342,8 +342,8 @@ const fileSpliteEncode = async (fileKey: string,localPath: string,encKey: string
 const fileSplitDecode = async (targetPath: string,localPath: string, encKey: string): Promise<string | null> => {
     const exists = await RNFS.exists(targetPath);
     if (exists) {
-        return targetPath
-        // await RNFS.unlink(targetPath)
+        // return targetPath
+        await RNFS.unlink(targetPath)
     }
     const encodeFile = await FileSystem.getInfoAsync(localPath,{size: true,md5: true})
     const total = encodeFile.size    
