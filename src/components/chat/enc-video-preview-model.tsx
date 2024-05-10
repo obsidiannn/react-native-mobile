@@ -11,7 +11,6 @@ import toast from "@/lib/toast";
 import { IMessageVideo } from "./input-toolkit/types";
 import { TouchableWithoutFeedback } from "react-native";
 
-
 export interface EncVideoPreviewVideo {
     thumbnail: string;
     original: string;
@@ -35,43 +34,45 @@ export default forwardRef((_, ref) => {
     const [data, setData] = useState<string>();
     const [loading, setLoading] = useState(true);
 
-    const [paused,setPaused] = useState(false)
-    const [duration,setDuration] = useState(0)
-    const [videoProgress,setVideoProgress] = useState<{progress:number,current: number}>({
-        progress: 0,current: 0
+    const [paused, setPaused] = useState(false)
+    const [duration, setDuration] = useState(0)
+    const [videoProgress, setVideoProgress] = useState<{ progress: number, current: number }>({
+        progress: 0, current: 0
     })
 
-   
-    const loadVideo = async (video: IMessageVideo) => {
-        const path = video.path ?? (video.trans?? video.original)
-        if(!path ||path === '')        {
+
+    const loadVideo = useCallback(async (video: IMessageVideo,sharedKey: string) => {
+        const path = video.path ?? (video.trans ?? video.original)
+        if (!path || path === '') {
             toast('數據異常')
             return
         }
         setDuration(video.duration)
-        
-        if(path.startsWith('file://')){
-            if(await fileService.checkExist(path)){
+
+        if (path.startsWith('file://')) {
+            if (await fileService.checkExist(path)) {
                 console.log('使用原始文件');
                 setData(path)
-                return 
+                return
             } else {
                 toast('數據異常')
                 return
             }
         }
-        console.log('視頻預覽',path);
-        
-        const decodePath = await fileService.decodeVideo(path, encKey) ?? null;
+        console.log('視頻預覽', path);
+
+        const decodePath = await fileService.decodeVideo(path, sharedKey) ?? null;
         if (decodePath === null) {
             toast('下載失敗');
             return;
         }
-        console.log('file is',decodePath);
-        console.log('original md5:',video.o_md5);
+        console.log('[video] key=',sharedKey);
+        
+        console.log('file is', decodePath);
+        console.log('original md5:', video.o_md5);
         console.log('target md5', (await fileService.getFileInfo(decodePath)).md5);
-        
-        
+
+
         setData(decodePath)
         // const originalPath = 'file:///data/user/0/com.tdchat/cache//03b3782126aaaa53202bb447_trans.mp4'
         // const path = await fileService.fileSpliteEncode(originalPath,encKey)
@@ -79,23 +80,22 @@ export default forwardRef((_, ref) => {
         // console.log('path: ',decodePath);
         // console.log('原始MD5:',path.md5)
         // setData(decodePath??'')
-    }
+    },[encKey])
 
-     //自定義進度條
-     const onProgress = (data:any)=>{
-        if(paused){
-            return 
+    //自定義進度條
+    const onProgress = (data: any) => {
+        if (paused) {
+            return
         }
-        let currentTime=data.currentTime;
-        let percent=0;
+        let currentTime = data.currentTime;
+        let percent = 0;
 
-        if(duration!==0)
-        {
-            percent=Number((currentTime/duration).toFixed(2));
-        }else{
-            percent=0
+        if (duration !== 0) {
+            percent = Number((currentTime / duration).toFixed(2));
+        } else {
+            percent = 0
         }
-        
+
         setVideoProgress({
             progress: percent,
             current: currentTime
@@ -103,7 +103,7 @@ export default forwardRef((_, ref) => {
     }
 
     //視頻結束顯示重新播放按鈕
-    const onEnd=()=> {
+    const onEnd = () => {
         setVideoProgress({
             progress: 1,
             current: 1
@@ -111,14 +111,13 @@ export default forwardRef((_, ref) => {
         setPaused(true)
     }
     //點擊按鈕重新播放
-    const _replay = ()=>{
-        if(videoProgress.progress==1)
-        {
+    const _replay = () => {
+        if (videoProgress.progress == 1) {
             videoRef.current.seek(0)
         }
         setPaused(false)
     }
-    const onError = (e) =>{
+    const onError = (e) => {
         console.log(e);
     }
     useImperativeHandle(ref, () => ({
@@ -127,15 +126,15 @@ export default forwardRef((_, ref) => {
             video: IMessageVideo;
             initialIndex?: number;
         }) => {
-            console.log('open::',params.video.path);
-            
+            console.log('open::', params.video.path);
+
             (async () => {
                 setVisible(true);
                 setEncKey(params.encKey);
-                try{
-                    await loadVideo(params.video)
+                try {
+                    await loadVideo(params.video,params.encKey)
                     setLoading(false)
-                }finally{
+                } finally {
                     setLoading(false)
                 }
             })()
@@ -153,12 +152,12 @@ export default forwardRef((_, ref) => {
         }}>
             <Navbar theme="dark" title="視頻預覽" onLeftPress={() => setVisible(false)} />
             <TouchableWithoutFeedback
-                    onPress={()=>{
-                        setPaused(!paused)
-                    }}>
-                <Video 
+                onPress={() => {
+                    setPaused(!paused)
+                }}>
+                <Video
                     style={styles.videoStyle}
-                    source={{uri: data,type: 'mp4'}}
+                    source={{ uri: data, type: 'mp4' }}
                     ref={videoRef}
                     resizeMode='contain'
                     paused={paused}
@@ -167,30 +166,30 @@ export default forwardRef((_, ref) => {
                     onError={onError}
                 />
             </TouchableWithoutFeedback>
-             {/* 進度條 */}
-             <View style={styles.progressBox}>
-                <View style={[styles.progress,{width:Dimensions.get('window').width*videoProgress.progress}]}></View>
+            {/* 進度條 */}
+            <View style={styles.progressBox}>
+                <View style={[styles.progress, { width: Dimensions.get('window').width * videoProgress.progress }]}></View>
             </View>
-            
+
             {loading ? (
-                <View style={styles.wrap2}> 
-                <Text style={styles.loadingStyle}>
-                    <ActivityIndicator  size={30} color="white" />
-                </Text>
-                 </View>
-            ):null}
+                <View style={styles.wrap2}>
+                    <Text style={styles.loadingStyle}>
+                        <ActivityIndicator size={30} color="white" />
+                    </Text>
+                </View>
+            ) : null}
 
             {
-                paused? 
-                <TouchableOpacity style={styles.wrap2}
-                    onPress={_replay}
-                >
-                   
-                    <View style={styles.play}>
-                        <Text style={{color:'#ccc',fontSize:30,lineHeight:50,marginLeft:5,marginBottom:5}} >▶</Text>
-                    </View>
-                </TouchableOpacity>
-                :<View></View>
+                paused ?
+                    <TouchableOpacity style={styles.wrap2}
+                        onPress={_replay}
+                    >
+
+                        <View style={styles.play}>
+                            <Text style={{ color: '#ccc', fontSize: 30, lineHeight: 50, marginLeft: 5, marginBottom: 5 }} >▶</Text>
+                        </View>
+                    </TouchableOpacity>
+                    : <View></View>
             }
         </View>
 
@@ -203,10 +202,10 @@ var styles = StyleSheet.create({
         textAlign: 'center',
         verticalAlign: 'middle'
     },
-    videoStyle:{
+    videoStyle: {
         flex: 1,
         // position: 'absolute',
-        backgroundColor: 'blue',
+        // backgroundColor: 'blue',
         // top:0,
         // left: 0,
         // bottom: 0,
@@ -214,31 +213,31 @@ var styles = StyleSheet.create({
         // width: 200,
         // height: 200
     },
-    progressBox:{
-        width:'100%',
-        height:scale(3),
-        backgroundColor:'#ccc'
+    progressBox: {
+        width: '100%',
+        height: scale(3),
+        backgroundColor: '#ccc'
     },
-    progress:{
-        width:scale(1),
-        height:scale(2),
-        backgroundColor:'green'
+    progress: {
+        width: scale(1),
+        height: scale(2),
+        backgroundColor: 'green'
     },
-    wrap2:{
-        position:'absolute',
+    wrap2: {
+        position: 'absolute',
         height: '100%',
         width: '100%',
-        justifyContent:'center',
-        alignItems:'center',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    play:{
-        height:scale(50),
-        width:scale(50),
-        resizeMode:'contain',
-        borderWidth:1,
-        borderColor:'#ccc',
-        borderRadius:50,
-        justifyContent:'center',
-        alignItems:'center',
+    play: {
+        height: scale(50),
+        width: scale(50),
+        resizeMode: 'contain',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
     }
-  });
+});
